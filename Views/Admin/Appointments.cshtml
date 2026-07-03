@@ -1,0 +1,184 @@
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewBag.Title = "Duyệt Lịch Hẹn";
+    ViewBag.ActiveMenu = "Appointments";
+    ViewBag.PageTitle = "Duyệt Lịch Hẹn";
+    ViewBag.PageSubtitle = "Quản lý tất cả lịch đặt từ bệnh nhân";
+}
+
+@section TopbarActions {
+    <button class="btn-icon" onclick="loadAppointments()" aria-label="Làm mới"><i class="bi bi-arrow-clockwise"></i></button>
+}
+
+
+
+      <!-- Stat Cards -->
+      <div class="row g-3 mb-4">
+        <div class="col-6 col-lg-3">
+          <div style="background:var(--warning-light);border-radius:var(--radius-md);padding:16px;text-align:center;">
+            <div style="font-size:var(--text-2xl);font-weight:800;color:var(--warning-dark);" id="countPending">-</div>
+            <div style="font-size:var(--text-xs);color:var(--warning-dark);font-weight:600;">Chờ duyệt</div>
+          </div>
+        </div>
+        <div class="col-6 col-lg-3">
+          <div style="background:var(--success-light);border-radius:var(--radius-md);padding:16px;text-align:center;">
+            <div style="font-size:var(--text-2xl);font-weight:800;color:var(--success-dark);" id="countApproved">-</div>
+            <div style="font-size:var(--text-xs);color:var(--success-dark);font-weight:600;">Đã duyệt</div>
+          </div>
+        </div>
+        <div class="col-6 col-lg-3">
+          <div style="background:var(--info-light);border-radius:var(--radius-md);padding:16px;text-align:center;">
+            <div style="font-size:var(--text-2xl);font-weight:800;color:var(--info-dark);" id="countCompleted">-</div>
+            <div style="font-size:var(--text-xs);color:var(--info-dark);font-weight:600;">Hoàn thành</div>
+          </div>
+        </div>
+        <div class="col-6 col-lg-3">
+          <div style="background:var(--danger-light);border-radius:var(--radius-md);padding:16px;text-align:center;">
+            <div style="font-size:var(--text-2xl);font-weight:800;color:var(--danger-dark);" id="countCancelled">-</div>
+            <div style="font-size:var(--text-xs);color:var(--danger-dark);font-weight:600;">Đã hủy</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filter -->
+      <div class="card-medical p-3 mb-4">
+        <div class="d-flex flex-wrap gap-2">
+          <button class="btn-ghost filter-btn active" data-filter="" onclick="filterStatus('')">Tất cả</button>
+          <button class="btn-ghost filter-btn" data-filter="pending" onclick="filterStatus('pending')">🟡 Chờ duyệt</button>
+          <button class="btn-ghost filter-btn" data-filter="approved" onclick="filterStatus('approved')">🟢 Đã duyệt</button>
+          <button class="btn-ghost filter-btn" data-filter="completed" onclick="filterStatus('completed')">🔵 Hoàn thành</button>
+          <button class="btn-ghost filter-btn" data-filter="cancelled" onclick="filterStatus('cancelled')">🔴 Đã hủy</button>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="card-medical p-4">
+        <div class="table-responsive-medical">
+          <table class="table-medical">
+            <thead>
+              <tr>
+                <th>Mã đặt lịch</th>
+                <th>Bệnh nhân</th>
+                <th>SĐT</th>
+                <th>Bác sĩ</th>
+                <th>Chuyên khoa</th>
+                <th>Ngày khám</th>
+                <th>Giờ</th>
+                <th>Trạng thái</th>
+                <th style="width:140px;">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody id="appointmentsTable"></tbody>
+    </div>
+
+
+
+@section Scripts {
+  <script>
+    App.requireAuth(['admin']);
+    let currentFilter = '';
+
+    function filterStatus(status) {
+      currentFilter = status;
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.filter === status);
+        if (btn.dataset.filter === status) {
+          btn.style.background = 'var(--primary-50)';
+          btn.style.color = 'var(--primary-600)';
+        } else {
+          btn.style.background = '';
+          btn.style.color = '';
+        }
+      });
+      loadAppointments();
+    }
+
+    async function loadAppointments() {
+      const tbody = document.getElementById('appointmentsTable');
+      App.showTableLoading(tbody, 9, 5);
+
+      const allAppointments = await API.getAppointments();
+      const filtered = currentFilter ? allAppointments.filter(a => a.status === currentFilter) : allAppointments;
+
+      // Update counts
+      document.getElementById('countPending').textContent = allAppointments.filter(a => a.status === 'pending').length;
+      document.getElementById('countApproved').textContent = allAppointments.filter(a => a.status === 'approved').length;
+      document.getElementById('countCompleted').textContent = allAppointments.filter(a => a.status === 'completed').length;
+      document.getElementById('countCancelled').textContent = allAppointments.filter(a => a.status === 'cancelled').length;
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><div class="empty-icon">📋</div><h5>Không có lịch hẹn</h5><p>Chưa có lịch hẹn nào ${currentFilter ? 'với trạng thái này' : ''}</p></div></td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(apt => `
+        <tr id="row-${apt.id}" class="status-transition">
+          <td style="font-family:var(--font-mono);font-weight:700;font-size:var(--text-xs);color:var(--primary-600);">${apt.bookingId}</td>
+          <td style="font-weight:600;">${apt.patientName}</td>
+          <td style="font-size:var(--text-sm);">${apt.phone}</td>
+          <td style="font-size:var(--text-sm);">${apt.doctorName}</td>
+          <td><span class="badge-medical badge-approved" style="font-size:11px;"><span class="status-dot"></span>${apt.specialty}</span></td>
+          <td style="font-size:var(--text-sm);">${App.formatDate(apt.date)}</td>
+          <td style="font-weight:600;color:var(--primary-600);">${apt.time}</td>
+          <td id="status-${apt.id}">${App.renderStatusBadge(apt.status)}</td>
+          <td>
+            <div class="d-flex gap-1" id="actions-${apt.id}">
+              ${apt.status === 'pending' ? `
+                <button class="btn-success-medical" onclick="approveAppointment('${apt.id}')" style="font-size:12px;padding:4px 10px;">
+                  Duyệt ✅
+                </button>
+                <button class="btn-danger-medical" onclick="cancelAppointment('${apt.id}')" style="font-size:12px;padding:4px 10px;">
+                  Hủy ❌
+                </button>
+              ` : '<span style="color:var(--text-muted);font-size:var(--text-xs);">—</span>'}
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function approveAppointment(id) {
+      const row = document.getElementById(`row-${id}`);
+      row.classList.add('changing');
+      try {
+        await API.updateAppointmentStatus(id, 'approved');
+        document.getElementById(`status-${id}`).innerHTML = App.renderStatusBadge('approved');
+        document.getElementById(`actions-${id}`).innerHTML = '<span style="color:var(--text-muted);font-size:var(--text-xs);">—</span>';
+        row.classList.remove('changing');
+        App.toast.success('Đã duyệt!', 'Lịch hẹn đã được xác nhận');
+        const all = await API.getAppointments();
+        document.getElementById('countPending').textContent = all.filter(a => a.status === 'pending').length;
+        document.getElementById('countApproved').textContent = all.filter(a => a.status === 'approved').length;
+      } catch (err) {
+        row.classList.remove('changing');
+        App.toast.error('Lỗi', err.message);
+      }
+    }
+
+    async function cancelAppointment(id) {
+      App.confirm('Hủy lịch hẹn', 'Bạn có chắc muốn hủy lịch hẹn này?', async () => {
+        const row = document.getElementById(`row-${id}`);
+        row.classList.add('changing');
+        try {
+          await API.updateAppointmentStatus(id, 'cancelled');
+          document.getElementById(`status-${id}`).innerHTML = App.renderStatusBadge('cancelled');
+          document.getElementById(`actions-${id}`).innerHTML = '<span style="color:var(--text-muted);font-size:var(--text-xs);">—</span>';
+          row.classList.remove('changing');
+          App.toast.warning('Đã hủy', 'Lịch hẹn đã bị hủy');
+          const all = await API.getAppointments();
+          document.getElementById('countPending').textContent = all.filter(a => a.status === 'pending').length;
+          document.getElementById('countCancelled').textContent = all.filter(a => a.status === 'cancelled').length;
+        } catch (err) {
+          row.classList.remove('changing');
+          App.toast.error('Lỗi', err.message);
+        }
+      }, 'Hủy lịch');
+    }
+
+    loadAppointments();
+  </script>
+}
+
+
+
+

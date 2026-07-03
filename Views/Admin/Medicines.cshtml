@@ -1,0 +1,187 @@
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewBag.Title = "Quản Lý Kho Thuốc";
+    ViewBag.ActiveMenu = "Medicines";
+    ViewBag.PageTitle = "Quản Lý Kho Thuốc";
+    ViewBag.PageSubtitle = "Thêm, sửa, xóa danh mục thuốc";
+}
+
+@section TopbarActions {
+    <button class="btn-primary-medical" data-bs-toggle="modal" data-bs-target="#medicineModal" onclick="openAddModal()">
+          <i class="bi bi-plus-lg"></i> Thêm thuốc
+        </button>
+}
+
+<div class="card-medical p-4">
+        <div class="table-responsive-medical">
+          <table class="table-medical">
+            <thead>
+              <tr>
+                <th>Tên thuốc</th>
+                <th>Thành phần</th>
+                <th>Đơn vị tính</th>
+                <th>Hạn sử dụng</th>
+                <th style="width:120px;">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody id="medicinesTable">
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal fade" id="medicineModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content" style="border:none;border-radius:var(--radius-xl);overflow:hidden;">
+        <div class="modal-header" style="border-bottom:1px solid var(--bg-tertiary);padding:20px 24px;">
+          <h5 class="modal-title" id="modalTitle" style="font-weight:700;">Thêm Thuốc Mới</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+        </div>
+        <div class="modal-body" style="padding:24px;">
+          <form id="medicineForm" class="form-medical" novalidate>
+            <input type="hidden" id="editId">
+            <div class="mb-3">
+              <label class="form-label">Tên thuốc <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="medName" placeholder="VD: Paracetamol 500mg" required>
+              <div class="invalid-feedback">Vui lòng nhập tên thuốc</div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Thành phần</label>
+              <input type="text" class="form-control" id="medIngredients" placeholder="VD: Paracetamol">
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Đơn vị tính</label>
+                <select class="form-select" id="medUnit">
+                  <option value="Viên">Viên</option>
+                  <option value="Vỉ">Vỉ</option>
+                  <option value="Hộp">Hộp</option>
+                  <option value="Chai">Chai</option>
+                  <option value="Ống">Ống</option>
+                  <option value="Gói">Gói</option>
+                </select>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Hạn sử dụng</label>
+                <input type="date" class="form-control" id="medExpiryDate">
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer" style="border-top:1px solid var(--bg-tertiary);padding:16px 24px;">
+          <button type="button" class="btn-secondary-medical" data-bs-dismiss="modal">Hủy</button>
+          <button type="button" class="btn-primary-medical" id="saveBtn" onclick="saveMedicine()"><i class="bi bi-check-lg"></i> Lưu</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+@section Scripts {
+    <script>
+    const user = App.requireAuth(['admin']);
+    let editingId = null;
+
+    async function loadMedicines() {
+      const tbody = document.getElementById('medicinesTable');
+      App.showTableLoading(tbody, 5, 5);
+      const medicines = await API.getMedicines();
+
+      if (medicines.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">Không có dữ liệu thuốc</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = medicines.map(med => {
+        // Check if expired
+        let expiryBadge = '-';
+        if (med.expiryDate) {
+          const today = new Date();
+          const expDate = new Date(med.expiryDate);
+          const formattedDate = expDate.toLocaleDateString('vi-VN');
+          
+          if (expDate < today) {
+            expiryBadge = `<span class="badge-medical badge-cancelled"><i class="bi bi-exclamation-triangle me-1"></i>${formattedDate}</span>`;
+          } else {
+            expiryBadge = formattedDate;
+          }
+        }
+
+        return `
+          <tr>
+            <td style="font-weight:600; color:var(--text-primary);">${med.name}</td>
+            <td style="color:var(--text-secondary);">${med.ingredients || '-'}</td>
+            <td><span class="badge bg-light text-dark border">${med.unit || '-'}</span></td>
+            <td>${expiryBadge}</td>
+            <td>
+              <div class="d-flex gap-1">
+                <button class="btn-icon sm" onclick="openEditModal('${med.id}')" aria-label="Sửa" title="Sửa"><i class="bi bi-pencil"></i></button>
+                <button class="btn-icon sm" onclick="deleteMedicine('${med.id}','${med.name}')" aria-label="Xóa" title="Xóa" style="color:var(--danger)"><i class="bi bi-trash"></i></button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function openAddModal() {
+      editingId = null;
+      document.getElementById('modalTitle').textContent = 'Thêm Thuốc Mới';
+      document.getElementById('medicineForm').reset();
+      document.getElementById('medicineForm').classList.remove('was-validated');
+    }
+
+    async function openEditModal(id) {
+      editingId = id;
+      document.getElementById('modalTitle').textContent = 'Sửa Thông Tin Thuốc';
+      const medicines = await API.getMedicines();
+      const med = medicines.find(m => m.id === id);
+      if (!med) return;
+      
+      document.getElementById('medName').value = med.name;
+      document.getElementById('medIngredients').value = med.ingredients || '';
+      document.getElementById('medUnit').value = med.unit || 'Viên';
+      document.getElementById('medExpiryDate').value = med.expiryDate || '';
+      
+      new bootstrap.Modal(document.getElementById('medicineModal')).show();
+    }
+
+    async function saveMedicine() {
+      const form = document.getElementById('medicineForm');
+      if (!App.validateForm(form)) return;
+
+      const data = {
+        name: document.getElementById('medName').value.trim(),
+        ingredients: document.getElementById('medIngredients').value.trim(),
+        unit: document.getElementById('medUnit').value,
+        expiryDate: document.getElementById('medExpiryDate').value
+      };
+
+      try {
+        if (editingId) {
+          await API.updateMedicine(editingId, data);
+          App.toast.success('Thành công', 'Đã cập nhật thông tin thuốc');
+        } else {
+          await API.addMedicine(data);
+          App.toast.success('Thành công', 'Đã thêm thuốc mới vào kho');
+        }
+        bootstrap.Modal.getInstance(document.getElementById('medicineModal')).hide();
+        loadMedicines();
+      } catch (err) {
+        App.toast.error('Lỗi', err.message);
+      }
+    }
+
+    function deleteMedicine(id, name) {
+      App.confirm('Xóa thuốc', `Bạn có chắc muốn xóa <b>${name}</b> khỏi kho thuốc?`, async () => {
+        await API.deleteMedicine(id);
+        App.toast.success('Đã xóa', `Đã xóa "${name}" khỏi danh mục`);
+        loadMedicines();
+      }, 'Xóa');
+    }
+
+    loadMedicines();
+  </script>
+}

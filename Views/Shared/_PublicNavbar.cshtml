@@ -1,0 +1,34 @@
+@* Partial View: _PublicNavbar.cshtml
+   Model: string - tên nav-link đang active (vd: "Index", "Booking", "Lookup", "About")
+*@
+@model string
+
+@{
+    var active = Model ?? "";
+    Func<string, string> navCls = (item) => item == active ? "nav-link active" : "nav-link";
+}
+
+<nav class="navbar navbar-expand-lg navbar-medical" aria-label="Điều hướng chính">
+    <div class="container">
+        <a class="navbar-brand" href="/">
+            <div class="brand-icon"><i class="bi bi-heart-pulse-fill"></i></div>
+            <span>MediBooking</span>
+        </a>
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"
+                data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-list" style="font-size:1.5rem;color:var(--text-primary)"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="mainNav">
+            <ul class="navbar-nav mx-auto gap-1">
+                <li class="nav-item"><a class="@navCls("Index")" href="/">Trang chủ</a></li>
+                <li class="nav-item"><a class="@navCls("Booking")" href="/Home/Booking">Đặt lịch khám</a></li>
+                <li class="nav-item"><a class="@navCls("Lookup")" href="/Home/Lookup">Tra cứu lịch hẹn</a></li>
+                <li class="nav-item"><a class="@navCls("About")" href="/Home/About">Về chúng tôi</a></li>
+            </ul>
+            <div class="d-flex align-items-center gap-3">
+                <a href="/Home/Lookup" class="btn-secondary-medical"><i class="bi bi-search"></i> Tra cứu</a>
+                <a href="/Account/Login" class="btn-primary-medical"><i class="bi bi-box-arrow-in-right"></i> Đăng nhập</a>
+            </div>
+        </div>
+    </div>
+</nav>

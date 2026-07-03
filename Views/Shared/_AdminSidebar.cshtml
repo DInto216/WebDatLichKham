@@ -1,0 +1,69 @@
+@* Partial View: _AdminSidebar.cshtml
+   Nhận tham số: activeItem (string) - tên trang đang active
+   VD: @await Html.PartialAsync("_AdminSidebar", "Dashboard")
+*@
+@model string
+
+@{
+    var active = Model ?? "";
+    Func<string, string> cls = (item) => item == active ? "sidebar-link active" : "sidebar-link";
+}
+
+<aside class="sidebar" id="sidebar" aria-label="Menu quản trị">
+    <div class="sidebar-brand">
+        <div class="brand-icon"><i class="bi bi-heart-pulse-fill"></i></div>
+        <div>
+            <div class="brand-text">MediBooking</div>
+            <div class="brand-sub">Admin Panel</div>
+        </div>
+    </div>
+
+    <nav class="sidebar-nav">
+        <div class="nav-section-title">Tổng quan</div>
+        <a href="/Admin/Dashboard" class="@cls("Dashboard")">
+            <i class="bi bi-grid-1x2-fill"></i> Dashboard
+        </a>
+
+        <div class="nav-section-title">Quản lý</div>
+        <a href="/Admin/Specialties" class="@cls("Specialties")">
+            <i class="bi bi-hospital"></i> Chuyên khoa
+        </a>
+        <a href="/Admin/Accounts" class="@cls("Accounts")">
+            <i class="bi bi-people"></i> Tài khoản
+        </a>
+        <a href="/Admin/Doctors" class="@cls("Doctors")">
+            <i class="bi bi-person-badge"></i> Hồ sơ bác sĩ
+        </a>
+        <a href="/Admin/Appointments" class="@cls("Appointments")">
+            <i class="bi bi-calendar-check"></i> Duyệt lịch hẹn
+        </a>
+        <a href="/Admin/Medicines" class="@cls("Medicines")">
+            <i class="bi bi-capsule"></i> Kho thuốc
+        </a>
+        <a href="/Admin/MedicalHistory" class="@cls("MedicalHistory")">
+            <i class="bi bi-file-earmark-medical"></i> Lịch sử bệnh án
+        </a>
+        <a href="/Admin/Payments" class="@cls("Payments")">
+            <i class="bi bi-credit-card"></i> Thanh toán
+        </a>
+
+        <div class="nav-section-title">Tài khoản</div>
+        <a href="/Admin/Profile" class="@cls("Profile")">
+            <i class="bi bi-person-circle"></i> Thông tin cá nhân
+        </a>
+    </nav>
+
+    <div class="sidebar-footer">
+        <div class="sidebar-user">
+            <div style="width:40px;height:40px;background:var(--gradient-primary);border-radius:var(--radius-full);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:var(--text-sm);flex-shrink:0;">A</div>
+            <div class="user-info">
+                <div class="user-name" id="sidebarUserName">Admin</div>
+                <div class="user-role">Quản trị viên</div>
+            </div>
+            <button class="btn-ghost ms-auto" onclick="API.logout();window.location.href='/Account/Login'" aria-label="Đăng xuất">
+                <i class="bi bi-box-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+</aside>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>

@@ -1,0 +1,413 @@
+@{
+    Layout = "~/Views/Shared/_PublicLayout.cshtml";
+    ViewBag.Title = "MediBooking - Đặt Lịch Khám Bệnh Trực Tuyến";
+    ViewBag.ActiveNav = "Index";
+}
+
+@section PageStyles {
+<style>
+    @@keyframes pulse-ring {
+      0%   { transform: scale(1); opacity: 0.6; }
+      100% { transform: scale(1.6); opacity: 0; }
+    }
+    @@keyframes bounce-arrow {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-4px); }
+    }
+    @@keyframes spin-in {
+      from { transform: rotate(-180deg) scale(0); opacity: 0; }
+      to   { transform: rotate(0deg) scale(1); opacity: 1; }
+    }
+    @@keyframes ripple-click {
+      0%   { transform: scale(0); opacity: 0.5; }
+      100% { transform: scale(2.5); opacity: 0; }
+    }
+
+    .scroll-to-top-btn {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: var(--gradient-primary);
+      color: white;
+      border: none;
+      box-shadow: 0 4px 15px rgba(13,148,136,0.4);
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(24px) scale(0.8);
+      transition: opacity 0.4s ease, visibility 0.4s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+      z-index: 1000;
+      overflow: hidden;
+    }
+    /* Hiện nút với hiệu ứng pop */
+    .scroll-to-top-btn.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0) scale(1);
+    }
+    /* Vòng pulse nằm sau nút */
+    .scroll-to-top-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: inherit;
+      animation: pulse-ring 2s ease-out infinite;
+      z-index: -1;
+      opacity: 0;
+    }
+    .scroll-to-top-btn.show::before {
+      opacity: 1;
+    }
+    /* Icon mũi tên tự bounce */
+    .scroll-to-top-btn i {
+      animation: bounce-arrow 1.6s ease-in-out infinite;
+      display: inline-block;
+    }
+    /* Hover: nảy lên + đổ bóng sâu hơn */
+    .scroll-to-top-btn:hover {
+      transform: translateY(-6px) scale(1.08);
+      box-shadow: 0 12px 30px rgba(13,148,136,0.5);
+    }
+    .scroll-to-top-btn:hover i {
+      animation: none;
+      transform: translateY(-3px);
+      transition: transform 0.2s ease;
+    }
+    /* Ripple khi click */
+    .scroll-to-top-btn .ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.4);
+      pointer-events: none;
+      animation: ripple-click 0.6s ease-out forwards;
+    }
+    /* Active: nhấn xuống */
+    .scroll-to-top-btn:active {
+      transform: translateY(-2px) scale(0.95);
+    }
+  </style>
+}
+
+<!-- ============ HERO SECTION ============ -->
+    <section class="hero-section" id="hero">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-lg-6">
+            <div class="hero-content animate-fade-in-up">
+              <div class="hero-badge">
+                <i class="bi bi-shield-check"></i>
+                Nền tảng y tế đáng tin cậy #1
+              </div>
+              <h1>
+                Đặt Lịch Khám Bệnh<br>
+                <span class="highlight">Nhanh Chóng</span><br>
+                <span class="highlight">Tiện Lợi</span>
+              </h1>
+              <p>Hệ thống đặt lịch khám trực tuyến giúp bạn tiết kiệm thời gian, lựa chọn bác sĩ phù hợp và quản lý lịch hẹn dễ dàng chỉ với 3 bước đơn giản.</p>
+              <div class="hero-actions">
+                <a href="/Home/Booking" class="btn-primary-medical" style="padding:14px 32px;font-size:1rem;">
+                  <i class="bi bi-calendar-plus"></i> Đặt Lịch Ngay
+                </a>
+                <a href="#how-it-works" class="btn-secondary-medical" style="padding:14px 32px;font-size:1rem;background:rgba(255,255,255,0.1);color:white;border-color:rgba(255,255,255,0.2);">
+                  <i class="bi bi-play-circle"></i> Tìm Hiểu Thêm
+                </a>
+              </div>
+              <div class="hero-stats">
+                <div class="stat-item">
+                  <span class="stat-number" data-count="50">50+</span>
+                  <span class="stat-text">Bác sĩ</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-number" data-count="10000">10,000+</span>
+                  <span class="stat-text">Bệnh nhân</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-number" data-count="15">15+</span>
+                  <span class="stat-text">Chuyên khoa</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-6 d-none d-lg-block">
+            <div class="hero-image-wrapper animate-fade-in-right delay-2">
+              <!-- Floating Cards -->
+              <div class="hero-floating-card card-1">
+                <div class="floating-icon" style="background:var(--success-light);color:var(--success)">
+                  <i class="bi bi-calendar-check"></i>
+                </div>
+                <div class="floating-text">
+                  <div class="title">Lịch hẹn đã xác nhận</div>
+                  <div class="subtitle">Tại MediBooking</div>
+                </div>
+              </div>
+              <div class="hero-floating-card card-2">
+                <div class="floating-icon" style="background:var(--primary-50);color:var(--primary-600)">
+                  <i class="bi bi-people-fill"></i>
+                </div>
+                <div class="floating-text">
+                  <div class="title">+2,500 lượt khám</div>
+                  <div class="subtitle">Trong tháng này</div>
+                </div>
+              </div>
+              <!-- Hero Illustration -->
+              <div style="background:linear-gradient(135deg, rgba(37,99,235,0.1), rgba(13,148,136,0.1)); border-radius:var(--radius-2xl); padding:60px; text-align:center; position:relative;">
+                <div style="font-size:120px; line-height:1;">🏥</div>
+                <div style="display:flex; justify-content:center; gap:20px; margin-top:30px;">
+                  <div style="background:rgba(255,255,255,0.9); border-radius:var(--radius-lg); padding:16px 20px; box-shadow:var(--shadow-lg);">
+                    <div style="font-size:28px;">👨‍⚕️</div>
+                    <div style="font-size:12px; font-weight:600; color:var(--text-secondary); margin-top:4px;">Bác sĩ giỏi</div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.9); border-radius:var(--radius-lg); padding:16px 20px; box-shadow:var(--shadow-lg);">
+                    <div style="font-size:28px;">📋</div>
+                    <div style="font-size:12px; font-weight:600; color:var(--text-secondary); margin-top:4px;">Đặt lịch dễ</div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.9); border-radius:var(--radius-lg); padding:16px 20px; box-shadow:var(--shadow-lg);">
+                    <div style="font-size:28px;">⏰</div>
+                    <div style="font-size:12px; font-weight:600; color:var(--text-secondary); margin-top:4px;">Tiết kiệm</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ HOW IT WORKS ============ -->
+    <section class="section" id="how-it-works">
+      <div class="container">
+        <div class="section-title reveal">
+          <div class="badge-label"><i class="bi bi-lightning-fill"></i> Quy trình đơn giản</div>
+          <h2>Đặt Lịch Chỉ Với <span class="text-gradient">3 Bước</span></h2>
+          <p>Quy trình đặt lịch khám bệnh nhanh chóng, dễ dàng và hoàn toàn miễn phí</p>
+        </div>
+        <div class="row g-4">
+          <div class="col-md-4 reveal delay-1">
+            <div class="step-card">
+              <div class="step-number">1</div>
+              <h5>Chọn Chuyên Khoa & Bác Sĩ</h5>
+              <p>Duyệt danh sách bác sĩ theo chuyên khoa, xem thông tin chi tiết và lựa chọn bác sĩ phù hợp với nhu cầu.</p>
+            </div>
+          </div>
+          <div class="col-md-4 reveal delay-3">
+            <div class="step-card">
+              <div class="step-number">2</div>
+              <h5>Chọn Ngày & Khung Giờ</h5>
+              <p>Xem lịch trống của bác sĩ, chọn ngày và khung giờ thuận tiện. Khung giờ được cập nhật realtime.</p>
+            </div>
+          </div>
+          <div class="col-md-4 reveal delay-5">
+            <div class="step-card">
+              <div class="step-number">3</div>
+              <h5>Xác Nhận & Nhận Mã</h5>
+              <p>Điền thông tin cá nhân, xác nhận lịch hẹn và nhận mã Booking ID để tra cứu trạng thái.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SPECIALTIES ============ -->
+    <section class="section bg-light" id="specialties">
+      <div class="container">
+        <div class="section-title reveal">
+          <div class="badge-label"><i class="bi bi-hospital"></i> Chuyên khoa</div>
+          <h2>Chuyên Khoa <span class="text-gradient">Nổi Bật</span></h2>
+          <p>Đội ngũ bác sĩ giàu kinh nghiệm trong nhiều chuyên khoa khác nhau</p>
+        </div>
+        <div class="row g-4" id="specialties-grid">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ FEATURED DOCTORS ============ -->
+    <section class="section" id="doctors">
+      <div class="container">
+        <div class="section-title reveal">
+          <div class="badge-label"><i class="bi bi-person-badge"></i> Bác sĩ</div>
+          <h2>Bác Sĩ <span class="text-gradient">Chuyên Khoa</span></h2>
+          <p>Đội ngũ bác sĩ giỏi chuyên môn, tận tâm với bệnh nhân</p>
+        </div>
+        <div class="row g-4" id="doctors-grid">
+          <!-- Rendered by JS -->
+        </div>
+        <div class="text-center mt-5 reveal">
+          <a href="/Home/Booking" class="btn-primary-medical" style="padding:14px 40px;">
+            Đặt Lịch Khám Ngay <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ LOOKUP CTA ============ -->
+    <section class="section" id="lookup-cta" style="background: linear-gradient(135deg, var(--primary-50) 0%, white 50%, var(--secondary-50) 100%); overflow:hidden; position:relative;">
+      <!-- Decorative blobs -->
+      <div style="position:absolute;top:-80px;left:-80px;width:300px;height:300px;background:radial-gradient(circle, rgba(13,148,136,0.08) 0%, transparent 70%);border-radius:50%;pointer-events:none;"></div>
+      <div style="position:absolute;bottom:-60px;right:-60px;width:250px;height:250px;background:radial-gradient(circle, rgba(99,102,241,0.07) 0%, transparent 70%);border-radius:50%;pointer-events:none;"></div>
+
+      <div class="container" style="position:relative;">
+        <div class="row justify-content-center">
+          <div class="col-lg-8 col-xl-7 text-center reveal">
+            <div class="badge-label mb-3" style="display:inline-flex;gap:6px;align-items:center;">
+              <i class="bi bi-search"></i> Tra cứu
+            </div>
+            <h2 class="mb-3" style="font-size:clamp(1.8rem,4vw,2.6rem);line-height:1.25;">
+              Kiểm Tra <span class="text-gradient">Lịch Hẹn Của Bạn</span>
+            </h2>
+            <p class="text-muted-medical mb-5" style="font-size:1.05rem;line-height:1.7;max-width:520px;margin:0 auto 2rem;">
+              Chỉ cần mã Booking ID — xem ngay trạng thái lịch hẹn, thông tin bác sĩ và kết quả khám của bạn tức thì.
+            </p>
+            <div class="d-flex flex-wrap gap-3 align-items-center justify-content-center">
+              <a href="/Home/Lookup" class="btn-primary-medical" style="padding:14px 40px;font-size:1rem;">
+                <i class="bi bi-search"></i> Tra Cứu Ngay
+              </a>
+              <span style="font-size:var(--text-sm);color:var(--text-tertiary);display:flex;align-items:center;gap:6px;">
+                <i class="bi bi-shield-check" style="color:var(--success)"></i> Bảo mật &amp; riêng tư
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============ CLINIC INFO ============ -->
+    <section class="section" id="clinic-info">
+      <div class="container">
+        <div class="section-title reveal">
+          <div class="badge-label"><i class="bi bi-building"></i> Phòng khám</div>
+          <h2>Về <span class="text-gradient">MediBooking</span></h2>
+          <p>Hệ thống phòng khám đa khoa hiện đại, uy tín hàng đầu</p>
+        </div>
+        <div class="row g-4">
+          <div class="col-md-6 col-lg-3 reveal delay-1">
+            <div class="card-medical text-center h-100">
+              <div class="card-icon primary mx-auto"><i class="bi bi-award"></i></div>
+              <h5>Chất Lượng Cao</h5>
+              <p class="text-muted-medical" style="font-size:var(--text-sm)">Trang thiết bị hiện đại, quy trình chuyên nghiệp theo tiêu chuẩn quốc tế.</p>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-3 reveal delay-2">
+            <div class="card-medical text-center h-100">
+              <div class="card-icon secondary mx-auto"><i class="bi bi-clock"></i></div>
+              <h5>Tiết Kiệm Thời Gian</h5>
+              <p class="text-muted-medical" style="font-size:var(--text-sm)">Đặt lịch online, không cần xếp hàng chờ đợi, đến đúng giờ khám.</p>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-3 reveal delay-3">
+            <div class="card-medical text-center h-100">
+              <div class="card-icon success mx-auto"><i class="bi bi-person-check"></i></div>
+              <h5>Bác Sĩ Giỏi</h5>
+              <p class="text-muted-medical" style="font-size:var(--text-sm)">Đội ngũ bác sĩ giàu kinh nghiệm, được đào tạo chuyên sâu.</p>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-3 reveal delay-4">
+            <div class="card-medical text-center h-100">
+              <div class="card-icon warning mx-auto"><i class="bi bi-shield-lock"></i></div>
+              <h5>Bảo Mật An Toàn</h5>
+              <p class="text-muted-medical" style="font-size:var(--text-sm)">Thông tin cá nhân và hồ sơ bệnh án được bảo mật tuyệt đối.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+@section Scripts {
+<script>
+    // ---- Render Specialties ----
+    (async () => {
+      const grid = document.getElementById('specialties-grid');
+      const specialties = await API.getSpecialties();
+
+      const colors = [
+        { bg: 'var(--primary-50)', color: 'var(--primary-600)' },
+        { bg: 'var(--secondary-50)', color: 'var(--secondary-600)' },
+        { bg: 'var(--warning-light)', color: 'var(--warning)' },
+        { bg: 'var(--danger-light)', color: 'var(--danger)' },
+        { bg: 'var(--success-light)', color: 'var(--success)' },
+        { bg: 'var(--info-light)', color: 'var(--info)' },
+      ];
+
+      grid.innerHTML = specialties.slice(0, 6).map((sp, i) => {
+        const c = colors[i % colors.length];
+        return `
+          <div class="col-6 col-md-4 col-lg-2 reveal delay-${i + 1}">
+            <div class="specialty-card">
+              <div class="specialty-icon" style="background:${c.bg};color:${c.color}">${sp.icon}</div>
+              <h5>${sp.name}</h5>
+              <p>${sp.doctorCount} bác sĩ</p>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      App.init(); // Re-init scroll reveal for new elements
+    })();
+
+    // ---- Render Doctors ----
+    (async () => {
+      const grid = document.getElementById('doctors-grid');
+      const doctors = await API.getDoctors();
+
+      const avatars = ['👨‍⚕️', '👩‍⚕️', '👨‍⚕️', '👩‍⚕️', '👨‍⚕️', '👩‍⚕️'];
+
+      grid.innerHTML = doctors.slice(0, 6).map((doc, i) => `
+        <div class="col-md-6 col-lg-4 reveal delay-${i + 1}">
+          <div class="doctor-card">
+            <div class="doctor-avatar d-flex align-items-center justify-content-center" style="background:linear-gradient(135deg, var(--primary-50), var(--secondary-50));">
+              <span style="font-size:80px">${avatars[i % avatars.length]}</span>
+            </div>
+            <div class="doctor-info">
+              <div class="doctor-specialty"><i class="bi bi-patch-check-fill"></i> ${doc.specialty}</div>
+              <h5 class="doctor-name">${doc.degree} ${doc.name}</h5>
+              <p style="font-size:var(--text-sm);color:var(--text-tertiary);margin-bottom:12px;">${doc.bio}</p>
+              <div class="doctor-meta">
+                <span class="doctor-price">${App.formatCurrency(doc.price)}</span>
+                <span class="doctor-rating"><i class="bi bi-star-fill"></i> ${doc.rating} (${doc.reviews})</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      App.init();
+
+      // Scroll to top functionality
+      const scrollTopBtn = document.getElementById('scrollToTopBtn');
+      if (scrollTopBtn) {
+        window.addEventListener('scroll', () => {
+          if (window.scrollY > 300) {
+            scrollTopBtn.classList.add('show');
+          } else {
+            scrollTopBtn.classList.remove('show');
+          }
+        });
+        scrollTopBtn.addEventListener('click', (e) => {
+          // Ripple effect
+          const ripple = document.createElement('span');
+          const size = Math.max(scrollTopBtn.offsetWidth, scrollTopBtn.offsetHeight);
+          ripple.style.cssText = `width:${size}px;height:${size}px;left:${e.offsetX - size/2}px;top:${e.offsetY - size/2}px;`;
+          ripple.classList.add('ripple');
+          scrollTopBtn.appendChild(ripple);
+          ripple.addEventListener('animationend', () => ripple.remove());
+
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+      }
+    })();
+  </script>
+
+  <!-- Nút cuộn lên đầu trang -->
+  <button id="scrollToTopBtn" class="scroll-to-top-btn" aria-label="Lên đầu trang">
+    <i class="bi bi-arrow-up"></i>
+  </button>
+}

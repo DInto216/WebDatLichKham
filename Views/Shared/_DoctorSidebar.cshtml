@@ -1,0 +1,54 @@
+@* Partial View: _DoctorSidebar.cshtml
+   Model: string - tên trang active
+   VD: @await Html.PartialAsync("_DoctorSidebar", "Examinations")
+*@
+@model string
+
+@{
+    var active = Model ?? "";
+    Func<string, string> cls = (item) => item == active ? "sidebar-link active" : "sidebar-link";
+}
+
+<aside class="sidebar" id="sidebar" aria-label="Menu bác sĩ">
+    <div class="sidebar-brand">
+        <div class="brand-icon"><i class="bi bi-heart-pulse-fill"></i></div>
+        <div>
+            <div class="brand-text">MediBooking</div>
+            <div class="brand-sub">Doctor Panel</div>
+        </div>
+    </div>
+
+    <nav class="sidebar-nav">
+        <div class="nav-section-title">Quản lý</div>
+        <a href="/Doctor/Schedule" class="@cls("Schedule")">
+            <i class="bi bi-calendar-week"></i> Lịch trực &amp; Khung giờ
+        </a>
+        <a href="/Doctor/Examinations" class="@cls("Examinations")">
+            <i class="bi bi-clipboard2-pulse"></i> Danh sách ca khám
+        </a>
+        <a href="/Doctor/CreateRecord" class="@cls("CreateRecord")">
+            <i class="bi bi-file-earmark-plus"></i> Lập bệnh án
+        </a>
+        <a href="/Doctor/MedicalHistory" class="@cls("MedicalHistory")">
+            <i class="bi bi-journal-medical"></i> Lịch sử bệnh án
+        </a>
+        <div class="nav-section-title">Tài khoản</div>
+        <a href="/Doctor/Profile" class="@cls("Profile")">
+            <i class="bi bi-person-circle"></i> Thông tin cá nhân
+        </a>
+    </nav>
+
+    <div class="sidebar-footer">
+        <div class="sidebar-user">
+            <div style="width:40px;height:40px;background:var(--gradient-secondary);border-radius:var(--radius-full);display:flex;align-items:center;justify-content:center;color:white;font-size:18px;flex-shrink:0;">👨‍⚕️</div>
+            <div class="user-info">
+                <div class="user-name" id="sidebarDoctorName">Bác sĩ</div>
+                <div class="user-role">Doctor</div>
+            </div>
+            <button class="btn-ghost ms-auto" onclick="API.logout();window.location.href='/Account/Login'" aria-label="Đăng xuất">
+                <i class="bi bi-box-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+</aside>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>

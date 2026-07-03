@@ -1,0 +1,188 @@
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Đăng nhập vào hệ thống MediBooking - Quản lý lịch hẹn khám bệnh">
+  <title>Đăng Nhập - MediBooking</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/animations.css">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <a href="/" class="btn btn-light shadow-sm" style="position: absolute; top: 24px; left: 24px; z-index: 10; border-radius: 50px; padding: 8px 20px; font-weight: 500; display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--text-primary);">
+    <i class="bi bi-arrow-left"></i> Quay lại
+  </a>
+  <div class="auth-page">
+    <!-- ---- Left Panel ---- -->
+    <div class="auth-left">
+      <div style="position:relative;z-index:2;text-align:center;">
+        <div style="font-size:100px;margin-bottom:24px;">🏥</div>
+        <h2>Chào mừng trở lại!</h2>
+        <p>Đăng nhập để quản lý lịch hẹn, theo dõi bệnh nhân và nhiều hơn nữa.</p>
+        <div style="display:flex;gap:16px;justify-content:center;margin-top:32px;">
+          <div style="background:rgba(255,255,255,0.1);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.15);border-radius:var(--radius-md);padding:16px 20px;text-align:center;">
+            <div class="stat-number" data-count="50" style="font-size:24px;font-weight:800;color:white;">50+</div>
+            <div style="font-size:12px;color:rgba(255,255,255,0.6);">Bác sĩ</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.1);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.15);border-radius:var(--radius-md);padding:16px 20px;text-align:center;">
+            <div class="stat-number" data-count="10" style="font-size:24px;font-weight:800;color:white;">10k+</div>
+            <div style="font-size:12px;color:rgba(255,255,255,0.6);">Lượt khám</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.1);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.15);border-radius:var(--radius-md);padding:16px 20px;text-align:center;">
+            <div class="stat-number" data-count="15" style="font-size:24px;font-weight:800;color:white;">15+</div>
+            <div style="font-size:12px;color:rgba(255,255,255,0.6);">Chuyên khoa</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---- Right Panel (Form) ---- -->
+    <div class="auth-right">
+      <div class="auth-form-wrapper animate-fade-in-up">
+        <a href="/" class="auth-logo">
+          <div class="brand-icon"><i class="bi bi-heart-pulse-fill"></i></div>
+          <span class="brand-name">MediBooking</span>
+        </a>
+
+        <h3>Đăng Nhập</h3>
+        <p class="auth-subtitle">Nhập thông tin tài khoản để tiếp tục</p>
+
+        <form id="loginForm" class="form-medical" novalidate>
+          <div class="form-group">
+            <label class="form-label" for="username">Tên đăng nhập</label>
+            <div class="input-icon">
+              <i class="bi bi-person"></i>
+              <input type="text" class="form-control" id="username" placeholder="Nhập username" required autocomplete="username">
+              <div class="invalid-feedback">Vui lòng nhập tên đăng nhập</div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="password">Mật khẩu</label>
+            <div class="input-icon" style="position:relative">
+              <i class="bi bi-lock"></i>
+              <input type="password" class="form-control" id="password" placeholder="Nhập mật khẩu" required autocomplete="current-password">
+              <button type="button" class="password-toggle" aria-label="Hiển thị mật khẩu">
+                <i class="bi bi-eye"></i>
+              </button>
+              <div class="invalid-feedback">Vui lòng nhập mật khẩu</div>
+            </div>
+          </div>
+
+          <div class="d-flex align-items-center justify-content-between mb-4">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="remember">
+              <label class="form-check-label" for="remember" style="font-size:var(--text-sm);color:var(--text-tertiary);">Ghi nhớ đăng nhập</label>
+            </div>
+            <a href="/Account/ForgotPassword" style="font-size:var(--text-sm);color:var(--primary-600);font-weight:500;">Quên mật khẩu?</a>
+          </div>
+
+          <button type="submit" class="btn-primary-medical w-100 justify-content-center" style="padding:14px;" id="loginBtn">
+            <i class="bi bi-box-arrow-in-right"></i> Đăng Nhập
+          </button>
+
+          <div id="loginError" class="mt-3" style="display:none;">
+            <div style="background:var(--danger-light);color:var(--danger-dark);padding:12px 16px;border-radius:var(--radius-sm);font-size:var(--text-sm);display:flex;align-items:center;gap:8px;">
+              <i class="bi bi-exclamation-circle"></i>
+              <span id="loginErrorMsg"></span>
+            </div>
+          </div>
+        </form>
+
+        <div style="margin-top:32px;text-align:center;">
+          <p style="font-size:var(--text-sm);color:var(--text-tertiary);">
+            Bạn là bệnh nhân? <a href="/Home/Booking" style="color:var(--primary-600);font-weight:600;">Đặt lịch không cần đăng nhập</a>
+          </p>
+        </div>
+
+        <!-- Demo credentials -->
+        <div style="margin-top:24px;background:var(--bg-tertiary);border-radius:var(--radius-md);padding:16px;">
+          <p style="font-size:var(--text-xs);font-weight:600;color:var(--text-tertiary);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.05em;">🔑 Tài khoản demo</p>
+          <div style="font-size:var(--text-xs);color:var(--text-tertiary);line-height:1.8;">
+            <div><strong>Admin:</strong> admin / admin123</div>
+            <div><strong>Doctor:</strong> doctor01 / doctor123</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/api.js?v=1.1"></script>
+  <script src="/js/main.js?v=1.1"></script>
+  <script>
+    (() => {
+      'use strict';
+
+      const form = document.getElementById('loginForm');
+      const loginBtn = document.getElementById('loginBtn');
+      const errorDiv = document.getElementById('loginError');
+      const errorMsg = document.getElementById('loginErrorMsg');
+      const passwordToggle = document.querySelector('.password-toggle');
+      const passwordInput = document.getElementById('password');
+
+      // Password visibility toggle
+      passwordToggle.addEventListener('click', () => {
+        const type = passwordInput.type === 'password' ? 'text' : 'password';
+        passwordInput.type = type;
+        passwordToggle.querySelector('i').className = type === 'password' ? 'bi bi-eye' : 'bi bi-eye-slash';
+      });
+
+      // Login handler
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        errorDiv.style.display = 'none';
+
+        if (!App.validateForm(form)) return;
+
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value;
+
+        // Loading state
+        loginBtn.disabled = true;
+        loginBtn.innerHTML = '<span class="animate-spin" style="display:inline-block"><i class="bi bi-arrow-repeat"></i></span> Đang đăng nhập...';
+
+        try {
+          const user = await API.login(username, password);
+          App.toast.success('Đăng nhập thành công!', `Chào mừng ${user.name}`);
+
+          // Redirect based on role
+          setTimeout(() => {
+            if (user.role === 'admin') {
+              window.location.href = '/Admin/Dashboard';
+            } else if (user.role === 'doctor') {
+              window.location.href = '/Doctor/Schedule';
+            }
+          }, 800);
+        } catch (err) {
+          errorDiv.style.display = 'block';
+          errorMsg.textContent = err.message;
+          loginBtn.disabled = false;
+          loginBtn.innerHTML = '<i class="bi bi-box-arrow-in-right"></i> Đăng Nhập';
+        }
+      });
+
+      // Check if already logged in
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.has('ReturnUrl')) {
+        localStorage.removeItem('currentUser');
+      } else {
+        const user = API.getCurrentUser();
+        if (user) {
+          if (user.role === 'admin') window.location.href = '/Admin/Dashboard';
+          else if (user.role === 'doctor') window.location.href = '/Doctor/Schedule';
+        }
+      }
+    })();
+  </script>
+</body>
+</html>
+
+
+

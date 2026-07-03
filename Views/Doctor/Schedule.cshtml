@@ -1,0 +1,203 @@
+@{
+    Layout = "~/Views/Shared/_DoctorLayout.cshtml";
+    ViewBag.Title = "Quản Lý Lịch Trực";
+    ViewBag.ActiveMenu = "Schedule";
+    ViewBag.PageTitle = "Lịch Trực & Khung Giờ";
+    ViewBag.PageSubtitle = "Cập nhật hồ sơ và cấu hình lịch làm việc";
+}
+
+<!-- Doctor Profile -->
+      <div class="card-medical p-4 p-md-5 mb-4">
+        <h5 class="mb-4"><i class="bi bi-person-badge text-primary-medical me-2"></i>Hồ Sơ Chuyên Sâu</h5>
+        <form id="profileForm" class="form-medical" novalidate>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Họ tên</label>
+              <input type="text" class="form-control" id="profName" readonly style="background:var(--bg-tertiary);">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Học vị</label>
+              <select class="form-select" id="profDegree">
+                <option value="BS">BS</option>
+                <option value="BS.CKI">BS.CKI</option>
+                <option value="BS.CKII">BS.CKII</option>
+                <option value="ThS.BS">ThS.BS</option>
+                <option value="TS.BS">TS.BS</option>
+                <option value="PGS.TS">PGS.TS</option>
+                <option value="GS.TS">GS.TS</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Giá khám (VNĐ)</label>
+              <input type="number" class="form-control" id="profPrice" min="0">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Chuyên khoa</label>
+              <input type="text" class="form-control" id="profSpecialty" readonly style="background:var(--bg-tertiary);">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Giới thiệu</label>
+              <textarea class="form-control" id="profBio" rows="2" placeholder="Kinh nghiệm, chứng chỉ..."></textarea>
+            </div>
+          </div>
+          <div class="mt-4">
+            <button type="button" class="btn-primary-medical" id="saveProfileBtn" onclick="saveProfile()">
+              <i class="bi bi-check-lg"></i> Cập nhật hồ sơ
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Schedule Configuration -->
+      <div class="card-medical p-4 p-md-5">
+        <h5 class="mb-2"><i class="bi bi-calendar-week text-primary-medical me-2"></i>Cấu Hình Khung Giờ Làm Việc</h5>
+        <p style="font-size:var(--text-sm);color:var(--text-tertiary);margin-bottom:24px;">Chọn các khung giờ bạn có thể khám trong tuần. Bệnh nhân sẽ chỉ thấy các khung giờ bạn chọn.</p>
+
+        <div id="scheduleGrid">
+          <!-- Rendered by JS -->
+        </div>
+
+        <div class="mt-4 pt-4" style="border-top:1px solid var(--bg-tertiary);">
+          <button type="button" class="btn-primary-medical" id="saveScheduleBtn" onclick="saveSchedule()">
+            <i class="bi bi-check-lg"></i> Lưu Lịch Trực
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+@section Scripts {
+    <script>
+    const user = App.requireAuth(['doctor']);
+    let doctorData = null;
+
+    const DAYS = [
+      { key: 'monday', label: 'Thứ 2' },
+      { key: 'tuesday', label: 'Thứ 3' },
+      { key: 'wednesday', label: 'Thứ 4' },
+      { key: 'thursday', label: 'Thứ 5' },
+      { key: 'friday', label: 'Thứ 6' },
+      { key: 'saturday', label: 'Thứ 7' },
+      { key: 'sunday', label: 'Chủ nhật' }
+    ];
+
+    const TIME_SLOTS = [
+      '07:00', '07:30', '08:00', '08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
+      '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00'
+    ];
+
+    async function loadDoctorProfile() {
+      if (!user || !user.doctorId) return;
+      document.getElementById('sidebarDoctorName').textContent = user.name;
+
+      doctorData = await API.getDoctorById(user.doctorId);
+      if (!doctorData) return;
+
+      document.getElementById('profName').value = doctorData.name;
+      document.getElementById('profDegree').value = doctorData.degree;
+      document.getElementById('profPrice').value = doctorData.price;
+      document.getElementById('profSpecialty').value = doctorData.specialty;
+      document.getElementById('profBio').value = doctorData.bio || '';
+
+      renderScheduleGrid();
+    }
+
+    function renderScheduleGrid() {
+      const grid = document.getElementById('scheduleGrid');
+
+      grid.innerHTML = DAYS.map(day => {
+        const selectedSlots = doctorData.schedule[day.key] || [];
+
+        return `
+          <div class="mb-4">
+            <div class="d-flex align-items-center gap-3 mb-2">
+              <h6 style="margin:0;min-width:80px;font-size:var(--text-sm);">${day.label}</h6>
+              <button type="button" class="btn-ghost" style="font-size:11px;padding:2px 8px;" onclick="toggleAllSlots('${day.key}')">
+                Chọn tất cả
+              </button>
+              <button type="button" class="btn-ghost" style="font-size:11px;padding:2px 8px;color:var(--danger)" onclick="clearAllSlots('${day.key}')">
+                Bỏ tất cả
+              </button>
+            </div>
+            <div class="d-flex flex-wrap gap-2" id="slots-${day.key}">
+              ${TIME_SLOTS.map(time => {
+                const isSelected = selectedSlots.includes(time);
+                return `
+                  <label class="time-slot ${isSelected ? 'selected' : ''}" style="cursor:pointer;user-select:none;">
+                    <input type="checkbox" value="${time}" data-day="${day.key}" ${isSelected ? 'checked' : ''} style="display:none;" onchange="toggleSlotStyle(this)">
+                    ${time}
+                  </label>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function toggleSlotStyle(checkbox) {
+      const label = checkbox.closest('.time-slot');
+      label.classList.toggle('selected', checkbox.checked);
+    }
+
+    function toggleAllSlots(day) {
+      const container = document.getElementById(`slots-${day}`);
+      container.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+        cb.checked = true;
+        toggleSlotStyle(cb);
+      });
+    }
+
+    function clearAllSlots(day) {
+      const container = document.getElementById(`slots-${day}`);
+      container.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+        cb.checked = false;
+        toggleSlotStyle(cb);
+      });
+    }
+
+    async function saveProfile() {
+      const btn = document.getElementById('saveProfileBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="animate-spin" style="display:inline-block"><i class="bi bi-arrow-repeat"></i></span> Đang lưu...';
+
+      try {
+        await API.updateDoctor(user.doctorId, {
+          degree: document.getElementById('profDegree').value,
+          price: parseInt(document.getElementById('profPrice').value),
+          bio: document.getElementById('profBio').value.trim()
+        });
+        App.toast.success('Thành công', 'Đã cập nhật hồ sơ bác sĩ');
+      } catch (err) {
+        App.toast.error('Lỗi', err.message);
+      }
+
+      btn.disabled = false;
+      btn.innerHTML = '<i class="bi bi-check-lg"></i> Cập nhật hồ sơ';
+    }
+
+    async function saveSchedule() {
+      const btn = document.getElementById('saveScheduleBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="animate-spin" style="display:inline-block"><i class="bi bi-arrow-repeat"></i></span> Đang lưu...';
+
+      const schedule = {};
+      DAYS.forEach(day => {
+        const checkboxes = document.querySelectorAll(`input[data-day="${day.key}"]:checked`);
+        schedule[day.key] = Array.from(checkboxes).map(cb => cb.value).sort();
+      });
+
+      try {
+        await API.updateDoctor(user.doctorId, { schedule });
+        App.toast.success('Thành công', 'Đã lưu lịch trực');
+      } catch (err) {
+        App.toast.error('Lỗi', err.message);
+      }
+
+      btn.disabled = false;
+      btn.innerHTML = '<i class="bi bi-check-lg"></i> Lưu Lịch Trực';
+    }
+
+    loadDoctorProfile();
+  </script>
+}

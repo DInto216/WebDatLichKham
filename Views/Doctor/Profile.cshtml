@@ -1,0 +1,241 @@
+@{
+    Layout = "~/Views/Shared/_DoctorLayout.cshtml";
+    ViewBag.Title = "Thông Tin Cá Nhân";
+    ViewBag.ActiveMenu = "Profile";
+    ViewBag.PageTitle = "Thông Tin Cá Nhân";
+    ViewBag.PageSubtitle = "Quản lý hồ sơ cá nhân và đổi mật khẩu";
+}
+
+<!-- Profile banner -->
+      <div class="profile-hero animate-fade-in-up">
+        <div class="profile-avatar-large" id="profileAvatar" onclick="triggerAvatarUpload()">
+          👨‍⚕️
+          <div class="profile-avatar-overlay"><i class="bi bi-camera"></i></div>
+        </div>
+        <input type="file" id="avatarFileInput" accept="image/*" style="display: none;" onchange="handleAvatarFile(event)">
+        <div class="profile-meta">
+          <h4 id="profileDisplayName">Đang tải...</h4>
+          <span id="profileRole">Bác sĩ</span>
+        </div>
+      </div>
+
+      <div class="row g-4">
+        <!-- Edit Profile Column -->
+        <div class="col-lg-8">
+          <div class="card-medical p-4">
+            <h5 class="fw-bold mb-4"><i class="bi bi-person-lines-fill text-primary me-2"></i>Cập nhật thông tin hồ sơ</h5>
+            <form id="profileForm" class="form-medical" novalidate>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Họ và tên <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" id="docName" required>
+                  <div class="invalid-feedback">Vui lòng nhập họ và tên</div>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Chuyên khoa (Đọc duy nhất)</label>
+                  <input type="text" class="form-control" id="docSpecialty" readonly style="background:var(--bg-tertiary);">
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Email</label>
+                  <input type="email" class="form-control" id="docEmail">
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Số điện thoại</label>
+                  <input type="tel" class="form-control" id="docPhone">
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Học hàm / Học vị</label>
+                  <input type="text" class="form-control" id="docDegree" placeholder="VD: Thạc sĩ Y khoa, Bác sĩ CKI">
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Kinh nghiệm làm việc</label>
+                  <input type="text" class="form-control" id="docExperience" placeholder="VD: 10 năm kinh nghiệm">
+                </div>
+              </div>
+              <div class="mb-4">
+                <label class="form-label">Giới thiệu bản thân / Tiểu sử</label>
+                <textarea class="form-control" id="docBiography" rows="4" placeholder="Giới thiệu sơ lược về kinh nghiệm khám và quá trình công tác..."></textarea>
+              </div>
+              <button type="submit" class="btn-primary-medical" id="saveProfileBtn">
+                <i class="bi bi-save me-1"></i> Lưu thay đổi
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Security / Password Column -->
+        <div class="col-lg-4">
+          <div class="card-medical p-4">
+            <h5 class="fw-bold mb-4"><i class="bi bi-shield-lock text-primary me-2"></i>Đổi mật khẩu</h5>
+            <form id="passwordForm" class="form-medical" novalidate>
+              <div class="mb-3">
+                <label class="form-label">Mật khẩu hiện tại <span class="text-danger">*</span></label>
+                <input type="password" class="form-control" id="oldPassword" required>
+                <div class="invalid-feedback">Vui lòng nhập mật khẩu cũ</div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Mật khẩu mới <span class="text-danger">*</span></label>
+                <input type="password" class="form-control" id="newPassword" minlength="3" required>
+                <div class="invalid-feedback">Mật khẩu mới tối thiểu 3 ký tự</div>
+              </div>
+              <div class="mb-4">
+                <label class="form-label">Xác nhận mật khẩu mới <span class="text-danger">*</span></label>
+                <input type="password" class="form-control" id="confirmPassword" required>
+                <div class="invalid-feedback">Mật khẩu xác nhận không đúng</div>
+              </div>
+              <button type="submit" class="btn-primary-medical w-100 justify-content-center" id="changePasswordBtn">
+                <i class="bi bi-key me-1"></i> Cập nhật mật khẩu
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+@section Scripts {
+    <script>
+    const user = App.requireAuth(['doctor']);
+    let docProfile = null;
+
+    async function initProfile() {
+      if (!user) return;
+      const currentUser = API.getCurrentUser() || user;
+      document.getElementById('sidebarDoctorName').textContent = currentUser.name;
+      document.getElementById('profileDisplayName').textContent = currentUser.name;
+      
+      const avatarContainer = document.getElementById('profileAvatar');
+      if (currentUser.avatar) {
+        avatarContainer.innerHTML = `<img src="${currentUser.avatar}" alt="Avatar"><div class="profile-avatar-overlay"><i class="bi bi-camera"></i></div>`;
+      } else {
+        avatarContainer.innerHTML = `👨‍⚕️<div class="profile-avatar-overlay"><i class="bi bi-camera"></i></div>`;
+      }
+      
+      // Load detailed doctor profile
+      if (currentUser.doctorId) {
+        docProfile = await API.getDoctorById(currentUser.doctorId);
+        if (docProfile) {
+          document.getElementById('docName').value = docProfile.name || '';
+          document.getElementById('docSpecialty').value = docProfile.specialty || '';
+          document.getElementById('docEmail').value = docProfile.email || '';
+          document.getElementById('docPhone').value = docProfile.phone || '';
+          document.getElementById('docDegree').value = docProfile.degree || '';
+          document.getElementById('docExperience').value = docProfile.experience || '';
+          document.getElementById('docBiography').value = docProfile.biography || '';
+        }
+      }
+    }
+
+    function triggerAvatarUpload() {
+      document.getElementById('avatarFileInput').click();
+    }
+
+    async function handleAvatarFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      if (!file.type.startsWith('image/')) {
+        App.toast.error('Lỗi', 'Vui lòng chọn tệp tin hình ảnh');
+        return;
+      }
+      if (file.size > 2 * 1024 * 1024) {
+        App.toast.error('Lỗi', 'Kích thước ảnh tối đa là 2MB');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const base64Data = e.target.result;
+        try {
+          await API.updateProfile(user.id, { avatar: base64Data });
+          App.toast.success('Thành công', 'Đã cập nhật ảnh đại diện');
+          const updatedUser = API.getCurrentUser();
+          App.updateSidebarUser(updatedUser);
+          await initProfile();
+        } catch (err) {
+          App.toast.error('Lỗi', err.message || 'Không thể lưu ảnh đại diện');
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Submit profile changes
+    document.getElementById('profileForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      if (!App.validateForm(form)) return;
+
+      const btn = document.getElementById('saveProfileBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Đang lưu...';
+
+      const data = {
+        name: document.getElementById('docName').value.trim(),
+        email: document.getElementById('docEmail').value.trim(),
+        phone: document.getElementById('docPhone').value.trim(),
+        degree: document.getElementById('docDegree').value.trim(),
+        experience: document.getElementById('docExperience').value.trim(),
+        biography: document.getElementById('docBiography').value.trim(),
+      };
+
+      try {
+        await API.updateProfile(user.id, data);
+        App.toast.success('Thành công', 'Đã cập nhật thông tin cá nhân');
+        
+        // Update user session in memory/local
+        const updatedUser = API.getCurrentUser();
+        document.getElementById('sidebarDoctorName').textContent = updatedUser.name;
+        document.getElementById('profileDisplayName').textContent = updatedUser.name;
+      } catch (err) {
+        App.toast.error('Lỗi', err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-save me-1"></i> Lưu thay đổi';
+      }
+    });
+
+    // Change password
+    document.getElementById('passwordForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      if (!App.validateForm(form)) return;
+
+      const oldPassword = document.getElementById('oldPassword').value;
+      const newPassword = document.getElementById('newPassword').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+
+      if (newPassword !== confirmPassword) {
+        document.getElementById('confirmPassword').classList.add('is-invalid');
+        App.toast.warning('Cảnh báo', 'Mật khẩu xác nhận không khớp');
+        return;
+      } else {
+        document.getElementById('confirmPassword').classList.remove('is-invalid');
+      }
+
+      const btn = document.getElementById('changePasswordBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Đang đổi...';
+
+      try {
+        await API.updateProfile(user.id, {
+          oldPassword,
+          newPassword
+        });
+        App.toast.success('Thành công', 'Đã thay đổi mật khẩu thành công');
+        form.reset();
+        form.classList.remove('was-validated');
+      } catch (err) {
+        App.toast.error('Lỗi', err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-key me-1"></i> Cập nhật mật khẩu';
+      }
+    });
+
+    initProfile();
+  </script>
+}

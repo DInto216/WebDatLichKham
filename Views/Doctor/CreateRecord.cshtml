@@ -1,0 +1,373 @@
+@{
+    Layout = "~/Views/Shared/_DoctorLayout.cshtml";
+    ViewBag.Title = "Lập Bệnh Án & Kê Đơn";
+    ViewBag.ActiveMenu = "CreateRecord";
+    ViewBag.PageTitle = "Lập Bệnh Án & Kê Đơn Thuốc";
+    ViewBag.PageSubtitle = "Ghi nhận kết quả khám và kê đơn thuốc cho bệnh nhân";
+}
+
+<!-- Step 1: Select patient -->
+      <div class="patient-selector" id="patientSelector">
+        <label><i class="bi bi-person-check me-1"></i> Chọn bệnh nhân từ danh sách ca khám đã duyệt</label>
+        <div class="d-flex gap-2 align-items-end flex-wrap">
+          <div class="form-medical" style="flex:1;min-width:240px;">
+            <select class="form-select" id="patientSelect">
+              <option value="">-- Chọn bệnh nhân --</option>
+            </select>
+          </div>
+          <button class="btn-primary-medical" onclick="selectPatient()" id="btnSelectPatient" disabled>
+            <i class="bi bi-arrow-right-circle me-1"></i> Tiếp tục
+          </button>
+        </div>
+      </div>
+
+      <!-- Main form (hidden until patient selected) -->
+      <div id="recordForm" style="display:none;">
+
+        <!-- Patient info (read-only) -->
+        <div class="patient-info-banner" id="patientBanner">
+          <!-- Filled by JS -->
+        </div>
+
+        <!-- Section: Chẩn đoán (BenhAn) -->
+        <div class="section-card">
+          <div class="section-title"><i class="bi bi-journal-medical"></i> Thông tin bệnh án</div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Triệu chứng lâm sàng <span class="text-danger">*</span></label>
+            <textarea class="form-control" id="symptoms" rows="3" placeholder="Mô tả triệu chứng lâm sàng của bệnh nhân..."></textarea>
+          </div>
+          <div class="mb-0">
+            <label class="form-label fw-semibold">Chẩn đoán bệnh <span class="text-danger">*</span></label>
+            <textarea class="form-control" id="diagnosis" rows="2" placeholder="Kết quả chẩn đoán bệnh..."></textarea>
+          </div>
+        </div>
+
+        <!-- Section: Kê đơn thuốc (ChiTietDonThuoc) -->
+        <div class="section-card">
+          <div class="section-title"><i class="bi bi-capsule"></i> Kê đơn thuốc</div>
+
+          <!-- Drug search & add -->
+          <div class="drug-add-row mb-3">
+            <div>
+              <label class="form-label" style="font-size:var(--text-xs);font-weight:600;">Tên thuốc (DanhMucThuoc)</label>
+              <input type="text" class="form-control" id="drugSearch" list="drugList" placeholder="Gõ để tìm thuốc..." autocomplete="off">
+              <datalist id="drugList"></datalist>
+            </div>
+            <div>
+              <label class="form-label" style="font-size:var(--text-xs);font-weight:600;">Số lượng</label>
+              <input type="number" class="form-control" id="drugQty" min="1" value="1" placeholder="SL">
+            </div>
+            <div>
+              <label class="form-label" style="font-size:var(--text-xs);font-weight:600;">Liều lượng / Cách dùng</label>
+              <input type="text" class="form-control" id="drugDosage" placeholder="VD: Ngày 2 lần, sau ăn">
+            </div>
+            <div>
+              <button class="btn-primary-medical" onclick="addDrug()" style="white-space:nowrap;">
+                <i class="bi bi-plus-lg"></i> Thêm vào đơn
+              </button>
+            </div>
+          </div>
+
+          <!-- Prescription table -->
+          <div style="border:1px solid var(--border-primary);border-radius:var(--radius-lg);overflow:hidden;">
+            <table class="prescription-table" id="prescriptionTable">
+              <thead>
+                <tr>
+                  <th style="width:40px;">STT</th>
+                  <th>Tên thuốc</th>
+                  <th style="width:80px;">Số lượng</th>
+                  <th>Liều lượng / Cách dùng</th>
+                  <th style="width:60px;"></th>
+                </tr>
+              </thead>
+              <tbody id="prescriptionBody">
+              </tbody>
+            </table>
+            <div id="prescriptionEmpty" class="prescription-empty">
+              <i class="bi bi-clipboard-plus"></i>
+              <p>Chưa có thuốc trong đơn.<br>Hãy tìm và thêm thuốc ở trên.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer actions -->
+        <div class="section-card">
+          <div class="form-footer" style="border:none;padding:0;margin:0;">
+            <button class="btn-secondary-medical" onclick="resetForm()"><i class="bi bi-arrow-counterclockwise me-1"></i> Làm lại</button>
+            <button class="btn-sign" onclick="submitRecord()" id="btnSubmit">
+              <i class="bi bi-shield-check"></i> Xác nhận ký số & Hoàn tất
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+@section Scripts {
+    <script>
+    const user = App.requireAuth(['doctor']);
+
+    let selectedAppointment = null;
+    let prescriptionDrugs = [];
+    let medicinesCatalog = [];
+
+    // ---- Init ----
+    async function init() {
+      if (!user || !user.doctorId) return;
+      document.getElementById('sidebarDoctorName').textContent = user.name;
+
+      // Load approved appointments for this doctor
+      const today = new Date().toISOString().split('T')[0];
+      const appointments = await API.getAppointments({ doctorId: user.doctorId });
+      const approved = appointments.filter(a => a.status === 'approved');
+
+      const select = document.getElementById('patientSelect');
+      select.innerHTML = '<option value="">-- Chọn bệnh nhân --</option>';
+      approved.forEach(apt => {
+        const age = apt.birthYear ? (new Date().getFullYear() - apt.birthYear) + ' tuổi' : '';
+        const opt = document.createElement('option');
+        opt.value = apt.id;
+        opt.textContent = `${apt.time} - ${apt.patientName} (${apt.phone}) ${age ? '• ' + age : ''} — ${App.formatDate(apt.date)}`;
+        select.appendChild(opt);
+      });
+
+      select.addEventListener('change', () => {
+        document.getElementById('btnSelectPatient').disabled = !select.value;
+      });
+
+      // Load medicines for datalist
+      medicinesCatalog = await API.getMedicines();
+      const datalist = document.getElementById('drugList');
+      datalist.innerHTML = '';
+      medicinesCatalog.forEach(med => {
+        const opt = document.createElement('option');
+        opt.value = med.name;
+        opt.textContent = `${med.name} (${med.unit})`;
+        datalist.appendChild(opt);
+      });
+
+      // Check query parameter
+      const params = new URLSearchParams(window.location.search);
+      const urlAptId = params.get('appointmentId');
+      if (urlAptId) {
+        const exists = appointments.find(a => a.id === urlAptId);
+        if (exists) {
+          if (exists.status === 'completed') {
+            App.toast.info('Thông báo', 'Lịch hẹn này đã hoàn thành bệnh án');
+            return;
+          }
+          if (!approved.some(a => a.id === urlAptId)) {
+            const age = exists.birthYear ? (new Date().getFullYear() - exists.birthYear) + ' tuổi' : '';
+            const opt = document.createElement('option');
+            opt.value = exists.id;
+            opt.textContent = `${exists.time} - ${exists.patientName} (${exists.phone}) ${age ? '• ' + age : ''} — ${App.formatDate(exists.date)}`;
+            select.appendChild(opt);
+          }
+          select.value = urlAptId;
+          document.getElementById('btnSelectPatient').disabled = false;
+          selectPatient();
+        }
+      }
+    }
+
+    // ---- Select patient ----
+    async function selectPatient() {
+      const aptId = document.getElementById('patientSelect').value;
+      if (!aptId) return;
+
+      const appointments = await API.getAppointments({ doctorId: user.doctorId });
+      selectedAppointment = appointments.find(a => a.id === aptId);
+      if (!selectedAppointment) {
+        App.toast.error('Lỗi', 'Không tìm thấy lịch hẹn');
+        return;
+      }
+
+      // Fill patient banner
+      const age = selectedAppointment.birthYear ? (new Date().getFullYear() - selectedAppointment.birthYear) : '?';
+      document.getElementById('patientBanner').innerHTML = `
+        <div class="pi-avatar">${selectedAppointment.patientName.charAt(0)}</div>
+        <div style="flex:1;">
+          <div class="pi-name">${selectedAppointment.patientName}</div>
+          <div class="pi-meta">
+            <span><i class="bi bi-telephone"></i> ${selectedAppointment.phone}</span>
+            <span><i class="bi bi-person"></i> ${selectedAppointment.gender || 'N/A'} — ${age} tuổi</span>
+            <span><i class="bi bi-calendar3"></i> Ngày khám: ${App.formatDate(selectedAppointment.date)}</span>
+            <span><i class="bi bi-clock"></i> ${selectedAppointment.time}</span>
+          </div>
+        </div>
+      `;
+
+      // Pre-fill symptoms from reason
+      if (selectedAppointment.reason) {
+        document.getElementById('symptoms').value = selectedAppointment.reason;
+      }
+
+      // Show form, hide selector
+      document.getElementById('patientSelector').style.display = 'none';
+      document.getElementById('recordForm').style.display = 'block';
+    }
+
+    // ---- Add drug to prescription ----
+    function addDrug() {
+      const nameInput = document.getElementById('drugSearch');
+      const qtyInput = document.getElementById('drugQty');
+      const dosageInput = document.getElementById('drugDosage');
+
+      const name = nameInput.value.trim();
+      const qty = parseInt(qtyInput.value) || 0;
+      const dosage = dosageInput.value.trim();
+
+      if (!name) {
+        App.toast.warning('Thiếu thông tin', 'Vui lòng chọn hoặc nhập tên thuốc');
+        nameInput.focus();
+        return;
+      }
+      if (qty <= 0) {
+        App.toast.warning('Thiếu thông tin', 'Số lượng phải lớn hơn 0');
+        qtyInput.focus();
+        return;
+      }
+      if (!dosage) {
+        App.toast.warning('Thiếu thông tin', 'Vui lòng nhập liều lượng / cách dùng');
+        dosageInput.focus();
+        return;
+      }
+
+      // Find unit from catalog
+      const found = medicinesCatalog.find(m => m.name.toLowerCase() === name.toLowerCase());
+      const unit = found ? found.unit : '';
+
+      prescriptionDrugs.push({ name, qty, unit, dosage });
+      renderPrescription();
+
+      // Reset inputs
+      nameInput.value = '';
+      qtyInput.value = '1';
+      dosageInput.value = '';
+      nameInput.focus();
+
+      App.toast.success('Đã thêm', `${name} x${qty}`);
+    }
+
+    // ---- Remove drug from prescription ----
+    function removeDrug(index) {
+      const removed = prescriptionDrugs.splice(index, 1);
+      renderPrescription();
+      App.toast.info('Đã xóa', `Đã xóa ${removed[0]?.name || 'thuốc'} khỏi đơn`);
+    }
+
+    // ---- Render prescription table ----
+    function renderPrescription() {
+      const tbody = document.getElementById('prescriptionBody');
+      const empty = document.getElementById('prescriptionEmpty');
+
+      if (prescriptionDrugs.length === 0) {
+        tbody.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+      }
+
+      empty.style.display = 'none';
+      tbody.innerHTML = prescriptionDrugs.map((drug, i) => `
+        <tr>
+          <td style="color:var(--text-tertiary);font-weight:600;">${i + 1}</td>
+          <td>
+            <div class="drug-name">${drug.name}</div>
+            ${drug.unit ? `<div class="drug-unit">${drug.unit}</div>` : ''}
+          </td>
+          <td style="font-weight:600;text-align:center;">${drug.qty}</td>
+          <td style="color:var(--text-secondary);">${drug.dosage}</td>
+          <td>
+            <button class="btn-icon sm" onclick="removeDrug(${i})" style="color:var(--danger);" title="Xóa">
+              <i class="bi bi-x-lg"></i>
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // ---- Submit record ----
+    function submitRecord() {
+      const symptoms = document.getElementById('symptoms').value.trim();
+      const diagnosis = document.getElementById('diagnosis').value.trim();
+
+      if (!symptoms) {
+        App.toast.warning('Thiếu thông tin', 'Vui lòng nhập triệu chứng lâm sàng');
+        document.getElementById('symptoms').focus();
+        return;
+      }
+      if (!diagnosis) {
+        App.toast.warning('Thiếu thông tin', 'Vui lòng nhập chẩn đoán bệnh');
+        document.getElementById('diagnosis').focus();
+        return;
+      }
+      if (prescriptionDrugs.length === 0) {
+        App.toast.warning('Thiếu thông tin', 'Đơn thuốc đang trống, vui lòng kê ít nhất 1 thuốc');
+        return;
+      }
+
+      // Confirm
+      App.confirm(
+        'Xác nhận ký số & Hoàn tất',
+        `<div style="text-align:left;font-size:var(--text-sm);">
+          <p><strong>Bệnh nhân:</strong> ${selectedAppointment.patientName}</p>
+          <p><strong>Chẩn đoán:</strong> ${diagnosis}</p>
+          <p><strong>Đơn thuốc:</strong> ${prescriptionDrugs.length} loại</p>
+          <hr>
+          <p class="text-muted">Sau khi xác nhận, bệnh án sẽ được ký số và lưu vào hệ thống. Hành động này không thể hoàn tác.</p>
+        </div>`,
+        async () => {
+          const historyData = {
+            soDienThoai: selectedAppointment.phone,
+            bookingId: selectedAppointment.bookingId,
+            patientName: selectedAppointment.patientName,
+            doctorName: selectedAppointment.doctorName,
+            specialty: selectedAppointment.specialty,
+            symptoms: symptoms,
+            diagnosis: diagnosis,
+            prescriptionItems: prescriptionDrugs,
+            prescription: prescriptionDrugs.map(d => `${d.name} x${d.qty}`).join(', '),
+            notes: 'Uống thuốc đúng liều lượng, tái khám khi có dấu hiệu bất thường.'
+          };
+
+          try {
+            // Save to medical history store
+            await API.addMedicalHistory(historyData);
+            // Mark appointment as completed
+            await API.updateAppointmentStatus(selectedAppointment.id, 'completed');
+            
+            App.toast.success('Hoàn tất!', 'Bệnh án đã được ký số và lưu thành công');
+          } catch (e) {
+            App.toast.error('Lỗi', 'Không thể hoàn thành bệnh án: ' + e.message);
+            return;
+          }
+
+          // Redirect back after short delay
+          setTimeout(() => {
+            window.location.href = '/Doctor/Examinations';
+          }, 1500);
+        },
+        'Xác nhận ký số'
+      );
+    }
+
+    // ---- Reset form ----
+    function resetForm() {
+      selectedAppointment = null;
+      prescriptionDrugs = [];
+      document.getElementById('symptoms').value = '';
+      document.getElementById('diagnosis').value = '';
+      document.getElementById('drugSearch').value = '';
+      document.getElementById('drugQty').value = '1';
+      document.getElementById('drugDosage').value = '';
+      renderPrescription();
+      document.getElementById('recordForm').style.display = 'none';
+      document.getElementById('patientSelector').style.display = 'block';
+      document.getElementById('patientSelect').value = '';
+      document.getElementById('btnSelectPatient').disabled = true;
+    }
+
+    init();
+  </script>
+}

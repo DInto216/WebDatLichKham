@@ -1,0 +1,154 @@
+@{
+    Layout = "~/Views/Shared/_DoctorLayout.cshtml";
+    ViewBag.Title = "Danh Sách Ca Khám";
+    ViewBag.ActiveMenu = "Examinations";
+    ViewBag.PageTitle = "Danh Sách Ca Khám";
+    ViewBag.PageSubtitle = "Các lịch hẹn đã được Admin duyệt";
+}
+
+@section TopbarActions {
+    <div class="form-medical" style="min-width:160px;">
+          <input type="date" class="form-control" id="filterDate" style="font-size:var(--text-sm);">
+        </div>
+        <button class="btn-icon" onclick="loadExaminations()" aria-label="Làm mới"><i class="bi bi-arrow-clockwise"></i></button>
+}
+
+<!-- Today Summary -->
+      <div class="row g-3 mb-4">
+        <div class="col-sm-4">
+          <div class="stat-card success">
+            <div class="d-flex align-items-center justify-content-between">
+              <div>
+                <div class="stat-value" id="statApproved">-</div>
+                <div class="stat-label">Chờ khám</div>
+              </div>
+              <div class="stat-icon" style="background:var(--success-light);color:var(--success)"><i class="bi bi-calendar-check"></i></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <div class="stat-card info">
+            <div class="d-flex align-items-center justify-content-between">
+              <div>
+                <div class="stat-value" id="statCompleted">-</div>
+                <div class="stat-label">Đã khám xong</div>
+              </div>
+              <div class="stat-icon" style="background:var(--info-light);color:var(--info)"><i class="bi bi-clipboard-check"></i></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <div class="stat-card primary">
+            <div class="d-flex align-items-center justify-content-between">
+              <div>
+                <div class="stat-value" id="statTotal">-</div>
+                <div class="stat-label">Tổng ca</div>
+              </div>
+              <div class="stat-icon" style="background:var(--primary-50);color:var(--primary-600)"><i class="bi bi-people"></i></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Examinations List -->
+      <div class="card-medical p-4">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+          <h5 class="mb-0" id="listTitle">Ca khám hôm nay</h5>
+        </div>
+        <div id="examinationsList">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+@section Scripts {
+    <script>
+    const user = App.requireAuth(['doctor']);
+
+    async function loadExaminations() {
+      if (!user || !user.doctorId) return;
+      document.getElementById('sidebarDoctorName').textContent = user.name;
+
+      const dateInput = document.getElementById('filterDate');
+      const selectedDate = dateInput.value || new Date().toISOString().split('T')[0];
+      dateInput.value = selectedDate;
+
+      const isToday = selectedDate === new Date().toISOString().split('T')[0];
+      document.getElementById('listTitle').textContent = isToday
+        ? 'Ca khám hôm nay'
+        : `Ca khám ngày ${App.formatDate(selectedDate)}`;
+
+      const container = document.getElementById('examinationsList');
+      App.showLoading(container, 4);
+
+      const allAppointments = await API.getAppointments({
+        doctorId: user.doctorId,
+        date: selectedDate
+      });
+
+      // Only show approved and completed
+      const appointments = allAppointments.filter(a => a.status === 'approved' || a.status === 'completed');
+
+      // Stats
+      const approved = appointments.filter(a => a.status === 'approved').length;
+      const completed = appointments.filter(a => a.status === 'completed').length;
+      document.getElementById('statApproved').textContent = approved;
+      document.getElementById('statCompleted').textContent = completed;
+      document.getElementById('statTotal').textContent = appointments.length;
+
+      if (appointments.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">📋</div>
+            <h5>Chưa có ca khám</h5>
+            <p>Không có lịch hẹn đã duyệt cho ngày này</p>
+          </div>
+        `;
+        return;
+      }
+
+      // Sort by time
+      appointments.sort((a, b) => a.time.localeCompare(b.time));
+
+      container.innerHTML = appointments.map(apt => `
+        <div class="d-flex align-items-center gap-3 p-3 mb-2 status-transition" style="background:var(--bg-tertiary);border-radius:var(--radius-md);${apt.status === 'completed' ? 'opacity:0.7;' : ''}" id="exam-${apt.id}">
+          <div style="min-width:64px;text-align:center;">
+            <div style="font-size:var(--text-xl);font-weight:800;color:var(--primary-600);">${apt.time}</div>
+          </div>
+          <div style="width:1px;height:40px;background:#E2E8F0;"></div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-weight:600;font-size:var(--text-base);">${apt.patientName}</div>
+            <div style="font-size:var(--text-sm);color:var(--text-tertiary);">
+              <i class="bi bi-telephone me-1"></i>${apt.phone}
+              <span class="mx-2">·</span>
+              ${apt.gender || ''} ${apt.birthYear ? '(' + (new Date().getFullYear() - apt.birthYear) + ' tuổi)' : ''}
+            </div>
+            <div style="font-size:var(--text-sm);color:var(--text-secondary);margin-top:4px;">
+              <i class="bi bi-chat-text me-1" style="color:var(--primary-400)"></i>${apt.reason || 'Không có thông tin'}
+            </div>
+          </div>
+          <div class="text-end" style="min-width:140px;">
+            <div class="mb-2" id="exam-status-${apt.id}">${App.renderStatusBadge(apt.status)}</div>
+            ${apt.status === 'approved' ? `
+              <button class="btn-success-medical" onclick="completeExam('${apt.id}')" style="font-size:12px;">
+                <i class="bi bi-check2-circle"></i> Hoàn thành 🩺
+              </button>
+            ` : '<span style="font-size:var(--text-xs);color:var(--text-muted);">Đã hoàn thành</span>'}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function completeExam(id) {
+      window.location.href = `/Doctor/CreateRecord?appointmentId=${id}`;
+    }
+
+    // Date filter
+    document.getElementById('filterDate').addEventListener('change', loadExaminations);
+
+    // Set today as default
+    document.getElementById('filterDate').value = new Date().toISOString().split('T')[0];
+    loadExaminations();
+  </script>
+}

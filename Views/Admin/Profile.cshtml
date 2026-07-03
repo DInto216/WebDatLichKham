@@ -1,0 +1,198 @@
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewBag.Title = "Thông Tin Cá Nhân";
+    ViewBag.ActiveMenu = "Profile";
+    ViewBag.PageTitle = "Thông Tin Cá Nhân";
+    ViewBag.PageSubtitle = "Quản lý thông tin quản trị và đổi mật khẩu";
+}
+
+<!-- Profile banner -->
+      <div class="profile-hero animate-fade-in-up">
+        <div class="profile-avatar-large" id="profileAvatar" onclick="triggerAvatarUpload()">
+          🔑
+          <div class="profile-avatar-overlay"><i class="bi bi-camera"></i></div>
+        </div>
+        <input type="file" id="avatarFileInput" accept="image/*" style="display: none;" onchange="handleAvatarFile(event)">
+        <div class="profile-meta">
+          <h4 id="profileDisplayName">Đang tải...</h4>
+          <span id="profileRole">Quản trị viên</span>
+        </div>
+      </div>
+
+      <div class="row g-4">
+        <!-- Edit Profile Column -->
+        <div class="col-lg-8">
+          <div class="card-medical p-4">
+            <h5 class="fw-bold mb-4"><i class="bi bi-person-lines-fill text-primary me-2"></i>Cập nhật thông tin</h5>
+            <form id="profileForm" class="form-medical" novalidate>
+              <div class="mb-3">
+                <label class="form-label">Tên hiển thị <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="adminName" required>
+                <div class="invalid-feedback">Vui lòng nhập tên hiển thị</div>
+              </div>
+              <div class="mb-4">
+                <label class="form-label">Tên đăng nhập / Username (Đọc duy nhất)</label>
+                <input type="text" class="form-control" id="adminUsername" readonly style="background:var(--bg-tertiary);">
+              </div>
+              <button type="submit" class="btn-primary-medical" id="saveProfileBtn">
+                <i class="bi bi-save me-1"></i> Lưu thay đổi
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Security / Password Column -->
+        <div class="col-lg-4">
+          <div class="card-medical p-4">
+            <h5 class="fw-bold mb-4"><i class="bi bi-shield-lock text-primary me-2"></i>Đổi mật khẩu</h5>
+            <form id="passwordForm" class="form-medical" novalidate>
+              <div class="mb-3">
+                <label class="form-label">Mật khẩu hiện tại <span class="text-danger">*</span></label>
+                <input type="password" class="form-control" id="oldPassword" required>
+                <div class="invalid-feedback">Vui lòng nhập mật khẩu cũ</div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Mật khẩu mới <span class="text-danger">*</span></label>
+                <input type="password" class="form-control" id="newPassword" minlength="3" required>
+                <div class="invalid-feedback">Mật khẩu mới tối thiểu 3 ký tự</div>
+              </div>
+              <div class="mb-4">
+                <label class="form-label">Xác nhận mật khẩu mới <span class="text-danger">*</span></label>
+                <input type="password" class="form-control" id="confirmPassword" required>
+                <div class="invalid-feedback">Mật khẩu xác nhận không đúng</div>
+              </div>
+              <button type="submit" class="btn-primary-medical w-100 justify-content-center" id="changePasswordBtn">
+                <i class="bi bi-key me-1"></i> Cập nhật mật khẩu
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+@section Scripts {
+    <script>
+    const user = App.requireAuth(['admin']);
+
+    function initProfile() {
+      if (!user) return;
+      const currentUser = API.getCurrentUser() || user;
+      document.getElementById('sidebarAdminName').textContent = currentUser.name;
+      document.getElementById('profileDisplayName').textContent = currentUser.name;
+      
+      const avatarContainer = document.getElementById('profileAvatar');
+      if (currentUser.avatar) {
+        avatarContainer.innerHTML = `<img src="${currentUser.avatar}" alt="Avatar"><div class="profile-avatar-overlay"><i class="bi bi-camera"></i></div>`;
+      } else {
+        avatarContainer.innerHTML = `${currentUser.name.charAt(0).toUpperCase() || '🔑'}<div class="profile-avatar-overlay"><i class="bi bi-camera"></i></div>`;
+      }
+      
+      document.getElementById('adminName').value = currentUser.name || '';
+      document.getElementById('adminUsername').value = currentUser.username || '';
+    }
+
+    function triggerAvatarUpload() {
+      document.getElementById('avatarFileInput').click();
+    }
+
+    async function handleAvatarFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      if (!file.type.startsWith('image/')) {
+        App.toast.error('Lỗi', 'Vui lòng chọn tệp tin hình ảnh');
+        return;
+      }
+      if (file.size > 2 * 1024 * 1024) {
+        App.toast.error('Lỗi', 'Kích thước ảnh tối đa là 2MB');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const base64Data = e.target.result;
+        try {
+          await API.updateProfile(user.id, { avatar: base64Data });
+          App.toast.success('Thành công', 'Đã cập nhật ảnh đại diện');
+          const updatedUser = API.getCurrentUser();
+          App.updateSidebarUser(updatedUser);
+          initProfile();
+        } catch (err) {
+          App.toast.error('Lỗi', err.message || 'Không thể lưu ảnh đại diện');
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Submit profile changes
+    document.getElementById('profileForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      if (!App.validateForm(form)) return;
+
+      const btn = document.getElementById('saveProfileBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Đang lưu...';
+
+      const data = {
+        name: document.getElementById('adminName').value.trim()
+      };
+
+      try {
+        await API.updateProfile(user.id, data);
+        App.toast.success('Thành công', 'Đã cập nhật thông tin cá nhân');
+        
+        // Update user session in memory/local
+        const updatedUser = API.getCurrentUser();
+        document.getElementById('sidebarAdminName').textContent = updatedUser.name;
+        document.getElementById('profileDisplayName').textContent = updatedUser.name;
+      } catch (err) {
+        App.toast.error('Lỗi', err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-save me-1"></i> Lưu thay đổi';
+      }
+    });
+
+    // Change password
+    document.getElementById('passwordForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      if (!App.validateForm(form)) return;
+
+      const oldPassword = document.getElementById('oldPassword').value;
+      const newPassword = document.getElementById('newPassword').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+
+      if (newPassword !== confirmPassword) {
+        document.getElementById('confirmPassword').classList.add('is-invalid');
+        App.toast.warning('Cảnh báo', 'Mật khẩu xác nhận không khớp');
+        return;
+      } else {
+        document.getElementById('confirmPassword').classList.remove('is-invalid');
+      }
+
+      const btn = document.getElementById('changePasswordBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Đang đổi...';
+
+      try {
+        await API.updateProfile(user.id, {
+          oldPassword,
+          newPassword
+        });
+        App.toast.success('Thành công', 'Đã thay đổi mật khẩu thành công');
+        form.reset();
+        form.classList.remove('was-validated');
+      } catch (err) {
+        App.toast.error('Lỗi', err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-key me-1"></i> Cập nhật mật khẩu';
+      }
+    });
+
+    initProfile();
+  </script>
+}

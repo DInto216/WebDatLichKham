@@ -1,0 +1,339 @@
+@{
+    Layout = "~/Views/Shared/_PublicLayout.cshtml";
+    ViewBag.Title = "Tra Cứu Lịch Hẹn";
+    ViewBag.ActiveNav = "Lookup";
+}
+
+@section PageStyles {
+<style>
+    /* ---- Print Slip Styles ---- */
+    .print-slip {
+      display: none;
+    }
+
+    @@media print {
+      body * { visibility: hidden !important; }
+      .print-slip, .print-slip * { visibility: visible !important; }
+      .print-slip {
+        display: block !important;
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: white;
+        z-index: 99999;
+        padding: 40px;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .print-slip .slip-header-print {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 3px solid #1e3a5f;
+        padding-bottom: 16px;
+        margin-bottom: 24px;
+      }
+      .print-slip .slip-logo-print {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .print-slip .slip-logo-print .logo-box {
+        width: 44px; height: 44px;
+        background: #2563eb;
+        border-radius: 10px;
+        display: flex; align-items: center; justify-content: center;
+        color: white; font-size: 1.3rem;
+      }
+      .print-slip .slip-logo-print .logo-name {
+        font-size: 1.2rem; font-weight: 800; color: #1e293b;
+      }
+      .print-slip .slip-logo-print .logo-sub {
+        font-size: 0.7rem; color: #64748b; text-transform: uppercase; letter-spacing: 1px;
+      }
+      .print-slip .slip-booking-id {
+        text-align: right;
+      }
+      .print-slip .slip-booking-id .label {
+        font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.5px; color: #94a3b8;
+      }
+      .print-slip .slip-booking-id .value {
+        font-size: 1.1rem; font-weight: 800; font-family: monospace; color: #1e293b;
+      }
+      .print-slip .slip-main-title {
+        text-align: center;
+        margin-bottom: 28px;
+      }
+      .print-slip .slip-main-title h2 {
+        font-size: 1.3rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: #1e293b; margin-bottom: 4px;
+      }
+      .print-slip .slip-main-title p {
+        font-size: 0.8rem; color: #64748b;
+      }
+      .print-slip .info-table-print {
+        width: 100%; border-collapse: collapse; margin-bottom: 28px;
+      }
+      .print-slip .info-table-print td {
+        padding: 10px 12px; font-size: 0.9rem; border-bottom: 1px solid #e2e8f0;
+      }
+      .print-slip .info-table-print td:first-child {
+        width: 160px; color: #64748b; font-weight: 600;
+      }
+      .print-slip .info-table-print td:last-child {
+        color: #1e293b; font-weight: 600;
+      }
+      .print-slip .slip-notice {
+        background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px;
+        padding: 16px; margin-bottom: 28px;
+      }
+      .print-slip .slip-notice .notice-title {
+        font-size: 0.75rem; font-weight: 700; color: #16a34a; text-transform: uppercase; margin-bottom: 6px;
+      }
+      .print-slip .slip-notice p {
+        font-size: 0.85rem; color: #334155; margin: 0; line-height: 1.6;
+      }
+      .print-slip .slip-sign-area {
+        display: flex; justify-content: flex-end; margin-top: 40px;
+      }
+      .print-slip .slip-sign-box {
+        text-align: center; min-width: 200px;
+      }
+      .print-slip .slip-sign-box .sign-date {
+        font-size: 0.8rem; color: #64748b; margin-bottom: 60px;
+      }
+      .print-slip .slip-sign-box .sign-label {
+        font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: #94a3b8;
+      }
+      .print-slip .slip-footer-print {
+        position: fixed; bottom: 40px; left: 40px; right: 40px;
+        border-top: 1px solid #e2e8f0; padding-top: 10px;
+        font-size: 0.7rem; color: #94a3b8;
+        display: flex; justify-content: space-between;
+      }
+    }
+  </style>
+}
+
+<section class="lookup-section">
+      <div class="lookup-card animate-fade-in-up">
+        <div class="text-center mb-5">
+          <div style="width:64px;height:64px;background:var(--primary-50);border-radius:var(--radius-lg);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:28px;color:var(--primary-600);">
+            <i class="bi bi-search"></i>
+          </div>
+          <h3>Tra Cứu Lịch Hẹn</h3>
+          <p style="color:var(--text-tertiary);font-size:var(--text-sm);">Nhập số điện thoại và mã Booking ID để kiểm tra trạng thái lịch hẹn</p>
+        </div>
+
+        <form id="lookupForm" class="form-medical" novalidate>
+          <div class="mb-4">
+            <label class="form-label" for="lookupPhone">Số điện thoại</label>
+            <div class="input-icon">
+              <i class="bi bi-telephone"></i>
+              <input type="tel" class="form-control" id="lookupPhone" placeholder="VD: 0912345678" required>
+              <div class="invalid-feedback">Vui lòng nhập số điện thoại</div>
+            </div>
+          </div>
+          <div class="mb-4">
+            <label class="form-label" for="lookupBookingId">Mã đặt lịch (Booking ID)</label>
+            <div class="input-icon">
+              <i class="bi bi-upc-scan"></i>
+              <input type="text" class="form-control" id="lookupBookingId" placeholder="VD: BK-A1B2C3D4" required style="text-transform:uppercase;font-family:var(--font-mono);font-weight:600;letter-spacing:0.05em;">
+              <div class="invalid-feedback">Vui lòng nhập mã đặt lịch</div>
+            </div>
+          </div>
+          <button type="submit" class="btn-primary-medical w-100 justify-content-center" style="padding:14px;" id="lookupBtn">
+            <i class="bi bi-search"></i> Tra Cứu
+          </button>
+        </form>
+
+        <!-- Demo hint -->
+        <div style="margin-top:20px;background:var(--bg-tertiary);border-radius:var(--radius-sm);padding:12px;font-size:var(--text-xs);color:var(--text-tertiary);">
+          <strong>🔍 Demo:</strong> SĐT: <code>0912345678</code> · Mã: <code>BK-A1B2C3D4</code><br>
+          <strong>📜 Xem bệnh án (completed):</strong> SĐT: <code>0978111222</code> · Mã: <code>BK-M3N4O5P6</code>
+        </div>
+
+        <!-- Lookup Result -->
+        <div id="lookupResult" style="display:none;"></div>
+
+        <!-- Not Found -->
+        <div id="lookupNotFound" style="display:none;margin-top:24px;">
+          <div style="background:var(--danger-light);border-radius:var(--radius-md);padding:20px;text-align:center;">
+            <div style="font-size:40px;margin-bottom:8px;">😞</div>
+            <h6 style="color:var(--danger-dark);margin-bottom:4px;">Không tìm thấy lịch hẹn</h6>
+            <p style="font-size:var(--text-xs);color:var(--danger-dark);opacity:0.8;margin:0;">Vui lòng kiểm tra lại số điện thoại và mã đặt lịch.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+@section Scripts {
+<script>
+    (() => {
+      'use strict';
+
+      const form = document.getElementById('lookupForm');
+      const resultDiv = document.getElementById('lookupResult');
+      const notFoundDiv = document.getElementById('lookupNotFound');
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!App.validateForm(form)) return;
+
+        const phone = document.getElementById('lookupPhone').value.trim();
+        const bookingId = document.getElementById('lookupBookingId').value.trim().toUpperCase();
+
+        const btn = document.getElementById('lookupBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="animate-spin" style="display:inline-block"><i class="bi bi-arrow-repeat"></i></span> Đang tra cứu...';
+
+        resultDiv.style.display = 'none';
+        notFoundDiv.style.display = 'none';
+
+        try {
+          const result = await API.lookupAppointment(phone, bookingId);
+
+          if (!result) {
+            notFoundDiv.style.display = 'block';
+            notFoundDiv.classList.add('animate-fade-in-up');
+          } else {
+            const statusInfo = App.getStatusLabel(result.status);
+            const statusMessages = {
+              pending: 'Lịch hẹn đang chờ phòng khám xác nhận. Vui lòng chờ.',
+              approved: 'Lịch hẹn đã được duyệt. Vui lòng đến đúng giờ!',
+              cancelled: 'Lịch hẹn đã bị hủy. Liên hệ hotline để biết thêm chi tiết.',
+              completed: 'Ca khám đã hoàn thành. Cảm ơn bạn đã sử dụng dịch vụ!'
+            };
+
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = `
+              <div class="lookup-result">
+                <div style="text-align:center;margin-bottom:20px;">
+                  ${App.renderStatusBadge(result.status)}
+                  <p style="font-size:var(--text-xs);color:var(--text-tertiary);margin-top:8px;">${statusMessages[result.status]}</p>
+                </div>
+
+                <div style="background:var(--bg-tertiary);border-radius:var(--radius-md);padding:16px;">
+                  <div class="d-flex justify-content-between mb-2" style="font-size:var(--text-sm);">
+                    <span style="color:var(--text-tertiary);">Mã đặt lịch</span>
+                    <span style="font-weight:700;color:var(--primary-600);font-family:var(--font-mono);">${result.bookingId}</span>
+                  </div>
+                  <div class="d-flex justify-content-between mb-2" style="font-size:var(--text-sm);">
+                    <span style="color:var(--text-tertiary);">Bệnh nhân</span>
+                    <span style="font-weight:600;">${result.patientName}</span>
+                  </div>
+                  <div class="d-flex justify-content-between mb-2" style="font-size:var(--text-sm);">
+                    <span style="color:var(--text-tertiary);">SĐT</span>
+                    <span style="font-weight:600;">${result.phone}</span>
+                  </div>
+                  <div class="d-flex justify-content-between mb-2" style="font-size:var(--text-sm);">
+                    <span style="color:var(--text-tertiary);">Bác sĩ</span>
+                    <span style="font-weight:600;">${result.doctorName}</span>
+                  </div>
+                  <div class="d-flex justify-content-between mb-2" style="font-size:var(--text-sm);">
+                    <span style="color:var(--text-tertiary);">Chuyên khoa</span>
+                    <span style="font-weight:600;">${result.specialty}</span>
+                  </div>
+                  <div class="d-flex justify-content-between mb-2" style="font-size:var(--text-sm);">
+                    <span style="color:var(--text-tertiary);">Ngày khám</span>
+                    <span style="font-weight:600;">${App.formatDate(result.date)}</span>
+                  </div>
+                  <div class="d-flex justify-content-between" style="font-size:var(--text-sm);">
+                    <span style="color:var(--text-tertiary);">Giờ khám</span>
+                    <span style="font-weight:700;color:var(--primary-600);">${result.time}</span>
+                  </div>
+                </div>
+
+                ${result.status === 'approved' ? `
+                <div style="margin-top:16px;">
+                  <button onclick="printAppointmentSlip()" class="btn-primary-medical w-100 justify-content-center" style="padding:14px;background:linear-gradient(135deg,#6366f1 0%,#7c3aed 100%);border:none;cursor:pointer;">
+                    <i class="bi bi-printer"></i> In phiếu khám
+                  </button>
+                </div>
+                ` : ''}
+
+                ${result.status === 'completed' ? `
+                <div style="margin-top:16px;">
+                  <a href="/Home/ExamResult?bookingId=${result.bookingId}" class="btn-primary-medical w-100 justify-content-center" style="padding:14px;background:linear-gradient(135deg,#10b981 0%,#059669 100%);border:none;text-decoration:none;">
+                    <i class="bi bi-file-earmark-medical"></i> Xem đơn thuốc và Bệnh án
+                  </a>
+                </div>
+                ` : ''}
+              </div>
+            `;
+            // Store result for printing
+            window._lastLookupResult = result;
+            resultDiv.classList.add('animate-fade-in-up');
+          }
+        } catch (err) {
+          App.toast.error('Lỗi', 'Đã xảy ra lỗi, vui lòng thử lại');
+        }
+
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-search"></i> Tra Cứu';
+      });
+    })();
+
+    function printAppointmentSlip() {
+      const r = window._lastLookupResult;
+      if (!r) return;
+
+      const today = new Date();
+      const printDate = today.toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+      const examDate = new Date(r.date);
+      const formattedExamDate = examDate.toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+      document.getElementById('printSlip').innerHTML = `
+        <div class="slip-header-print">
+          <div class="slip-logo-print">
+            <div class="logo-box"><i class="bi bi-heart-pulse-fill"></i></div>
+            <div>
+              <div class="logo-name">MediBooking</div>
+              <div class="logo-sub">Phòng Khám Đa Khoa</div>
+            </div>
+          </div>
+          <div class="slip-booking-id">
+            <div class="label">Mã đặt lịch</div>
+            <div class="value">${r.bookingId}</div>
+          </div>
+        </div>
+
+        <div class="slip-main-title">
+          <h2>Phiếu Xác Nhận Lịch Hẹn Khám Bệnh</h2>
+          <p>Phiếu này xác nhận lịch hẹn của bạn đã được phòng khám duyệt</p>
+        </div>
+
+        <table class="info-table-print">
+          <tr><td>Họ và tên</td><td>${r.patientName}</td></tr>
+          <tr><td>Số điện thoại</td><td>${r.phone}</td></tr>
+          <tr><td>Bác sĩ phụ trách</td><td>${r.doctorName}</td></tr>
+          <tr><td>Chuyên khoa</td><td>${r.specialty}</td></tr>
+          <tr><td>Ngày khám</td><td>${formattedExamDate}</td></tr>
+          <tr><td>Giờ khám</td><td style="font-size:1.1rem;font-weight:800;color:#2563eb;">${r.time}</td></tr>
+          <tr><td>Lý do khám</td><td>${r.reason || 'Không có thông tin'}</td></tr>
+        </table>
+
+        <div class="slip-notice">
+          <div class="notice-title">📋 Lưu ý quan trọng</div>
+          <p>• Vui lòng đến trước giờ hẹn <strong>15 phút</strong> để làm thủ tục.<br>
+             • Mang theo CMND/CCCD và thẻ BHYT (nếu có).<br>
+             • Mang theo kết quả xét nghiệm cũ (nếu có).<br>
+             • Liên hệ hotline <strong>1900-xxxx</strong> nếu cần hủy hoặc đổi lịch.</p>
+        </div>
+
+        <div class="slip-sign-area">
+          <div class="slip-sign-box">
+            <div class="sign-date">Ngày ${today.getDate()} tháng ${today.getMonth() + 1} năm ${today.getFullYear()}</div>
+            <div class="sign-label">Xác nhận của phòng khám</div>
+          </div>
+        </div>
+
+        <div class="slip-footer-print">
+          <span>Phiếu được xuất tự động bởi hệ thống MediBooking</span>
+          <span>In ngày: ${printDate}</span>
+        </div>
+      `;
+
+      setTimeout(() => window.print(), 100);
+    }
+  </script>
+}

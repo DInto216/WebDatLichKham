@@ -1,0 +1,385 @@
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewBag.Title = "Quản Lý Thanh Toán - Admin";
+    ViewBag.ActiveMenu = "Payments";
+    ViewBag.PageTitle = "Quản Lý Thanh Toán";
+    ViewBag.PageSubtitle = "Theo dõi và đối soát các giao dịch thanh toán trực tuyến";
+}
+
+@section PageStyles {
+  <style>
+    .payment-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 700;
+    }
+    .payment-badge.unpaid { background: #fef3c7; color: #92400e; }
+    .payment-badge.pending_bank { background: #dbeafe; color: #1e40af; }
+    .payment-badge.paid { background: #d1fae5; color: #065f46; }
+    .payment-badge.refunded { background: #f3e8ff; color: #6b21a8; }
+
+    .pm-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; }
+
+    .stat-payment-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--bg-tertiary);
+      border-radius: var(--radius-md);
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .stat-payment-card .stat-icon {
+      width: 52px; height: 52px; border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center; font-size: 22px;
+    }
+    .stat-payment-card .stat-value { font-size: 22px; font-weight: 800; line-height: 1; }
+    .stat-payment-card .stat-label { font-size: 12px; color: var(--text-tertiary); margin-top: 4px; }
+
+    .filter-bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    .actions-cell { display: flex; gap: 6px; }
+  </style>
+}
+<!-- Stats Row -->
+      <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-xl-3">
+          <div class="stat-payment-card">
+            <div class="stat-icon" style="background:linear-gradient(135deg,#fef3c7,#fde68a);">💰</div>
+            <div>
+              <div class="stat-value" id="statTotalRevenue">---</div>
+              <div class="stat-label">Tổng doanh thu (đã thanh toán)</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+          <div class="stat-payment-card">
+            <div class="stat-icon" style="background:linear-gradient(135deg,#dbeafe,#bfdbfe);">⏳</div>
+            <div>
+              <div class="stat-value" id="statPendingCount">---</div>
+              <div class="stat-label">Chờ xác nhận chuyển khoản</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+          <div class="stat-payment-card">
+            <div class="stat-icon" style="background:linear-gradient(135deg,#d1fae5,#a7f3d0);">✅</div>
+            <div>
+              <div class="stat-value" id="statPaidCount">---</div>
+              <div class="stat-label">Đã xác nhận thanh toán</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+          <div class="stat-payment-card">
+            <div class="stat-icon" style="background:linear-gradient(135deg,#fce7f3,#f5d0fe);">📋</div>
+            <div>
+              <div class="stat-value" id="statUnpaidCount">---</div>
+              <div class="stat-label">Chưa thanh toán</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ---- Main Table Card ---- -->
+      <div class="card-medical p-0">
+        <div class="p-4 pb-0">
+          <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+            <h5 style="margin:0;"><i class="bi bi-credit-card me-2 text-primary-medical"></i>Danh Sách Giao Dịch Thanh Toán</h5>
+            <div class="filter-bar">
+              <select class="form-select" id="filterPaymentStatus" style="width:auto;min-width:160px;">
+                <option value="">Tất cả trạng thái</option>
+                <option value="unpaid">Chưa thanh toán</option>
+                <option value="pending_bank">Chờ xác nhận CK</option>
+                <option value="paid">Đã thanh toán</option>
+                <option value="refunded">Đã hoàn tiền</option>
+              </select>
+              <input type="date" class="form-control" id="filterDate" style="width:auto;">
+              <button class="btn-secondary-medical" onclick="loadPayments()">
+                <i class="bi bi-search"></i> Lọc
+              </button>
+              <button class="btn-ghost" onclick="clearFilter()">
+                <i class="bi bi-x-circle"></i> Xóa lọc
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table admin-table">
+            <thead>
+              <tr>
+                <th>Mã đặt lịch</th>
+                <th>Bệnh nhân</th>
+                <th>Bác sĩ</th>
+                <th>Ngày khám</th>
+                <th>Phương thức</th>
+                <th>Số tiền</th>
+                <th>Trạng thái TT</th>
+                <th>Thời gian tạo</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody id="paymentTableBody">
+              <tr><td colspan="9" class="text-center py-4"><div class="spinner-border spinner-border-sm text-primary" role="status"></div> Đang tải...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Confirm Payment Modal -->
+  <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-modal="true" role="dialog">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content" style="border:none;border-radius:var(--radius-xl);overflow:hidden;">
+        <div class="modal-header" style="background:var(--gradient-primary);border:none;">
+          <h5 class="modal-title text-white" id="paymentModalLabel"><i class="bi bi-credit-card me-2"></i>Cập Nhật Thanh Toán</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <div id="paymentModalInfo" class="mb-4"></div>
+          <div class="form-medical">
+            <label class="form-label">Trạng thái thanh toán mới</label>
+            <select class="form-select" id="newPaymentStatus">
+              <option value="unpaid">Chưa thanh toán</option>
+              <option value="pending_bank">Chờ xác nhận chuyển khoản</option>
+              <option value="paid">Đã thanh toán ✓</option>
+              <option value="refunded">Đã hoàn tiền</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer" style="border:none;padding:16px 24px 24px;">
+          <button type="button" class="btn-secondary-medical" data-bs-dismiss="modal">Hủy</button>
+          <button type="button" class="btn-primary-medical" id="btnSavePayment" style="padding:10px 24px;">
+            <i class="bi bi-save"></i> Lưu thay đổi
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/api.js?v=1.1"></script>
+  <script src="/js/main.js?v=1.1"></script>
+  <script>
+    const PM_LABELS = {
+      cash: { label: 'Tại quầy', icon: '💵' },
+      bank_transfer: { label: 'Chuyển khoản', icon: '🏦' },
+      momo: { label: 'MoMo', icon: '📱' },
+      zalopay: { label: 'ZaloPay', icon: '💚' }
+    };
+    const PS_LABELS = {
+      unpaid: { text: 'Chưa thanh toán', cls: 'unpaid', icon: 'bi-clock' },
+      pending_bank: { text: 'Chờ xác nhận CK', cls: 'pending_bank', icon: 'bi-hourglass-split' },
+      paid: { text: 'Đã thanh toán', cls: 'paid', icon: 'bi-check-circle-fill' },
+      refunded: { text: 'Đã hoàn tiền', cls: 'refunded', icon: 'bi-arrow-counterclockwise' }
+    };
+
+    let allPayments = [];
+    let editingAppointmentId = null;
+
+    async function loadPayments() {
+      const status = document.getElementById('filterPaymentStatus').value;
+      const date = document.getElementById('filterDate').value;
+
+      const tbody = document.getElementById('paymentTableBody');
+      tbody.innerHTML = '<tr><td colspan="9" class="text-center py-4"><div class="spinner-border spinner-border-sm text-primary" role="status"></div> Đang tải...</td></tr>';
+
+      try {
+        const params = new URLSearchParams();
+        if (status) params.append('paymentStatus', status);
+        if (date) params.append('date', date);
+
+        const res = await fetch(`/api/payments?${params}`, { credentials: 'include' });
+    const user = App.requireAuth(['admin']);
+    let payments = [];
+    let currentFilter = 'all';
+    
+    document.addEventListener('DOMContentLoaded', async () => {
+      await loadPayments();
+      document.querySelectorAll('.filter-bar .btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          document.querySelectorAll('.filter-bar .btn').forEach(b => {
+            b.classList.remove('btn-primary-medical');
+            b.classList.add('btn-outline-primary');
+          });
+          e.currentTarget.classList.remove('btn-outline-primary');
+          e.currentTarget.classList.add('btn-primary-medical');
+          currentFilter = e.currentTarget.dataset.filter;
+          renderPayments();
+        });
+      });
+      document.getElementById('searchInput').addEventListener('input', (e) => {
+        renderPayments(e.target.value.trim().toLowerCase());
+      });
+    });
+
+    const loadPayments = async () => {
+      try {
+        payments = await API.getPayments();
+        updateStats();
+        renderPayments();
+      } catch (err) {
+        App.toast.error('Lỗi', 'Không thể tải danh sách thanh toán');
+      }
+    };
+
+    const updateStats = () => {
+      const totalPaid = payments.filter(p => p.status === 'paid').reduce((acc, p) => acc + p.amount, 0);
+      const pendingCount = payments.filter(p => p.status === 'pending_bank').length;
+      const today = new Date().toISOString().split('T')[0];
+      const todayCount = payments.filter(p => p.transactionDate && p.transactionDate.startsWith(today)).length;
+      const refundCount = payments.filter(p => p.status === 'refunded').length;
+
+      document.getElementById('statTotalRevenue').textContent = App.formatCurrency(totalPaid);
+      document.getElementById('statPendingCount').textContent = pendingCount;
+      document.getElementById('statTodayCount').textContent = todayCount;
+      document.getElementById('statRefundCount').textContent = refundCount;
+    };
+
+    const renderPayments = (searchStr = '') => {
+      const tbody = document.getElementById('paymentTableBody');
+      let filtered = payments;
+
+      if (currentFilter !== 'all') {
+        filtered = filtered.filter(p => p.status === currentFilter);
+      }
+
+      if (searchStr) {
+        filtered = filtered.filter(p => 
+          (p.transactionId || '').toLowerCase().includes(searchStr) || 
+          p.patientName.toLowerCase().includes(searchStr) || 
+          (p.appointmentId || '').toLowerCase().includes(searchStr)
+        );
+      }
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted py-4">Không tìm thấy giao dịch nào</td></tr>';
+        return;
+      }
+
+        const amount = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p.paymentAmount || 0);
+        const date = p.date ? p.date : '---';
+        const createdAt = p.createdAt ? new Date(p.createdAt).toLocaleString('vi-VN') : '---';
+
+        return `
+          <tr>
+            <td><span class="booking-id-small" style="font-family:monospace;font-size:12px;background:var(--primary-50);padding:2px 8px;border-radius:4px;color:var(--primary-700);">${p.bookingId}</span></td>
+            <td>
+              <div style="font-weight:600;font-size:var(--text-sm);">${p.patientName}</div>
+              <div style="font-size:11px;color:var(--text-tertiary);">${p.phone}</div>
+            </td>
+            <td>
+              <div style="font-size:var(--text-sm);">${p.doctorName}</div>
+              <div style="font-size:11px;color:var(--text-tertiary);">${p.specialty}</div>
+            </td>
+            <td style="font-size:var(--text-sm);">${date}<br><span style="color:var(--primary-600);font-weight:600;">${p.time}</span></td>
+            <td><span class="pm-badge">${pm.icon} ${pm.label}</span></td>
+            <td style="font-weight:800;color:var(--secondary-600);">${amount}</td>
+            <td><span class="payment-badge ${ps.cls}"><i class="bi ${ps.icon}"></i> ${ps.text}</span></td>
+            <td style="font-size:11px;color:var(--text-tertiary);">${createdAt}</td>
+            <td>
+              <div class="actions-cell">
+                ${p.paymentStatus !== 'paid' ? `
+                  <button class="btn-icon sm" style="color:var(--success);" onclick="confirmPayment('${p.id}')" title="Xác nhận đã thanh toán">
+                    <i class="bi bi-check-circle"></i>
+                  </button>
+                ` : ''}
+                <button class="btn-icon sm" onclick="openEditPayment('${p.id}')" title="Chỉnh sửa">
+                  <i class="bi bi-pencil"></i>
+                </button>
+              </div>
+            </td>
+          </tr>`;
+      }).join('');
+    }
+
+    function updateStats(payments) {
+      const paid = payments.filter(p => p.paymentStatus === 'paid');
+      const pendingBank = payments.filter(p => p.paymentStatus === 'pending_bank');
+      const unpaid = payments.filter(p => p.paymentStatus === 'unpaid');
+      const totalRevenue = paid.reduce((sum, p) => sum + (p.paymentAmount || 0), 0);
+
+      const fmt = (n) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', notation: 'compact', maximumFractionDigits: 1 }).format(n);
+
+      document.getElementById('statTotalRevenue').textContent = fmt(totalRevenue);
+      document.getElementById('statPendingCount').textContent = pendingBank.length;
+      document.getElementById('statPaidCount').textContent = paid.length;
+      document.getElementById('statUnpaidCount').textContent = unpaid.length;
+    }
+
+    function clearFilter() {
+      document.getElementById('filterPaymentStatus').value = '';
+      document.getElementById('filterDate').value = '';
+      loadPayments();
+    }
+
+    async function confirmPayment(appointmentId) {
+      App.confirm('Xác nhận thanh toán', 'Đánh dấu giao dịch này là <strong>Đã thanh toán</strong>?', async () => {
+        try {
+          const res = await fetch(`/api/appointments/${appointmentId}/payment`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ paymentStatus: 'paid' })
+          });
+          if (!res.ok) { const e = await res.json(); throw new Error(e.message || 'Lỗi'); }
+          App.toast.success('Thành công', 'Đã xác nhận thanh toán');
+          loadPayments();
+        } catch (err) {
+          App.toast.error('Lỗi', err.message);
+        }
+      }, 'Xác nhận');
+    }
+
+    function openEditPayment(appointmentId) {
+      editingAppointmentId = appointmentId;
+      const p = allPayments.find(x => x.id === appointmentId);
+      if (!p) return;
+
+      const amount = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p.paymentAmount || 0);
+      const pm = PM_LABELS[p.paymentMethod] || { label: p.paymentMethod, icon: '💳' };
+
+      document.getElementById('paymentModalInfo').innerHTML = `
+        <div style="background:var(--bg-tertiary);border-radius:var(--radius-sm);padding:14px;font-size:13px;">
+          <div style="font-weight:700;margin-bottom:8px;">${p.bookingId}</div>
+          <div style="color:var(--text-tertiary);">Bệnh nhân: <strong style="color:var(--text-primary);">${p.patientName}</strong></div>
+          <div style="color:var(--text-tertiary);">Số tiền: <strong style="color:var(--secondary-600);">${amount}</strong></div>
+          <div style="color:var(--text-tertiary);">Phương thức: <strong>${pm.icon} ${pm.label}</strong></div>
+        </div>`;
+
+      document.getElementById('newPaymentStatus').value = p.paymentStatus;
+      bootstrap.Modal.getOrCreateInstance(document.getElementById('paymentModal')).show();
+    }
+
+    document.getElementById('btnSavePayment').addEventListener('click', async () => {
+      if (!editingAppointmentId) return;
+      const newStatus = document.getElementById('newPaymentStatus').value;
+
+      try {
+        const res = await fetch(`/api/appointments/${editingAppointmentId}/payment`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ paymentStatus: newStatus })
+        });
+        if (!res.ok) { const e = await res.json(); throw new Error(e.message || 'Lỗi'); }
+        bootstrap.Modal.getInstance(document.getElementById('paymentModal')).hide();
+        App.toast.success('Thành công', 'Đã cập nhật trạng thái thanh toán');
+        loadPayments();
+      } catch (err) {
+        App.toast.error('Lỗi', err.message);
+      }
+    });
+
+    // Sidebar toggle
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    document.querySelectorAll('.sidebar-toggle').forEach(btn => {
+      btn.addEventListener('click', () => { sidebar.classList.toggle('open'); overlay.classList.toggle('open'); });
+    });
+    overlay.addEventListener('click', () => { sidebar.classList.remove('open'); overlay.classList.remove('open'); });
+
+    loadPayments();
+  </script>
+</body>
+</html>

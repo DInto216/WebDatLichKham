@@ -1,0 +1,135 @@
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewBag.Title = "Quản Lý Tài Khoản";
+    ViewBag.ActiveMenu = "Accounts";
+    ViewBag.PageTitle = "Quản Lý Tài Khoản";
+    ViewBag.PageSubtitle = "Tạo tài khoản và cấp quyền Doctor";
+}
+
+@section TopbarActions {
+    <button class="btn-primary-medical" data-bs-toggle="modal" data-bs-target="#accountModal">
+          <i class="bi bi-person-plus"></i> Tạo tài khoản
+        </button>
+}
+
+<div class="card-medical p-4">
+        <div class="table-responsive-medical">
+          <table class="table-medical">
+            <thead>
+              <tr>
+                <th>Username</th>
+                <th>Tên</th>
+                <th>Vai trò</th>
+                <th>Mật khẩu</th>
+                <th>Ngày tạo</th>
+                <th style="width:80px;">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody id="accountsTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal fade" id="accountModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content" style="border:none;border-radius:var(--radius-xl);overflow:hidden;">
+        <div class="modal-header" style="border-bottom:1px solid var(--bg-tertiary);padding:20px 24px;">
+          <h5 class="modal-title" style="font-weight:700;">Tạo Tài Khoản Doctor</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+        </div>
+        <div class="modal-body" style="padding:24px;">
+          <form id="accountForm" class="form-medical" novalidate>
+            <div class="mb-3">
+              <label class="form-label">Tên hiển thị</label>
+              <input type="text" class="form-control" id="accName" placeholder="VD: BS. Nguyễn Văn A" required>
+              <div class="invalid-feedback">Vui lòng nhập tên</div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Username</label>
+              <input type="text" class="form-control" id="accUsername" placeholder="VD: doctor04" required>
+              <div class="invalid-feedback">Vui lòng nhập username</div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Mật khẩu</label>
+              <input type="text" class="form-control" id="accPassword" placeholder="Nhập mật khẩu" required>
+              <div class="invalid-feedback">Vui lòng nhập mật khẩu</div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Vai trò</label>
+              <select class="form-select" id="accRole" disabled>
+                <option value="doctor" selected>Doctor (Bác sĩ)</option>
+              </select>
+              <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:4px;">Chỉ tạo tài khoản cho Bác sĩ. Tài khoản Admin được cấp bởi hệ thống.</div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer" style="border-top:1px solid var(--bg-tertiary);padding:16px 24px;">
+          <button type="button" class="btn-secondary-medical" data-bs-dismiss="modal">Hủy</button>
+          <button type="button" class="btn-primary-medical" onclick="createAccount()"><i class="bi bi-check-lg"></i> Tạo tài khoản</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+@section Scripts {
+    <script>
+    App.requireAuth(['admin']);
+
+    async function loadAccounts() {
+      const tbody = document.getElementById('accountsTable');
+      App.showTableLoading(tbody, 6, 4);
+      const accounts = await API.getAccounts();
+
+      const roleBadges = {
+        admin: '<span class="badge-medical badge-completed"><span class="status-dot"></span>Admin</span>',
+        doctor: '<span class="badge-medical badge-approved"><span class="status-dot"></span>Doctor</span>'
+      };
+
+      tbody.innerHTML = accounts.map(acc => `
+        <tr>
+          <td style="font-weight:600;font-family:var(--font-mono);font-size:var(--text-sm);">${acc.username}</td>
+          <td>${acc.name}</td>
+          <td>${roleBadges[acc.role] || acc.role}</td>
+          <td style="color:var(--text-muted);">${acc.password}</td>
+          <td>${App.formatDate(acc.createdAt)}</td>
+          <td>
+            ${acc.role !== 'admin' ? `<button class="btn-icon sm" onclick="deleteAccount('${acc.id}','${acc.username}')" aria-label="Xóa" style="color:var(--danger)"><i class="bi bi-trash"></i></button>` : '<span style="color:var(--text-muted);font-size:var(--text-xs);">—</span>'}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function createAccount() {
+      const form = document.getElementById('accountForm');
+      if (!App.validateForm(form)) return;
+
+      try {
+        await API.createAccount({
+          name: document.getElementById('accName').value.trim(),
+          username: document.getElementById('accUsername').value.trim(),
+          password: document.getElementById('accPassword').value,
+          role: 'doctor'
+        });
+        App.toast.success('Thành công', 'Đã tạo tài khoản mới');
+        bootstrap.Modal.getInstance(document.getElementById('accountModal')).hide();
+        form.reset();
+        loadAccounts();
+      } catch (err) {
+        App.toast.error('Lỗi', err.message);
+      }
+    }
+
+    function deleteAccount(id, username) {
+      App.confirm('Xóa tài khoản', `Bạn có chắc muốn xóa tài khoản "${username}"?`, async () => {
+        await API.deleteAccount(id);
+        App.toast.success('Đã xóa', `Tài khoản "${username}" đã được xóa`);
+        loadAccounts();
+      }, 'Xóa');
+    }
+
+    loadAccounts();
+  </script>
+}

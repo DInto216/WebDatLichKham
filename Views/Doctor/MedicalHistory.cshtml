@@ -1,0 +1,162 @@
+@{
+    Layout = "~/Views/Shared/_DoctorLayout.cshtml";
+    ViewBag.Title = "Tra Cứu Lịch Sử Bệnh Án";
+    ViewBag.ActiveMenu = "MedicalHistory";
+    ViewBag.PageTitle = "Tra Cứu Lịch Sử Bệnh Án";
+    ViewBag.PageSubtitle = "Tra cứu toàn bộ lịch sử khám bệnh theo số điện thoại";
+}
+
+<!-- Search section -->
+<div class="card-medical p-4 mb-4">
+  <div class="row align-items-end g-3">
+    <div class="col-md-8">
+      <label class="form-label text-muted-medical"><i class="bi bi-search me-1"></i> Tìm kiếm theo số điện thoại</label>
+      <input type="tel" class="form-control" id="phoneInput" placeholder="VD: 0912345678" maxlength="15" autocomplete="off" style="font-size: 1.1rem; padding: 12px;">
+    </div>
+    <div class="col-md-4">
+      <button class="btn-primary-medical w-100 justify-content-center" id="searchBtn" onclick="searchHistory()" style="padding: 12px;">
+        <i class="bi bi-search me-1"></i> Tra cứu bệnh án
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Results area -->
+<div id="resultsArea">
+  <!-- Idle state -->
+  <div class="card-medical text-center p-5">
+    <div class="empty-state-icon mx-auto mb-3" style="font-size: 3.5rem; color: var(--bg-tertiary);"><i class="bi bi-file-earmark-medical"></i></div>
+    <h5 class="text-secondary">Chưa có dữ liệu tra cứu</h5>
+    <p class="text-muted">Nhập số điện thoại bệnh nhân vào ô bên trên và nhấn "Tra cứu" để xem lịch sử khám bệnh toàn viện.</p>
+  </div>
+</div>
+
+@section Scripts {
+  <script>
+    const user = App.requireAuth(['doctor']);
+    if (user) {
+      document.getElementById('sidebarDoctorName').textContent = user.name;
+    }
+
+    const phoneInput = document.getElementById('phoneInput');
+    const resultsArea = document.getElementById('resultsArea');
+
+    // Search on Enter key
+    phoneInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') searchHistory();
+    });
+
+    async function searchHistory() {
+      const phone = phoneInput.value.trim();
+      
+      if (!phone) {
+        App.toast.warning('Thiếu thông tin', 'Vui lòng nhập số điện thoại để tra cứu');
+        phoneInput.focus();
+        return;
+      }
+
+      resultsArea.innerHTML = `
+        <div class="card-medical text-center p-5">
+          <div class="spinner-border text-primary mb-3" role="status"></div>
+          <p class="text-muted">Đang tra cứu dữ liệu từ hệ thống...</p>
+        </div>
+      `;
+
+      try {
+        const records = await API.searchMedicalHistory(phone);
+        
+        if (!records || records.length === 0) {
+          resultsArea.innerHTML = `
+            <div class="card-medical text-center p-5">
+              <div class="empty-state-icon mx-auto mb-3" style="font-size: 3.5rem; color: var(--warning-color);"><i class="bi bi-exclamation-circle"></i></div>
+              <h5>Không tìm thấy kết quả</h5>
+              <p class="text-muted">Bệnh nhân với số điện thoại <strong>${phone}</strong> chưa có lịch sử khám bệnh.</p>
+            </div>
+          `;
+          return;
+        }
+
+        // Sort descending by date
+        records.sort((a, b) => new Date(b.visitDate) - new Date(a.visitDate));
+        
+        const patient = records[0];
+        const totalVisits = records.length;
+        const specialties = [...new Set(records.map(r => r.specialty))].join(', ');
+
+        let html = `
+          <div class="card-medical mb-4 p-4 border-primary" style="border-width: 2px;">
+            <div class="d-flex align-items-center gap-3">
+              <div style="width:64px;height:64px;background:var(--primary-100);color:var(--primary-700);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:bold;">
+                ${patient.patientName.charAt(0)}
+              </div>
+              <div>
+                <h4 class="mb-1">${patient.patientName}</h4>
+                <div class="text-muted"><i class="bi bi-telephone me-1"></i>${patient.soDienThoai}</div>
+              </div>
+              <div class="ms-auto text-end">
+                <div class="badge bg-primary mb-2" style="font-size:0.9rem;">Tổng số lần khám: ${totalVisits}</div>
+                <div class="text-muted" style="font-size:0.85rem;">Các khoa đã khám: ${specialties}</div>
+              </div>
+            </div>
+          </div>
+          
+          <h5 class="mb-3"><i class="bi bi-clock-history me-2 text-primary"></i>Chi tiết các lần khám</h5>
+        `;
+
+        records.forEach(record => {
+          const vDate = new Date(record.visitDate);
+          const dayString = vDate.getDate().toString().padStart(2, '0') + '/' + (vDate.getMonth() + 1).toString().padStart(2, '0');
+          
+          html += `
+            <div class="card-medical mb-3 p-0 overflow-hidden shadow-sm hover-elevate transition-all">
+              <div class="d-flex flex-column flex-md-row">
+                <div class="bg-light p-4 text-center border-end d-flex flex-column justify-content-center align-items-center" style="min-width: 160px;">
+                  <span class="d-block text-primary fw-bold fs-3">${dayString}</span>
+                  <span class="d-block text-muted mb-2">Năm ${vDate.getFullYear()}</span>
+                  <span class="badge bg-success-subtle text-success border border-success-subtle">Đã hoàn thành</span>
+                </div>
+                <div class="p-4 flex-grow-1">
+                  <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                      <h5 class="text-primary mb-1">Mã LS: #${record.maLichSu}</h5>
+                      <div class="text-muted"><i class="bi bi-hospital me-1"></i>${record.specialty} &bull; Bác sĩ: <strong>${record.doctorName}</strong></div>
+                    </div>
+                    <a href="/Home/ExamResult?id=${record.maLichSu}" target="_blank" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                      <i class="bi bi-printer me-1"></i> In Phiếu Khám
+                    </a>
+                  </div>
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <div class="p-3 bg-white border rounded h-100">
+                        <span class="d-block text-muted mb-1" style="font-size:0.85rem;"><i class="bi bi-activity"></i> Triệu chứng:</span>
+                        <strong class="text-dark">${record.symptoms || 'Không ghi nhận'}</strong>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="p-3 bg-white border rounded h-100">
+                        <span class="d-block text-muted mb-1" style="font-size:0.85rem;"><i class="bi bi-clipboard2-pulse"></i> Chẩn đoán:</span>
+                        <strong class="text-danger">${record.diagnosis || 'Đang chờ cập nhật'}</strong>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+
+        resultsArea.innerHTML = html;
+
+      } catch (err) {
+        resultsArea.innerHTML = `
+          <div class="card-medical text-center p-5 text-danger">
+            <i class="bi bi-wifi-off mb-3" style="font-size:3.5rem;"></i>
+            <h5>Lỗi kết nối</h5>
+            <p>Không thể tra cứu dữ liệu. Vui lòng thử lại sau.</p>
+          </div>
+        `;
+        App.toast.error('Lỗi', err.message);
+      }
+    }
+  </script>
+}

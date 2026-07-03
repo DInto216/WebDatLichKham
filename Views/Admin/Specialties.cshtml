@@ -1,0 +1,155 @@
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewBag.Title = "Quản Lý Chuyên Khoa";
+    ViewBag.ActiveMenu = "Specialties";
+    ViewBag.PageTitle = "Quản Lý Chuyên Khoa";
+    ViewBag.PageSubtitle = "Thêm, sửa, xóa chuyên khoa";
+}
+
+@section TopbarActions {
+    <button class="btn-primary-medical" data-bs-toggle="modal" data-bs-target="#specialtyModal" onclick="openAddModal()">
+      <i class="bi bi-plus-lg"></i> Thêm chuyên khoa
+    </button>
+}
+
+
+      <div class="card-medical p-4">
+        <div class="table-responsive-medical">
+          <table class="table-medical">
+            <thead>
+              <tr>
+                <th>Icon</th>
+                <th>Tên chuyên khoa</th>
+                <th>Mô tả</th>
+                <th>Số bác sĩ</th>
+                <th style="width:120px;">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody id="specialtiesTable">
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+
+  <!-- Modal -->
+  <div class="modal fade" id="specialtyModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content" style="border:none;border-radius:var(--radius-xl);overflow:hidden;">
+        <div class="modal-header" style="border-bottom:1px solid var(--bg-tertiary);padding:20px 24px;">
+          <h5 class="modal-title" id="modalTitle" style="font-weight:700;">Thêm Chuyên Khoa</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+        </div>
+        <div class="modal-body" style="padding:24px;">
+          <form id="specialtyForm" class="form-medical" novalidate>
+            <input type="hidden" id="editId">
+            <div class="mb-3">
+              <label class="form-label">Icon (Emoji)</label>
+              <input type="text" class="form-control" id="spIcon" placeholder="VD: 🫀" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Tên chuyên khoa</label>
+              <input type="text" class="form-control" id="spName" placeholder="VD: Nội tổng quát" required>
+              <div class="invalid-feedback">Vui lòng nhập tên chuyên khoa</div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Mô tả</label>
+              <textarea class="form-control" id="spDesc" rows="2" placeholder="Mô tả ngắn về chuyên khoa"></textarea>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer" style="border-top:1px solid var(--bg-tertiary);padding:16px 24px;">
+          <button type="button" class="btn-secondary-medical" data-bs-dismiss="modal">Hủy</button>
+          <button type="button" class="btn-primary-medical" id="saveBtn" onclick="saveSpecialty()"><i class="bi bi-check-lg"></i> Lưu</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+@section Scripts {
+  <script>
+    const user = App.requireAuth(['admin']);
+    let editingId = null;
+
+    async function loadSpecialties() {
+      const tbody = document.getElementById('specialtiesTable');
+      App.showTableLoading(tbody, 5, 5);
+      const specialties = await API.getSpecialties();
+
+      tbody.innerHTML = specialties.map(sp => `
+        <tr>
+          <td style="font-size:1.5rem;">${sp.icon}</td>
+          <td style="font-weight:600;">${sp.name}</td>
+          <td style="color:var(--text-tertiary);">${sp.description || '-'}</td>
+          <td><span class="badge-medical badge-approved"><span class="status-dot"></span>${sp.doctorCount}</span></td>
+          <td>
+            <div class="d-flex gap-1">
+              <button class="btn-icon sm" onclick="openEditModal('${sp.id}')" aria-label="Sửa"><i class="bi bi-pencil"></i></button>
+              <button class="btn-icon sm" onclick="deleteSpecialty('${sp.id}','${sp.name}')" aria-label="Xóa" style="color:var(--danger)"><i class="bi bi-trash"></i></button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function openAddModal() {
+      editingId = null;
+      document.getElementById('modalTitle').textContent = 'Thêm Chuyên Khoa';
+      document.getElementById('specialtyForm').reset();
+    }
+
+    async function openEditModal(id) {
+      editingId = id;
+      document.getElementById('modalTitle').textContent = 'Sửa Chuyên Khoa';
+      const specialties = await API.getSpecialties();
+      const sp = specialties.find(s => s.id === id);
+      if (!sp) return;
+      document.getElementById('spIcon').value = sp.icon;
+      document.getElementById('spName').value = sp.name;
+      document.getElementById('spDesc').value = sp.description || '';
+      new bootstrap.Modal(document.getElementById('specialtyModal')).show();
+    }
+
+    async function saveSpecialty() {
+      const form = document.getElementById('specialtyForm');
+      if (!App.validateForm(form)) return;
+
+      const data = {
+        icon: document.getElementById('spIcon').value.trim(),
+        name: document.getElementById('spName').value.trim(),
+        description: document.getElementById('spDesc').value.trim()
+      };
+
+      try {
+        if (editingId) {
+          await API.updateSpecialty(editingId, data);
+          App.toast.success('Thành công', 'Đã cập nhật chuyên khoa');
+        } else {
+          await API.addSpecialty(data);
+          App.toast.success('Thành công', 'Đã thêm chuyên khoa mới');
+        }
+        bootstrap.Modal.getInstance(document.getElementById('specialtyModal')).hide();
+        loadSpecialties();
+      } catch (err) {
+        App.toast.error('Lỗi', err.message);
+      }
+    }
+
+    function deleteSpecialty(id, name) {
+      App.confirm('Xóa chuyên khoa', `Bạn có chắc muốn xóa chuyên khoa "${name}"?`, async () => {
+        try {
+          await API.deleteSpecialty(id);
+          App.toast.success('Đã xóa', `Chuyên khoa "${name}" đã được xóa`);
+          loadSpecialties();
+        } catch (err) {
+          App.toast.error('Lỗi khi xóa', err.message);
+        }
+      }, 'Xóa');
+    }
+
+    loadSpecialties();
+  </script>
+}
+
+
+

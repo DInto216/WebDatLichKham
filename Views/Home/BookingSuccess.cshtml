@@ -1,0 +1,176 @@
+@{
+    Layout = "~/Views/Shared/_PublicLayout.cshtml";
+    ViewBag.Title = "Đặt Lịch Thành Công";
+    ViewBag.ActiveNav = "Booking";
+}
+
+@section PageStyles {
+  <style>
+    .payment-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .payment-badge.unpaid { background: #fef3c7; color: #92400e; }
+    .payment-badge.pending_bank { background: #dbeafe; color: #1e40af; }
+    .payment-badge.paid { background: #d1fae5; color: #065f46; }
+    .payment-badge.refunded { background: #f3e8ff; color: #6b21a8; }
+
+    .payment-info-box {
+      background: linear-gradient(135deg, var(--primary-50), #f0f9ff);
+      border: 1px solid var(--primary-100);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      margin-bottom: 20px;
+    }
+    .payment-info-box .pm-icon { font-size: 28px; margin-bottom: 4px; }
+  </style>
+}
+
+  <div class="success-page">
+    <div class="success-card animate-scale-in" id="successCard">
+      <!-- Filled by JS -->
+    </div>
+  </div>
+
+@section Scripts {
+  <script>
+    (() => {
+      'use strict';
+
+      const bookingData = JSON.parse(sessionStorage.getItem('lastBooking'));
+      const card = document.getElementById('successCard');
+
+      if (!bookingData) {
+        card.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">📋</div>
+            <h5>Không có dữ liệu đặt lịch</h5>
+            <p>Vui lòng thực hiện đặt lịch khám trước.</p>
+            <a href="/Home/Booking" class="btn-primary-medical mt-4"><i class="bi bi-calendar-plus"></i> Đặt Lịch Khám</a>
+          </div>
+        `;
+        return;
+      }
+
+      // Mask data
+      const maskedName = API.maskName(bookingData.patientName);
+      const maskedPhone = API.maskPhone(bookingData.phone);
+
+      // Payment method display
+      const PM_LABELS = {
+        cash: { label: 'Thanh toán tại quầy', icon: '💵' },
+        bank_transfer: { label: 'Chuyển khoản ngân hàng', icon: '🏦' },
+        momo: { label: 'Ví MoMo', icon: '📱' },
+        zalopay: { label: 'ZaloPay', icon: '💚' }
+      };
+      const PS_LABELS = {
+        unpaid: { text: 'Chưa thanh toán', cls: 'unpaid', icon: 'bi-clock' },
+        pending_bank: { text: 'Chờ xác nhận CK', cls: 'pending_bank', icon: 'bi-hourglass-split' },
+        paid: { text: 'Đã thanh toán', cls: 'paid', icon: 'bi-check-circle-fill' },
+        refunded: { text: 'Đã hoàn tiền', cls: 'refunded', icon: 'bi-arrow-counterclockwise' }
+      };
+
+      const pm = PM_LABELS[bookingData.paymentMethod] || PM_LABELS.cash;
+      const ps = PS_LABELS[bookingData.paymentStatus] || PS_LABELS.unpaid;
+
+      const paymentNotice = bookingData.paymentMethod === 'cash'
+        ? `<div style="background:#ecfdf5;border:1px solid #6ee7b7;border-radius:8px;padding:12px 16px;font-size:12px;color:#065f46;display:flex;gap:8px;">
+              <i class="bi bi-info-circle-fill" style="flex-shrink:0;"></i>
+              <span>Vui lòng đến quầy lễ tân thanh toán <strong>phí khám ${App.formatCurrency(bookingData.paymentAmount || 0)}</strong> khi đến khám.</span>
+           </div>`
+        : `<div style="background:#dbeafe;border:1px solid #93c5fd;border-radius:8px;padding:12px 16px;font-size:12px;color:#1e40af;display:flex;gap:8px;">
+              <i class="bi bi-info-circle-fill" style="flex-shrink:0;"></i>
+              <span>Chúng tôi đã nhận được yêu cầu chuyển khoản. Admin sẽ xác nhận trong vòng <strong>1-2 giờ</strong>.</span>
+           </div>`;
+
+      card.innerHTML = `
+        <div class="success-icon animate-scale-in delay-2">
+          <i class="bi bi-check-lg"></i>
+        </div>
+        <h3 style="margin-bottom:8px;">Đặt Lịch Thành Công! 🎉</h3>
+        <p style="color:var(--text-tertiary);font-size:var(--text-sm);margin-bottom:8px;">Lịch hẹn của bạn đang chờ xác nhận từ phòng khám.</p>
+
+        <div class="booking-id">${bookingData.bookingId}</div>
+        <p style="font-size:var(--text-xs);color:var(--text-muted);margin-bottom:0;">Mã đặt lịch - Vui lòng lưu lại để tra cứu</p>
+
+        <div class="masked-info">
+          <div class="info-row">
+            <span class="info-label">Bệnh nhân</span>
+            <span class="info-value">${maskedName}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Số điện thoại</span>
+            <span class="info-value">${maskedPhone}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Bác sĩ</span>
+            <span class="info-value">${bookingData.doctorName}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Chuyên khoa</span>
+            <span class="info-value">${bookingData.specialty}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Ngày khám</span>
+            <span class="info-value">${App.formatDate(bookingData.date)}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Giờ khám</span>
+            <span class="info-value" style="color:var(--primary-600);font-weight:700;">${bookingData.time}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Trạng thái</span>
+            <span>${App.renderStatusBadge('pending')}</span>
+          </div>
+        </div>
+
+        <!-- Payment Info Box -->
+        <div class="payment-info-box">
+          <div style="font-weight:700;margin-bottom:12px;font-size:14px;color:var(--text-primary);">
+            <i class="bi bi-credit-card me-1" style="color:var(--primary-500);"></i> Thông Tin Thanh Toán
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:13px;">
+            <span style="color:var(--text-tertiary);">Phương thức</span>
+            <span style="font-weight:700;">${pm.icon} ${pm.label}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:13px;">
+            <span style="color:var(--text-tertiary);">Số tiền</span>
+            <span style="font-weight:800;color:var(--secondary-600);font-size:16px;">${App.formatCurrency(bookingData.paymentAmount || 0)}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;">
+            <span style="color:var(--text-tertiary);">Trạng thái TT</span>
+            <span class="payment-badge ${ps.cls}">
+              <i class="bi ${ps.icon}"></i> ${ps.text}
+            </span>
+          </div>
+        </div>
+
+        ${paymentNotice}
+
+        <div style="background:var(--warning-light);border-radius:var(--radius-sm);padding:12px 16px;text-align:left;font-size:var(--text-xs);color:var(--warning-dark);margin:16px 0;display:flex;gap:8px;">
+          <i class="bi bi-exclamation-triangle-fill" style="flex-shrink:0;margin-top:1px;"></i>
+          <span>Vui lòng lưu lại <strong>Mã Đặt Lịch</strong> và <strong>Số Điện Thoại</strong> để tra cứu trạng thái lịch hẹn.</span>
+        </div>
+
+        <div class="d-grid gap-2">
+          <a href="/Home/Lookup" class="btn-primary-medical justify-content-center" style="padding:14px;">
+            <i class="bi bi-search"></i> Tra Cứu Lịch Hẹn
+          </a>
+          <a href="/" class="btn-secondary-medical justify-content-center" style="padding:14px;">
+            <i class="bi bi-house"></i> Về Trang Chủ
+          </a>
+        </div>
+      `;
+
+      // Clean up
+      sessionStorage.removeItem('lastBooking');
+    })();
+  </script>
+}
+
+
