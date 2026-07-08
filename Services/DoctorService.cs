@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using WebDatLichKham.Data;
@@ -40,7 +36,7 @@ namespace WebDatLichKham.Services
                 doctors = await _context.Doctors.AsNoTracking().ToListAsync();
                 var cacheOptions = new MemoryCacheEntryOptions()
                     .SetAbsoluteExpiration(TimeSpan.FromMinutes(15));
-                _cache.Set(cacheKey, doctors, cacheOptions);
+                _ = _cache.Set(cacheKey, doctors, cacheOptions);
             }
             return doctors;
         }
@@ -55,7 +51,7 @@ namespace WebDatLichKham.Services
                 {
                     var cacheOptions = new MemoryCacheEntryOptions()
                         .SetAbsoluteExpiration(TimeSpan.FromMinutes(15));
-                    _cache.Set(cacheKey, doctor, cacheOptions);
+                    _ = _cache.Set(cacheKey, doctor, cacheOptions);
                 }
             }
             return doctor;
@@ -68,16 +64,16 @@ namespace WebDatLichKham.Services
             {
                 doctor.ScheduleJson = "{}";
             }
-            _context.Doctors.Add(doctor);
-            
+            _ = _context.Doctors.Add(doctor);
+
             // Update specialty count
             if (!string.IsNullOrEmpty(doctor.SpecialtyName))
             {
                 var spec = await _context.Specialties.FirstOrDefaultAsync(s => s.Name == doctor.SpecialtyName);
                 if (spec != null) spec.DoctorCount++;
             }
-            
-            await _context.SaveChangesAsync();
+
+            _ = await _context.SaveChangesAsync();
             InvalidateCache();
             return doctor;
         }
@@ -104,14 +100,14 @@ namespace WebDatLichKham.Services
             if (data.TryGetProperty("avatar", out var avatarProp)) doctor.Avatar = avatarProp.GetString() ?? doctor.Avatar;
             if (data.TryGetProperty("bio", out var bioProp)) doctor.Bio = bioProp.GetString() ?? doctor.Bio;
             if (data.TryGetProperty("degree", out var degreeProp)) doctor.Degree = degreeProp.GetString() ?? doctor.Degree;
-            
+
             if (data.TryGetProperty("price", out var priceProp) && priceProp.TryGetDecimal(out var price))
                 doctor.Price = price;
-            
+
             if (data.TryGetProperty("scheduleJson", out var scheduleProp))
                 doctor.ScheduleJson = scheduleProp.GetString() ?? doctor.ScheduleJson;
 
-            await _context.SaveChangesAsync();
+            _ = await _context.SaveChangesAsync();
             InvalidateCache();
             _cache.Remove(CacheKeyPrefix + id);
             return doctor;
@@ -128,12 +124,12 @@ namespace WebDatLichKham.Services
                 if (spec != null && spec.DoctorCount > 0) spec.DoctorCount--;
             }
 
-            _context.Doctors.Remove(doctor);
-            
+            _ = _context.Doctors.Remove(doctor);
+
             var account = await _context.Accounts.FirstOrDefaultAsync(a => a.DoctorId == id);
-            if (account != null) _context.Accounts.Remove(account);
-            
-            await _context.SaveChangesAsync();
+            if (account != null) _ = _context.Accounts.Remove(account);
+
+            _ = await _context.SaveChangesAsync();
             InvalidateCache();
             _cache.Remove(CacheKeyPrefix + id);
             return true;
@@ -145,7 +141,7 @@ namespace WebDatLichKham.Services
             if (doctor == null) return new List<string>();
 
             var schedule = JsonSerializer.Deserialize<Dictionary<string, List<string>>>(doctor.ScheduleJson ?? "{}");
-            
+
             if (DateTime.TryParse(date, out DateTime parsedDate))
             {
                 string dayOfWeek = parsedDate.DayOfWeek.ToString().ToLower();
@@ -156,7 +152,7 @@ namespace WebDatLichKham.Services
             }
             return new List<string>();
         }
-        
+
         private void InvalidateCache()
         {
             _cache.Remove(CacheKeyPrefix + "All");

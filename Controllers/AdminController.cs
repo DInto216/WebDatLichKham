@@ -46,5 +46,10 @@ namespace WebDatLichKham.Controllers
         {
             return View();
         }
+
+        public IActionResult PaymentConfig()
+        {
+            return View();
+        }
     }
 }

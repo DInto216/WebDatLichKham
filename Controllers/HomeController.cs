@@ -17,8 +17,13 @@ namespace WebDatLichKham.Controllers
             _context = context;
         }
 
+        /// <summary>
+        /// Giao diện Trang chủ (Landing Page) dành cho Bệnh nhân.
+        /// Sử dụng Async/Await để tránh nghẽn luồng (thread starvation) khi truy vấn thống kê từ Database.
+        /// </summary>
         public async Task<IActionResult> Index()
         {
+            // Tối ưu hóa: Thay vì Count toàn bộ bảng, EF Core CountAsync() sẽ dịch thẳng ra câu lệnh "SELECT COUNT(*)" ở dưới DB.
             ViewBag.TotalDoctors = await _context.Doctors.CountAsync();
             ViewBag.TotalPatients = await _context.Appointments.CountAsync();
             ViewBag.TotalSpecialties = await _context.Specialties.CountAsync();
@@ -33,6 +38,10 @@ namespace WebDatLichKham.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Luồng: Đặt lịch khám bệnh. Trả về giao diện Wizard (Booking.cshtml)
+        /// Form nhập liệu sẽ gọi API bằng JS thay vì PostBack truyền thống.
+        /// </summary>
         public IActionResult Booking()
         {
             return View();
@@ -43,11 +52,17 @@ namespace WebDatLichKham.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Luồng: Tra cứu lịch hẹn của bệnh nhân
+        /// </summary>
         public IActionResult Lookup()
         {
             return View();
         }
 
+        /// <summary>
+        /// Luồng: Xem kết quả khám và đơn thuốc điện tử
+        /// </summary>
         public IActionResult ExamResult()
         {
             return View();

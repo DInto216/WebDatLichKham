@@ -1,15 +1,17 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication;
-using System;
-using System.Collections.Generic;
 using System.Text.Json;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using WebDatLichKham.Models;
 using WebDatLichKham.Services;
 
 namespace WebDatLichKham.Controllers
 {
+    /// <summary>
+    /// Bộ điều khiển trung tâm (Centralized API Controller) xử lý dữ liệu cho SPA.
+    /// [BẢO MẬT]: 100% các endpoint tương tác CSDL đều dùng EF Core Parameterized LINQ, không nối chuỗi (No SqlRaw).
+    /// Việc này đảm bảo ngăn chặn triệt để tấn công SQL Injection từ mọi form nhập liệu (Patient Form, Admin Form).
+    /// </summary>
     [ApiController]
     [Route("api")]
     public class ApiController : ControllerBase
@@ -44,8 +46,9 @@ namespace WebDatLichKham.Controllers
         }
 
         // ============================================
-        // SPECIALTIES
+        // SPECIALTIES (Chuyên khoa)
         // ============================================
+
         [HttpGet("specialties")]
         public async Task<IActionResult> GetSpecialties()
         {
@@ -53,6 +56,10 @@ namespace WebDatLichKham.Controllers
             return Ok(specialties);
         }
 
+        /// <summary>
+        /// [AUTHORIZATION - RBAC]: Chỉ role "admin" mới có quyền Thêm/Sửa/Xóa chuyên khoa.
+        /// Chặn các truy cập từ user (bệnh nhân) hoặc Bác sĩ để bảo vệ tính nhất quán dữ liệu cốt lõi.
+        /// </summary>
         [Authorize(Roles = "admin")]
         [HttpPost("specialties")]
         public async Task<IActionResult> AddSpecialty([FromBody] Specialty specialty)
@@ -101,8 +108,16 @@ namespace WebDatLichKham.Controllers
         [HttpPost("doctors")]
         public async Task<IActionResult> AddDoctor([FromBody] Doctor doctor)
         {
-            var result = await _doctorService.AddAsync(doctor);
-            return Ok(result);
+            try
+            {
+                var result = await _doctorService.AddAsync(doctor);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                // [QA FIX]: Trả về JSON lỗi thân thiện thay vì văng trang lỗi 500 HTML
+                return StatusCode(500, new { message = "Lỗi hệ thống khi thêm bác sĩ: " + ex.Message });
+            }
         }
 
         [Authorize(Roles = "admin,doctor")]
@@ -131,12 +146,20 @@ namespace WebDatLichKham.Controllers
         }
 
         // ============================================
-        // APPOINTMENTS
+        // APPOINTMENTS (Lịch hẹn khám)
         // ============================================
+
+        /// <summary>
+        /// [AUTHORIZATION - RBAC]: Cả "admin" và "doctor" đều xem được lịch hẹn.
+        /// Tuy nhiên:
+        /// - Admin xem được tất cả lịch của toàn bệnh viện.
+        /// - Doctor chỉ xem được lịch hẹn của ĐÚNG MÌNH. Hệ thống chặn chéo ID (Tenant Isolation) ngay trong hàm.
+        /// </summary>
         [Authorize(Roles = "admin,doctor")]
         [HttpGet("appointments")]
         public async Task<IActionResult> GetAppointments([FromQuery] string? doctorId, [FromQuery] string? date)
         {
+            // Kiểm tra phân lập dữ liệu (Data Isolation / Multi-tenancy check)
             if (User.IsInRole("doctor") && !User.IsInRole("admin"))
             {
                 var claimDoctorId = User.FindFirst("DoctorId")?.Value;
@@ -153,8 +176,26 @@ namespace WebDatLichKham.Controllers
         [HttpPost("appointments")]
         public async Task<IActionResult> AddAppointment([FromBody] Appointment data)
         {
-            var result = await _appointmentService.AddAsync(data);
-            return Ok(result);
+            // [QA FIX]: Model Validation tự động bắt lỗi nếu thiếu trường Required (Tên, SĐT, Ngày, Giờ)
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { message = "Dữ liệu nhập vào không hợp lệ. Vui lòng kiểm tra lại." });
+            }
+
+            try
+            {
+                var result = await _appointmentService.AddAsync(data);
+                return Ok(result);
+            }
+            catch (ArgumentException argEx)
+            {
+                return BadRequest(new { message = argEx.Message });
+            }
+            catch (Exception ex)
+            {
+                // [QA FIX]: Bọc Try-Catch để tránh trả về HTML lỗi 500 làm sập giao diện React/Fetch API
+                return StatusCode(500, new { message = "Lỗi hệ thống khi đặt lịch: " + ex.Message });
+            }
         }
 
         [Authorize(Roles = "admin,doctor")]
@@ -178,16 +219,18 @@ namespace WebDatLichKham.Controllers
         }
 
         [HttpGet("appointments/lookup")]
-        public async Task<IActionResult> LookupAppointments([FromQuery] string? phone, [FromQuery] string? bookingId)
+        public async Task<IActionResult> LookupAppointments([FromQuery] string? phone)
         {
-            if (string.IsNullOrEmpty(phone) || string.IsNullOrEmpty(bookingId))
+            if (string.IsNullOrEmpty(phone))
             {
-                return BadRequest(new { message = "Thiếu số điện thoại hoặc mã đặt lịch" });
+                return BadRequest(new { message = "Thiếu số điện thoại" });
             }
             var list = await _appointmentService.LookupAsync(phone);
-            var appt = list.FirstOrDefault(a => a.BookingId.Equals(bookingId.Trim(), StringComparison.OrdinalIgnoreCase));
-            if (appt == null) return NotFound(new { message = "Không tìm thấy lịch hẹn" });
-            return Ok(appt);
+            if (list == null || !list.Any()) return NotFound(new { message = "Không tìm thấy lịch hẹn nào với số điện thoại này." });
+
+            // Xắp xếp mới nhất lên đầu
+            var sortedList = list.OrderByDescending(a => a.Date).ThenByDescending(a => a.Time).ToList();
+            return Ok(sortedList);
         }
 
         [Authorize(Roles = "admin")]
@@ -197,6 +240,90 @@ namespace WebDatLichKham.Controllers
             var payments = await _appointmentService.GetPaymentsAsync();
             return Ok(payments);
         }
+
+        // ============================================
+        // PAYMENT SETTINGS
+        // ============================================
+        [HttpGet("payments/settings")]
+        public async Task<IActionResult> GetPaymentSettings()
+        {
+            var db = HttpContext.RequestServices.GetService(typeof(WebDatLichKham.Data.ApplicationDbContext)) as WebDatLichKham.Data.ApplicationDbContext;
+            if (db == null) return StatusCode(500);
+            var settings = await Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.ToListAsync(db.PaymentSettings);
+            return Ok(settings);
+        }
+
+        [Authorize(Roles = "admin")]
+        [HttpPut("payments/settings/{id}")]
+        public async Task<IActionResult> UpdatePaymentSetting(int id, [FromBody] JsonElement data)
+        {
+            var db = HttpContext.RequestServices.GetService(typeof(WebDatLichKham.Data.ApplicationDbContext)) as WebDatLichKham.Data.ApplicationDbContext;
+            if (db == null) return StatusCode(500);
+
+            var setting = await db.PaymentSettings.FindAsync(id);
+            if (setting == null) return NotFound();
+
+            if (data.TryGetProperty("isActive", out JsonElement activeElement))
+            {
+                setting.IsActive = activeElement.GetBoolean();
+            }
+            if (data.TryGetProperty("additionalConfigJson", out JsonElement configElement))
+            {
+                setting.AdditionalConfigJson = configElement.ValueKind == JsonValueKind.Null ? null : configElement.GetString();
+            }
+
+            // [VALIDATION BẮT BUỘC]: Nếu kích hoạt (isActive = true) thì cấu hình không được phép trống
+            if (setting.IsActive)
+            {
+                if (string.IsNullOrWhiteSpace(setting.AdditionalConfigJson))
+                {
+                    return BadRequest(new { message = "Vui lòng nhập đầy đủ cấu hình trước khi kích hoạt phương thức thanh toán này!" });
+                }
+
+                try
+                {
+                    var configObj = System.Text.Json.JsonDocument.Parse(setting.AdditionalConfigJson).RootElement;
+
+                    if (setting.MethodCode == "vnpay")
+                    {
+                        if (string.IsNullOrWhiteSpace(configObj.GetProperty("vnpTmnCode").GetString()) ||
+                            string.IsNullOrWhiteSpace(configObj.GetProperty("vnpHashSecret").GetString()) ||
+                            string.IsNullOrWhiteSpace(configObj.GetProperty("vnpUrl").GetString()))
+                        {
+                            return BadRequest(new { message = "Thiếu thông tin cấu hình VNPay (Mã Website, Khóa bí mật hoặc URL)." });
+                        }
+                    }
+                    else if (setting.MethodCode == "momo")
+                    {
+                        if (string.IsNullOrWhiteSpace(configObj.GetProperty("partnerCode").GetString()) ||
+                            string.IsNullOrWhiteSpace(configObj.GetProperty("accessKey").GetString()) ||
+                            string.IsNullOrWhiteSpace(configObj.GetProperty("secretKey").GetString()))
+                        {
+                            return BadRequest(new { message = "Thiếu thông tin cấu hình MoMo (Partner Code, Access Key, Secret Key)." });
+                        }
+                    }
+                    else if (setting.MethodCode == "bank_transfer")
+                    {
+                        if (string.IsNullOrWhiteSpace(configObj.GetProperty("bankName").GetString()) ||
+                            string.IsNullOrWhiteSpace(configObj.GetProperty("accountNumber").GetString()) ||
+                            string.IsNullOrWhiteSpace(configObj.GetProperty("accountName").GetString()))
+                        {
+                            return BadRequest(new { message = "Thiếu thông tin Ngân hàng chuyển khoản (Tên Ngân hàng, Số tài khoản, Chủ tài khoản)." });
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    return BadRequest(new { message = "Định dạng cấu hình không hợp lệ." });
+                }
+            }
+
+            setting.UpdatedAt = DateTime.UtcNow;
+
+            _ = await db.SaveChangesAsync();
+            return Ok(setting);
+        }
+
 
         // ============================================
         // ACCOUNTS
@@ -431,6 +558,53 @@ namespace WebDatLichKham.Controllers
         {
             var result = await _doctorReviewService.AddAsync(review);
             return Ok(result);
+        }
+        // ============================================
+        // UPLOAD LUỒNG TỐI ƯU (Tối ưu hóa File Storage)
+        // ============================================
+
+        /// <summary>
+        /// Luồng Tối Ưu: Nhận file ảnh qua Form-Data, lưu trực tiếp vào ổ cứng Server (wwwroot/uploads/avatars)
+        /// và chỉ trả về Đường dẫn tương đối (Relative Path) để lưu vào SQL Server.
+        /// Chống phình to Database so với việc lưu chuỗi Base64.
+        /// </summary>
+        [Authorize(Roles = "admin,doctor")]
+        [HttpPost("upload/avatar")]
+        public async Task<IActionResult> UploadAvatar([FromForm] Microsoft.AspNetCore.Http.IFormFile file)
+        {
+            try
+            {
+                if (file == null || file.Length == 0)
+                    return BadRequest(new { message = "Vui lòng chọn file ảnh hợp lệ." });
+
+                // Kiểm tra định dạng ảnh
+                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+                var ext = System.IO.Path.GetExtension(file.FileName).ToLower();
+                if (Array.IndexOf(allowedExtensions, ext) < 0)
+                    return BadRequest(new { message = "Chỉ hỗ trợ định dạng JPG, JPEG, PNG, GIF." });
+
+                // Tạo thư mục nếu chưa có
+                var uploadsFolder = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "wwwroot", "uploads", "avatars");
+                if (!System.IO.Directory.Exists(uploadsFolder))
+                    _ = System.IO.Directory.CreateDirectory(uploadsFolder);
+
+                // Lưu file với tên ngẫu nhiên
+                var uniqueFileName = Guid.NewGuid().ToString() + "_" + file.FileName;
+                var filePath = System.IO.Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var stream = new System.IO.FileStream(filePath, System.IO.FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+
+                // Trả về đường dẫn tương đối (sẽ được lưu vào cột Avatar trong bảng Accounts)
+                var relativePath = $"/uploads/avatars/{uniqueFileName}";
+                return Ok(new { url = relativePath });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi hệ thống khi tải ảnh: " + ex.Message });
+            }
         }
     }
 }

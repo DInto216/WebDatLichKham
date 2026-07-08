@@ -2,6 +2,7 @@
     Layout = "~/Views/Shared/_PublicLayout.cshtml";
     ViewBag.Title = "Tra Cứu Lịch Hẹn";
     ViewBag.ActiveNav = "Lookup";
+    ViewBag.HideFooter = true;
 }
 
 @section PageStyles {
@@ -12,6 +13,8 @@
     }
 
     @@media print {
+      @@page { margin: 0; }
+      body { margin: 1cm; }
       body * { visibility: hidden !important; }
       .print-slip, .print-slip * { visibility: visible !important; }
       .print-slip {
@@ -121,7 +124,7 @@
             <i class="bi bi-search"></i>
           </div>
           <h3>Tra Cứu Lịch Hẹn</h3>
-          <p style="color:var(--text-tertiary);font-size:var(--text-sm);">Nhập số điện thoại và mã Booking ID để kiểm tra trạng thái lịch hẹn</p>
+          <p style="color:var(--text-tertiary);font-size:var(--text-sm);">Nhập số điện thoại để kiểm tra trạng thái tất cả các lịch hẹn của bạn</p>
         </div>
 
         <form id="lookupForm" class="form-medical" novalidate>
@@ -131,14 +134,6 @@
               <i class="bi bi-telephone"></i>
               <input type="tel" class="form-control" id="lookupPhone" placeholder="VD: 0912345678" required>
               <div class="invalid-feedback">Vui lòng nhập số điện thoại</div>
-            </div>
-          </div>
-          <div class="mb-4">
-            <label class="form-label" for="lookupBookingId">Mã đặt lịch (Booking ID)</label>
-            <div class="input-icon">
-              <i class="bi bi-upc-scan"></i>
-              <input type="text" class="form-control" id="lookupBookingId" placeholder="VD: BK-A1B2C3D4" required style="text-transform:uppercase;font-family:var(--font-mono);font-weight:600;letter-spacing:0.05em;">
-              <div class="invalid-feedback">Vui lòng nhập mã đặt lịch</div>
             </div>
           </div>
           <button type="submit" class="btn-primary-medical w-100 justify-content-center" style="padding:14px;" id="lookupBtn">
@@ -156,7 +151,7 @@
           <div style="background:var(--danger-light);border-radius:var(--radius-md);padding:20px;text-align:center;">
             <div style="font-size:40px;margin-bottom:8px;">😞</div>
             <h6 style="color:var(--danger-dark);margin-bottom:4px;">Không tìm thấy lịch hẹn</h6>
-            <p style="font-size:var(--text-xs);color:var(--danger-dark);opacity:0.8;margin:0;">Vui lòng kiểm tra lại số điện thoại và mã đặt lịch.</p>
+            <p style="font-size:var(--text-xs);color:var(--danger-dark);opacity:0.8;margin:0;">Vui lòng kiểm tra lại số điện thoại.</p>
           </div>
         </div>
       </div>
@@ -179,7 +174,6 @@
         if (!App.validateForm(form)) return;
 
         const phone = document.getElementById('lookupPhone').value.trim();
-        const bookingId = document.getElementById('lookupBookingId').value.trim().toUpperCase();
 
         const btn = document.getElementById('lookupBtn');
         btn.disabled = true;
@@ -189,13 +183,12 @@
         notFoundDiv.style.display = 'none';
 
         try {
-          const result = await API.lookupAppointment(phone, bookingId);
+          const results = await API.lookupAppointment(phone);
 
-          if (!result) {
+          if (!results || results.length === 0) {
             notFoundDiv.style.display = 'block';
             notFoundDiv.classList.add('animate-fade-in-up');
           } else {
-            const statusInfo = App.getStatusLabel(result.status);
             const statusMessages = {
               pending: 'Lịch hẹn đang chờ phòng khám xác nhận. Vui lòng chờ.',
               approved: 'Lịch hẹn đã được duyệt. Vui lòng đến đúng giờ!',
@@ -203,9 +196,11 @@
               completed: 'Ca khám đã hoàn thành. Cảm ơn bạn đã sử dụng dịch vụ!'
             };
 
+            window._lookupResults = results; // Lưu kết quả
+
             resultDiv.style.display = 'block';
-            resultDiv.innerHTML = `
-              <div class="lookup-result">
+            resultDiv.innerHTML = `<h5 class="mb-4 text-center">Tìm thấy <strong>${results.length}</strong> lịch hẹn của bạn</h5>` + results.map(result => `
+              <div class="lookup-result mb-4" style="background:#fff; padding:20px; border-radius:var(--radius-lg); box-shadow:var(--shadow-md); border:1px solid var(--border-color);">
                 <div style="text-align:center;margin-bottom:20px;">
                   ${App.renderStatusBadge(result.status)}
                   <p style="font-size:var(--text-xs);color:var(--text-tertiary);margin-top:8px;">${statusMessages[result.status]}</p>
@@ -244,7 +239,7 @@
 
                 ${result.status === 'approved' ? `
                 <div style="margin-top:16px;">
-                  <button onclick="printAppointmentSlip()" class="btn-primary-medical w-100 justify-content-center" style="padding:14px;background:linear-gradient(135deg,#6366f1 0%,#7c3aed 100%);border:none;cursor:pointer;">
+                  <button onclick="printAppointmentSlip('${result.bookingId}')" class="btn-primary-medical w-100 justify-content-center" style="padding:14px;background:linear-gradient(135deg,#6366f1 0%,#7c3aed 100%);border:none;cursor:pointer;">
                     <i class="bi bi-printer"></i> In phiếu khám
                   </button>
                 </div>
@@ -258,9 +253,7 @@
                 </div>
                 ` : ''}
               </div>
-            `;
-            // Store result for printing
-            window._lastLookupResult = result;
+            `).join('');
             resultDiv.classList.add('animate-fade-in-up');
           }
         } catch (err) {
@@ -272,8 +265,9 @@
       });
     })();
 
-    function printAppointmentSlip() {
-      const r = window._lastLookupResult;
+    function printAppointmentSlip(bookingId) {
+      if (!window._lookupResults) return;
+      const r = window._lookupResults.find(x => x.bookingId === bookingId);
       if (!r) return;
 
       const today = new Date();
@@ -302,10 +296,11 @@
         </div>
 
         <table class="info-table-print">
-          <tr><td>Họ và tên</td><td>${r.patientName}</td></tr>
-          <tr><td>Số điện thoại</td><td>${r.phone}</td></tr>
-          <tr><td>Bác sĩ phụ trách</td><td>${r.doctorName}</td></tr>
-          <tr><td>Chuyên khoa</td><td>${r.specialty}</td></tr>
+          <!-- Bổ sung fallback cho thông tin rỗng để in phiếu không bị mất layout -->
+          <tr><td>Họ và tên</td><td>${r.patientName || 'Chưa cung cấp'}</td></tr>
+          <tr><td>Số điện thoại</td><td>${r.phone || 'Chưa cung cấp'}</td></tr>
+          <tr><td>Bác sĩ phụ trách</td><td>${r.doctorName || 'Chưa chỉ định'}</td></tr>
+          <tr><td>Chuyên khoa</td><td>${r.specialty || 'Chưa phân khoa'}</td></tr>
           <tr><td>Ngày khám</td><td>${formattedExamDate}</td></tr>
           <tr><td>Giờ khám</td><td style="font-size:1.1rem;font-weight:800;color:#2563eb;">${r.time}</td></tr>
           <tr><td>Lý do khám</td><td>${r.reason || 'Không có thông tin'}</td></tr>

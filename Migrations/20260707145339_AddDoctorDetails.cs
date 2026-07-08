@@ -10,25 +10,25 @@ namespace WebDatLichKham.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<string>(
+            _ = migrationBuilder.AddColumn<string>(
                 name: "Email",
                 table: "Doctors",
                 type: "nvarchar(max)",
                 nullable: true);
 
-            migrationBuilder.AddColumn<string>(
+            _ = migrationBuilder.AddColumn<string>(
                 name: "Experience",
                 table: "Doctors",
                 type: "nvarchar(max)",
                 nullable: true);
 
-            migrationBuilder.AddColumn<string>(
+            _ = migrationBuilder.AddColumn<string>(
                 name: "Phone",
                 table: "Doctors",
                 type: "nvarchar(max)",
                 nullable: true);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "BookingId",
                 table: "Appointments",
                 type: "nvarchar(max)",
@@ -36,42 +36,42 @@ namespace WebDatLichKham.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
 
-            migrationBuilder.UpdateData(
+            _ = migrationBuilder.UpdateData(
                 table: "Doctors",
                 keyColumn: "Id",
                 keyValue: "doc_01",
                 columns: new[] { "Email", "Experience", "Phone" },
                 values: new object[] { "", "", "" });
 
-            migrationBuilder.UpdateData(
+            _ = migrationBuilder.UpdateData(
                 table: "Doctors",
                 keyColumn: "Id",
                 keyValue: "doc_02",
                 columns: new[] { "Email", "Experience", "Phone" },
                 values: new object[] { "", "", "" });
 
-            migrationBuilder.UpdateData(
+            _ = migrationBuilder.UpdateData(
                 table: "Doctors",
                 keyColumn: "Id",
                 keyValue: "doc_03",
                 columns: new[] { "Email", "Experience", "Phone" },
                 values: new object[] { "", "", "" });
 
-            migrationBuilder.UpdateData(
+            _ = migrationBuilder.UpdateData(
                 table: "Doctors",
                 keyColumn: "Id",
                 keyValue: "doc_04",
                 columns: new[] { "Email", "Experience", "Phone" },
                 values: new object[] { "", "", "" });
 
-            migrationBuilder.UpdateData(
+            _ = migrationBuilder.UpdateData(
                 table: "Doctors",
                 keyColumn: "Id",
                 keyValue: "doc_05",
                 columns: new[] { "Email", "Experience", "Phone" },
                 values: new object[] { "", "", "" });
 
-            migrationBuilder.UpdateData(
+            _ = migrationBuilder.UpdateData(
                 table: "Doctors",
                 keyColumn: "Id",
                 keyValue: "doc_06",
@@ -82,19 +82,19 @@ namespace WebDatLichKham.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
+            _ = migrationBuilder.DropColumn(
                 name: "Email",
                 table: "Doctors");
 
-            migrationBuilder.DropColumn(
+            _ = migrationBuilder.DropColumn(
                 name: "Experience",
                 table: "Doctors");
 
-            migrationBuilder.DropColumn(
+            _ = migrationBuilder.DropColumn(
                 name: "Phone",
                 table: "Doctors");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "BookingId",
                 table: "Appointments",
                 type: "nvarchar(max)",

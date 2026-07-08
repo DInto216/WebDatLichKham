@@ -2,6 +2,7 @@
     Layout = "~/Views/Shared/_PublicLayout.cshtml";
     ViewBag.Title = "Phiếu Kết Quả Khám Bệnh";
     ViewBag.ActiveNav = "Lookup";
+    ViewBag.HideFooter = true;
 }
 
 @section PageStyles {
@@ -301,7 +302,8 @@
 
     /* ---- Print styles ---- */
     @@media print {
-      body { background: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      @@page { margin: 0; }
+      body { margin: 1cm; background: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
       .actions-bar, .navbar, .print-button-container { display: none !important; }
       .page-wrapper { padding: 0; max-width: 100%; }
       .medical-slip { box-shadow: none; border-radius: 0; }
@@ -429,11 +431,11 @@
           <tr>
             <td>${i + 1}</td>
             <td>
-              <div class="drug-name">${item.name}</div>
+              <div class="drug-name">${item.name || 'Không rõ tên thuốc'}</div>
               <div class="drug-unit">${item.unit || ''}</div>
             </td>
-            <td>${item.qty}</td>
-            <td>${item.dosage}</td>
+            <td>${item.qty || 0}</td>
+            <td>${item.dosage || 'Theo chỉ định'}</td>
           </tr>
         `).join('');
 
@@ -467,19 +469,20 @@
               <div class="info-grid">
                 <div class="info-item">
                   <label>Họ và tên bệnh nhân</label>
-                  <p>${record.patientName}</p>
+                  <p>${record.patientName || 'Không xác định'}</p>
                 </div>
                 <div class="info-item">
                   <label>Số điện thoại</label>
-                  <p>${record.soDienThoai}</p>
+                  <p>${record.soDienThoai || 'Chưa cung cấp'}</p>
                 </div>
                 <div class="info-item">
+                  <!-- Đã rà soát: Đảm bảo có hiển thị bác sĩ -->
                   <label>Bác sĩ phụ trách</label>
-                  <p>${record.doctorName}</p>
+                  <p>${record.doctorName || 'Chưa chỉ định'}</p>
                 </div>
                 <div class="info-item">
                   <label>Chuyên khoa</label>
-                  <p>${record.specialty}</p>
+                  <p>${record.specialty || 'Chưa ghi nhận'}</p>
                 </div>
               </div>
 
@@ -491,10 +494,25 @@
               </div>
               ` : ''}
 
+              <!-- Note -->
+              ${record.notes ? `
+              <div class="section-block mt-4">
+                <div class="section-label"><i class="bi bi-pencil-square"></i> Lời khuyên của bác sĩ</div>
+                <div class="section-content" style="border-left-color:#0284c7;">${record.notes}</div>
+              </div>
+              ` : `
+              <!-- Tối ưu hiển thị in: Bổ sung khung lời khuyên trống nếu bác sĩ không nhập -->
+              <div class="section-block mt-4">
+                <div class="section-label"><i class="bi bi-pencil-square"></i> Lời khuyên của bác sĩ</div>
+                <div class="section-content" style="border-left-color:#0284c7; color:#64748b; font-style:italic;">Bác sĩ không có dặn dò thêm.</div>
+              </div>
+              `}
+
               <!-- Diagnosis -->
               <div class="section-block">
                 <div class="section-label"><i class="bi bi-clipboard2-pulse"></i> Chẩn đoán</div>
-                <div class="section-content" style="border-left-color:#dc2626;font-weight:600;">${record.diagnosis}</div>
+                <!-- Tối ưu: Nếu không có chẩn đoán thì hiển thị text mặc định tránh vỡ layout -->
+                <div class="section-content" style="border-left-color:#dc2626;font-weight:600;">${record.diagnosis || 'Chưa có chẩn đoán cụ thể'}</div>
               </div>
 
               <!-- Prescription table -->

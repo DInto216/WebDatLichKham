@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using WebDatLichKham.Data;
@@ -35,7 +32,7 @@ namespace WebDatLichKham.Services
                 specialties = await _context.Specialties.AsNoTracking().ToListAsync();
                 var cacheOptions = new MemoryCacheEntryOptions()
                     .SetAbsoluteExpiration(TimeSpan.FromHours(1));
-                _cache.Set(CacheKey, specialties, cacheOptions);
+                _ = _cache.Set(CacheKey, specialties, cacheOptions);
             }
             return specialties;
         }
@@ -44,8 +41,8 @@ namespace WebDatLichKham.Services
         {
             specialty.Id = "sp_" + Guid.NewGuid().ToString("N").Substring(0, 8);
             specialty.DoctorCount = 0;
-            _context.Specialties.Add(specialty);
-            await _context.SaveChangesAsync();
+            _ = _context.Specialties.Add(specialty);
+            _ = await _context.SaveChangesAsync();
             _cache.Remove(CacheKey);
             return specialty;
         }
@@ -59,7 +56,7 @@ namespace WebDatLichKham.Services
             specialty.Description = data.Description;
             specialty.Icon = data.Icon;
 
-            await _context.SaveChangesAsync();
+            _ = await _context.SaveChangesAsync();
             _cache.Remove(CacheKey);
             return specialty;
         }
@@ -69,8 +66,8 @@ namespace WebDatLichKham.Services
             var specialty = await _context.Specialties.FindAsync(id);
             if (specialty == null) return false;
 
-            _context.Specialties.Remove(specialty);
-            await _context.SaveChangesAsync();
+            _ = _context.Specialties.Remove(specialty);
+            _ = await _context.SaveChangesAsync();
             _cache.Remove(CacheKey);
             return true;
         }

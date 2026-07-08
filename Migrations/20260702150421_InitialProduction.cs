@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -13,7 +12,7 @@ namespace WebDatLichKham.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateTable(
+            _ = migrationBuilder.CreateTable(
                 name: "Accounts",
                 columns: table => new
                 {
@@ -28,10 +27,10 @@ namespace WebDatLichKham.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Accounts", x => x.Id);
+                    _ = table.PrimaryKey("PK_Accounts", x => x.Id);
                 });
 
-            migrationBuilder.CreateTable(
+            _ = migrationBuilder.CreateTable(
                 name: "Appointments",
                 columns: table => new
                 {
@@ -53,10 +52,10 @@ namespace WebDatLichKham.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Appointments", x => x.Id);
+                    _ = table.PrimaryKey("PK_Appointments", x => x.Id);
                 });
 
-            migrationBuilder.CreateTable(
+            _ = migrationBuilder.CreateTable(
                 name: "Doctors",
                 columns: table => new
                 {
@@ -74,10 +73,10 @@ namespace WebDatLichKham.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Doctors", x => x.Id);
+                    _ = table.PrimaryKey("PK_Doctors", x => x.Id);
                 });
 
-            migrationBuilder.CreateTable(
+            _ = migrationBuilder.CreateTable(
                 name: "MedicalHistories",
                 columns: table => new
                 {
@@ -98,10 +97,10 @@ namespace WebDatLichKham.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MedicalHistories", x => x.MaLichSu);
+                    _ = table.PrimaryKey("PK_MedicalHistories", x => x.MaLichSu);
                 });
 
-            migrationBuilder.CreateTable(
+            _ = migrationBuilder.CreateTable(
                 name: "Medicines",
                 columns: table => new
                 {
@@ -113,10 +112,10 @@ namespace WebDatLichKham.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Medicines", x => x.Id);
+                    _ = table.PrimaryKey("PK_Medicines", x => x.Id);
                 });
 
-            migrationBuilder.CreateTable(
+            _ = migrationBuilder.CreateTable(
                 name: "Specialties",
                 columns: table => new
                 {
@@ -128,10 +127,10 @@ namespace WebDatLichKham.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Specialties", x => x.Id);
+                    _ = table.PrimaryKey("PK_Specialties", x => x.Id);
                 });
 
-            migrationBuilder.InsertData(
+            _ = migrationBuilder.InsertData(
                 table: "Accounts",
                 columns: new[] { "Id", "Avatar", "CreatedAt", "DoctorId", "Name", "Password", "Role", "Username" },
                 values: new object[,]
@@ -142,7 +141,7 @@ namespace WebDatLichKham.Migrations
                     { "acc_doc03", null, new DateTime(2025, 2, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), "doc_03", "BS. Lê Minh Tuấn", "doctor123", "doctor", "doctor03" }
                 });
 
-            migrationBuilder.InsertData(
+            _ = migrationBuilder.InsertData(
                 table: "Appointments",
                 columns: new[] { "Id", "BirthYear", "BookingId", "CreatedAt", "Date", "DoctorId", "DoctorName", "Email", "Gender", "PatientName", "Phone", "Reason", "Specialty", "Status", "Time" },
                 values: new object[,]
@@ -155,7 +154,7 @@ namespace WebDatLichKham.Migrations
                     { "appt_06", 1970, "BK-U1V2W3X4", new DateTime(2026, 6, 22, 8, 0, 0, 0, DateTimeKind.Unspecified), "2026-06-25", "doc_05", "BS. Võ Thanh Hùng", "tung@email.com", "Nam", "Đỗ Văn Tùng", "0945333444", "Viêm họng mãn tính", "Tai Mũi Họng", "cancelled", "08:30" }
                 });
 
-            migrationBuilder.InsertData(
+            _ = migrationBuilder.InsertData(
                 table: "Doctors",
                 columns: new[] { "Id", "Avatar", "Bio", "Degree", "Name", "Price", "Rating", "Reviews", "ScheduleJson", "SpecialtyId", "SpecialtyName" },
                 values: new object[,]
@@ -168,7 +167,7 @@ namespace WebDatLichKham.Migrations
                     { "doc_06", "", "Tiến sĩ chuyên ngành Sản phụ khoa, BV Từ Dũ", "TS.BS", "BS. Đặng Thị Mai", 450000m, 4.9000000000000004, 175, "{\"monday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\",\"14:00\",\"14:30\"],\"tuesday\":[\"08:00\",\"08:30\",\"09:00\"],\"wednesday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\",\"10:00\",\"14:00\",\"14:30\",\"15:00\"],\"thursday\":[\"08:00\",\"08:30\",\"09:00\"],\"friday\":[\"14:00\",\"14:30\",\"15:00\",\"15:30\"],\"saturday\":[\"08:00\",\"08:30\",\"09:00\"],\"sunday\":[]}", "sp_10", "Sản phụ khoa" }
                 });
 
-            migrationBuilder.InsertData(
+            _ = migrationBuilder.InsertData(
                 table: "MedicalHistories",
                 columns: new[] { "MaLichSu", "BookingId", "Diagnosis", "DoctorName", "MaBenhAn", "Notes", "PatientName", "Prescription", "PrescriptionItemsJson", "SoDienThoai", "Specialty", "Symptoms", "VisitDate" },
                 values: new object[,]
@@ -185,7 +184,7 @@ namespace WebDatLichKham.Migrations
                     { 910, null, "Viêm xoang mãn tính", "BS. Võ Thanh Hùng", 510, "Rửa mũi bằng nước muối sinh lý hàng ngày", "Đỗ Văn Tùng", "Amoxicillin 250mg x3, Xịt mũi Nasonex", "[{\"name\":\"Amoxicillin 250mg\",\"qty\":21,\"unit\":\"Viên\",\"dosage\":\"Ngày 3 lần, mỗi lần 1 viên\"},{\"name\":\"Xịt mũi Nasonex\",\"qty\":1,\"unit\":\"Chai\",\"dosage\":\"Xịt 2 nhát mỗi bên mũi, ngày 1 lần\"}]", "0945333444", "Tai Mũi Họng", "Nghẹt mũi, đau đầu vùng trán, chảy dịch mũi", "2026-02-28" }
                 });
 
-            migrationBuilder.InsertData(
+            _ = migrationBuilder.InsertData(
                 table: "Medicines",
                 columns: new[] { "Id", "ExpiryDate", "Ingredients", "Name", "Unit" },
                 values: new object[,]
@@ -197,7 +196,7 @@ namespace WebDatLichKham.Migrations
                     { "med_05", "2026-02-28", "Thảo dược", "Thuốc ho Bảo Thanh", "Chai" }
                 });
 
-            migrationBuilder.InsertData(
+            _ = migrationBuilder.InsertData(
                 table: "Specialties",
                 columns: new[] { "Id", "Description", "DoctorCount", "Icon", "Name" },
                 values: new object[,]
@@ -218,22 +217,22 @@ namespace WebDatLichKham.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
+            _ = migrationBuilder.DropTable(
                 name: "Accounts");
 
-            migrationBuilder.DropTable(
+            _ = migrationBuilder.DropTable(
                 name: "Appointments");
 
-            migrationBuilder.DropTable(
+            _ = migrationBuilder.DropTable(
                 name: "Doctors");
 
-            migrationBuilder.DropTable(
+            _ = migrationBuilder.DropTable(
                 name: "MedicalHistories");
 
-            migrationBuilder.DropTable(
+            _ = migrationBuilder.DropTable(
                 name: "Medicines");
 
-            migrationBuilder.DropTable(
+            _ = migrationBuilder.DropTable(
                 name: "Specialties");
         }
     }

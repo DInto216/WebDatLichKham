@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using WebDatLichKham.Data;
@@ -35,7 +32,7 @@ namespace WebDatLichKham.Services
                 medicines = await _context.Medicines.AsNoTracking().ToListAsync();
                 var cacheOptions = new MemoryCacheEntryOptions()
                     .SetAbsoluteExpiration(TimeSpan.FromHours(1));
-                _cache.Set(CacheKey, medicines, cacheOptions);
+                _ = _cache.Set(CacheKey, medicines, cacheOptions);
             }
             return medicines;
         }
@@ -43,8 +40,8 @@ namespace WebDatLichKham.Services
         public async Task<Medicine> AddAsync(Medicine medicine)
         {
             medicine.Id = "med_" + Guid.NewGuid().ToString("N").Substring(0, 8);
-            _context.Medicines.Add(medicine);
-            await _context.SaveChangesAsync();
+            _ = _context.Medicines.Add(medicine);
+            _ = await _context.SaveChangesAsync();
             _cache.Remove(CacheKey);
             return medicine;
         }
@@ -59,7 +56,7 @@ namespace WebDatLichKham.Services
             med.Unit = data.Unit;
             med.ExpiryDate = data.ExpiryDate;
 
-            await _context.SaveChangesAsync();
+            _ = await _context.SaveChangesAsync();
             _cache.Remove(CacheKey);
             return med;
         }
@@ -69,8 +66,8 @@ namespace WebDatLichKham.Services
             var med = await _context.Medicines.FindAsync(id);
             if (med == null) return false;
 
-            _context.Medicines.Remove(med);
-            await _context.SaveChangesAsync();
+            _ = _context.Medicines.Remove(med);
+            _ = await _context.SaveChangesAsync();
             _cache.Remove(CacheKey);
             return true;
         }

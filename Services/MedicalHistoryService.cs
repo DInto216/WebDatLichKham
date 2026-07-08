@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using WebDatLichKham.Data;
 using WebDatLichKham.Models;
@@ -43,13 +39,21 @@ namespace WebDatLichKham.Services
                 .ToList();
         }
 
+        /// <summary>
+        /// Tạo hồ sơ Bệnh án mới và hoàn tất luồng Khám bệnh.
+        /// Sử dụng EF Core Transaction (ACID) để đảm bảo: 
+        /// 1. Dữ liệu Bệnh án được lưu vào bảng MedicalHistories.
+        /// 2. Trạng thái của bảng Appointments được cập nhật sang "completed".
+        /// => NẾU 1 TRONG 2 BƯỚC BỊ LỖI (Ví dụ mất kết nối mạng, lỗi Server), toàn bộ thay đổi sẽ bị Rollback để tránh việc Lịch hẹn đã hoàn thành nhưng chưa có Bệnh án (Inconsistency).
+        /// </summary>
         public async Task<object> AddAsync(JsonElement rawData)
         {
+            // Bắt đầu 1 Transaction Database cấp phát đồng bộ
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
                 var h = new MedicalHistory();
-                
+
                 if (rawData.TryGetProperty("soDienThoai", out var phoneProp)) h.SoDienThoai = phoneProp.GetString() ?? "";
                 if (rawData.TryGetProperty("maBenhAn", out var baProp) && int.TryParse(baProp.GetString(), out int maBenhAn)) h.MaBenhAn = maBenhAn;
                 if (rawData.TryGetProperty("bookingId", out var bookProp)) h.BookingId = bookProp.GetString() ?? "";
@@ -60,7 +64,7 @@ namespace WebDatLichKham.Services
                 if (rawData.TryGetProperty("diagnosis", out var diagProp)) h.Diagnosis = diagProp.GetString() ?? "";
                 if (rawData.TryGetProperty("prescription", out var presProp)) h.Prescription = presProp.GetString() ?? "";
                 if (rawData.TryGetProperty("notes", out var notesProp)) h.Notes = notesProp.GetString() ?? "";
-                if (rawData.TryGetProperty("prescriptionItems", out var itemsProp)) h.PrescriptionItemsJson = itemsProp.ToString();
+                if (rawData.TryGetProperty("prescriptionItems", out var itemsProp)) h.PrescriptionItemsJson = itemsProp.GetRawText();
 
                 h.VisitDate = DateTime.Now.ToString("yyyy-MM-dd");
 
@@ -70,37 +74,50 @@ namespace WebDatLichKham.Services
                     h.MaBenhAn = lastRecord != null ? lastRecord.MaBenhAn + 1 : 501;
                 }
 
-                _context.MedicalHistories.Add(h);
-                
+                _ = _context.MedicalHistories.Add(h);
+
                 if (!string.IsNullOrEmpty(h.BookingId))
                 {
                     var appt = await _context.Appointments.FirstOrDefaultAsync(a => a.BookingId == h.BookingId);
                     if (appt != null)
                     {
                         appt.Status = "completed";
-                        
+
                         // Send exam result email if email is provided
                         if (!string.IsNullOrWhiteSpace(appt.Email))
                         {
-                            await _emailService.SendExamResultAsync(
-                                toEmail: appt.Email,
-                                patientName: appt.PatientName,
-                                bookingId: appt.BookingId,
-                                doctorName: appt.DoctorName,
-                                diagnosis: h.Diagnosis,
-                                prescription: h.Prescription
-                            );
+                            try
+                            {
+                                await _emailService.SendExamResultAsync(
+                                    toEmail: appt.Email,
+                                    patientName: appt.PatientName,
+                                    bookingId: appt.BookingId,
+                                    doctorName: appt.DoctorName,
+                                    diagnosis: h.Diagnosis,
+                                    prescription: h.Prescription
+                                );
+                            }
+                            catch (Exception ex)
+                            {
+                                // LỖI ẨN ĐÃ FIX: Không được để lỗi SMTP làm hỏng Database Transaction.
+                                // Nếu gửi mail thất bại, ghi log và cho phép lưu Bệnh án bình thường.
+                                Console.WriteLine($"Lỗi gửi email bệnh án (BookingId: {appt.BookingId}): {ex.Message}");
+                            }
                         }
                     }
                 }
 
-                await _context.SaveChangesAsync();
+                // Ghi nhận thay đổi vào CSDL
+                _ = await _context.SaveChangesAsync();
+
+                // Lưu lại và đóng gói Transaction thành công (Commit)
                 await transaction.CommitAsync();
 
                 return MapMedicalHistory(h);
             }
             catch (Exception)
             {
+                // [QUAN TRỌNG] Hủy bỏ mọi thay đổi nếu có lỗi xảy ra ở bất cứ dòng lệnh nào bên trên
                 await transaction.RollbackAsync();
                 throw;
             }
@@ -111,7 +128,7 @@ namespace WebDatLichKham.Services
             var h = await _context.MedicalHistories
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.BookingId == bookingId);
-            
+
             if (h == null) return null;
             return MapMedicalHistory(h);
         }
@@ -121,7 +138,7 @@ namespace WebDatLichKham.Services
             var h = await _context.MedicalHistories
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.MaLichSu == id);
-            
+
             if (h == null) return null;
             return MapMedicalHistory(h);
         }

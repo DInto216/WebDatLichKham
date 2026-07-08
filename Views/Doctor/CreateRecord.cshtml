@@ -1,28 +1,89 @@
 @{
     Layout = "~/Views/Shared/_DoctorLayout.cshtml";
-    ViewBag.Title = "Lập Bệnh Án & Kê Đơn";
+    ViewBag.Title = "Lập Bệnh Án và Kê Đơn";
     ViewBag.ActiveMenu = "CreateRecord";
-    ViewBag.PageTitle = "Lập Bệnh Án & Kê Đơn Thuốc";
+    ViewBag.PageTitle = "Lập Bệnh Án và Kê Đơn Thuốc";
     ViewBag.PageSubtitle = "Ghi nhận kết quả khám và kê đơn thuốc cho bệnh nhân";
 }
 
+@section PageStyles {
+<style>
+  /* Hiệu ứng chuyển động mượt mà chuyên nghiệp */
+  .animated-wrapper {
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  }
+  
+  .fade-slide-enter {
+    opacity: 0;
+    transform: translateY(20px);
+    display: none;
+  }
+  
+  .fade-slide-enter-active {
+    display: block;
+    animation: fadeSlideIn 0.5s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+  }
+  
+  .fade-slide-exit {
+    animation: fadeSlideOut 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+  }
+
+  @("@keyframes") fadeSlideIn {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  @("@keyframes") fadeSlideOut {
+    0% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-20px); }
+  }
+
+  /* Làm nổi bật form bằng Bootstrap Card shadow */
+  .record-card {
+    background: var(--bg-secondary, #fff);
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    padding: 24px;
+    border: 1px solid var(--border-primary);
+  }
+
+  .patient-selector-card {
+    background: var(--bg-secondary, #fff);
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    padding: 24px;
+    border: 1px solid var(--border-primary);
+    margin-bottom: 24px;
+  }
+
+  .row-flash {
+    animation: highlightRow 1s ease-out;
+  }
+
+  @("@keyframes") highlightRow {
+    0% { background-color: rgba(37, 99, 235, 0.15); }
+    100% { background-color: transparent; }
+  }
+</style>
+}
+
 <!-- Step 1: Select patient -->
-      <div class="patient-selector" id="patientSelector">
-        <label><i class="bi bi-person-check me-1"></i> Chọn bệnh nhân từ danh sách ca khám đã duyệt</label>
-        <div class="d-flex gap-2 align-items-end flex-wrap">
+      <div class="patient-selector-card animated-wrapper" id="patientSelector">
+        <label class="fw-bold mb-3 d-block fs-5"><i class="bi bi-person-check text-primary me-2"></i> Chọn bệnh nhân từ danh sách ca khám đã duyệt</label>
+        <div class="d-flex gap-3 align-items-end flex-wrap">
           <div class="form-medical" style="flex:1;min-width:240px;">
-            <select class="form-select" id="patientSelect">
+            <select class="form-select form-select-lg" id="patientSelect" style="border-radius: 8px;">
               <option value="">-- Chọn bệnh nhân --</option>
             </select>
           </div>
-          <button class="btn-primary-medical" onclick="selectPatient()" id="btnSelectPatient" disabled>
+          <button class="btn-primary-medical px-4 py-2" onclick="selectPatient()" id="btnSelectPatient" disabled style="border-radius: 8px;">
             <i class="bi bi-arrow-right-circle me-1"></i> Tiếp tục
           </button>
         </div>
       </div>
 
       <!-- Main form (hidden until patient selected) -->
-      <div id="recordForm" style="display:none;">
+      <div id="recordForm" class="record-card fade-slide-enter">
 
         <!-- Patient info (read-only) -->
         <div class="patient-info-banner" id="patientBanner">
@@ -47,40 +108,40 @@
           <div class="section-title"><i class="bi bi-capsule"></i> Kê đơn thuốc</div>
 
           <!-- Drug search & add -->
-          <div class="drug-add-row mb-3">
-            <div>
-              <label class="form-label" style="font-size:var(--text-xs);font-weight:600;">Tên thuốc (DanhMucThuoc)</label>
+          <div class="row g-3 mb-4 align-items-end">
+            <div class="col-md-4">
+              <label class="form-label text-muted" style="font-size:var(--text-xs);font-weight:600;text-transform:uppercase;">Tên thuốc (Danh mục)</label>
               <input type="text" class="form-control" id="drugSearch" list="drugList" placeholder="Gõ để tìm thuốc..." autocomplete="off">
               <datalist id="drugList"></datalist>
             </div>
-            <div>
-              <label class="form-label" style="font-size:var(--text-xs);font-weight:600;">Số lượng</label>
+            <div class="col-md-2">
+              <label class="form-label text-muted" style="font-size:var(--text-xs);font-weight:600;text-transform:uppercase;">Số lượng</label>
               <input type="number" class="form-control" id="drugQty" min="1" value="1" placeholder="SL">
             </div>
-            <div>
-              <label class="form-label" style="font-size:var(--text-xs);font-weight:600;">Liều lượng / Cách dùng</label>
+            <div class="col-md-4">
+              <label class="form-label text-muted" style="font-size:var(--text-xs);font-weight:600;text-transform:uppercase;">Liều lượng / Cách dùng</label>
               <input type="text" class="form-control" id="drugDosage" placeholder="VD: Ngày 2 lần, sau ăn">
             </div>
-            <div>
-              <button class="btn-primary-medical" onclick="addDrug()" style="white-space:nowrap;">
+            <div class="col-md-2">
+              <button class="btn-primary-medical w-100 py-2" onclick="addDrug()" style="white-space:nowrap; border-radius: 8px;">
                 <i class="bi bi-plus-lg"></i> Thêm vào đơn
               </button>
             </div>
           </div>
 
           <!-- Prescription table -->
-          <div style="border:1px solid var(--border-primary);border-radius:var(--radius-lg);overflow:hidden;">
-            <table class="prescription-table" id="prescriptionTable">
-              <thead>
+          <div class="table-responsive" style="border:1px solid var(--border-primary);border-radius:var(--radius-lg);overflow:hidden;">
+            <table class="table table-bordered table-hover mb-0" id="prescriptionTable">
+              <thead style="background-color: var(--bg-primary);">
                 <tr>
-                  <th style="width:40px;">STT</th>
+                  <th style="width:50px;text-align:center;">STT</th>
                   <th>Tên thuốc</th>
-                  <th style="width:80px;">Số lượng</th>
+                  <th style="width:100px;text-align:center;">Số lượng</th>
                   <th>Liều lượng / Cách dùng</th>
-                  <th style="width:60px;"></th>
+                  <th style="width:70px;text-align:center;">Thao tác</th>
                 </tr>
               </thead>
-              <tbody id="prescriptionBody">
+              <tbody id="prescriptionBody" style="background-color: var(--bg-secondary);">
               </tbody>
             </table>
             <div id="prescriptionEmpty" class="prescription-empty">
@@ -91,11 +152,11 @@
         </div>
 
         <!-- Footer actions -->
-        <div class="section-card">
-          <div class="form-footer" style="border:none;padding:0;margin:0;">
-            <button class="btn-secondary-medical" onclick="resetForm()"><i class="bi bi-arrow-counterclockwise me-1"></i> Làm lại</button>
-            <button class="btn-sign" onclick="submitRecord()" id="btnSubmit">
-              <i class="bi bi-shield-check"></i> Xác nhận ký số & Hoàn tất
+        <div class="section-card mt-4">
+          <div class="form-footer d-flex justify-content-end gap-3" style="border:none;padding:0;margin:0;">
+            <button class="btn btn-outline-secondary px-4 py-2" onclick="resetForm()" style="border-radius:8px;"><i class="bi bi-arrow-counterclockwise me-1"></i> Làm lại</button>
+            <button class="btn-sign px-4 py-2" onclick="submitRecord()" id="btnSubmit" style="border-radius:8px;background:var(--primary-600);color:#fff;border:none;">
+              <i class="bi bi-shield-check"></i> Xác nhận ký số và Hoàn tất
             </button>
           </div>
         </div>
@@ -186,14 +247,18 @@
       // Fill patient banner
       const age = selectedAppointment.birthYear ? (new Date().getFullYear() - selectedAppointment.birthYear) : '?';
       document.getElementById('patientBanner').innerHTML = `
-        <div class="pi-avatar">${selectedAppointment.patientName.charAt(0)}</div>
-        <div style="flex:1;">
-          <div class="pi-name">${selectedAppointment.patientName}</div>
-          <div class="pi-meta">
-            <span><i class="bi bi-telephone"></i> ${selectedAppointment.phone}</span>
-            <span><i class="bi bi-person"></i> ${selectedAppointment.gender || 'N/A'} — ${age} tuổi</span>
-            <span><i class="bi bi-calendar3"></i> Ngày khám: ${App.formatDate(selectedAppointment.date)}</span>
-            <span><i class="bi bi-clock"></i> ${selectedAppointment.time}</span>
+        <div class="d-flex align-items-center mb-4 p-3" style="background: var(--bg-primary); border-radius: 12px; border: 1px solid var(--border-primary);">
+          <div class="d-flex align-items-center justify-content-center me-3 shadow-sm" style="width: 56px; height: 56px; background: var(--primary-600); color: #fff; font-size: 24px; font-weight: bold; border-radius: 50%;">
+            ${selectedAppointment.patientName.charAt(0)}
+          </div>
+          <div style="flex:1;">
+            <div class="fw-bold fs-5 mb-1" style="color: var(--text-primary);">${selectedAppointment.patientName}</div>
+            <div class="d-flex flex-wrap gap-3" style="color: var(--text-secondary); font-size: 0.9rem;">
+              <span><i class="bi bi-telephone"></i> ${selectedAppointment.phone}</span>
+              <span><i class="bi bi-person"></i> ${selectedAppointment.gender || 'N/A'} — ${age} tuổi</span>
+              <span><i class="bi bi-calendar3"></i> Ngày khám: ${App.formatDate(selectedAppointment.date)}</span>
+              <span><i class="bi bi-clock"></i> ${selectedAppointment.time}</span>
+            </div>
           </div>
         </div>
       `;
@@ -203,9 +268,19 @@
         document.getElementById('symptoms').value = selectedAppointment.reason;
       }
 
-      // Show form, hide selector
-      document.getElementById('patientSelector').style.display = 'none';
-      document.getElementById('recordForm').style.display = 'block';
+      // Show form, hide selector with smooth animation
+      const selector = document.getElementById('patientSelector');
+      const form = document.getElementById('recordForm');
+      
+      selector.classList.add('fade-slide-exit');
+      
+      setTimeout(() => {
+        selector.style.display = 'none';
+        selector.classList.remove('fade-slide-exit');
+        
+        form.classList.remove('fade-slide-enter');
+        form.classList.add('fade-slide-enter-active');
+      }, 300);
     }
 
     // ---- Add drug to prescription ----
@@ -238,7 +313,7 @@
       const found = medicinesCatalog.find(m => m.name.toLowerCase() === name.toLowerCase());
       const unit = found ? found.unit : '';
 
-      prescriptionDrugs.push({ name, qty, unit, dosage });
+      prescriptionDrugs.push({ name, qty, unit, dosage, isNew: true });
       renderPrescription();
 
       // Reset inputs
@@ -270,21 +345,26 @@
 
       empty.style.display = 'none';
       tbody.innerHTML = prescriptionDrugs.map((drug, i) => `
-        <tr>
-          <td style="color:var(--text-tertiary);font-weight:600;">${i + 1}</td>
-          <td>
-            <div class="drug-name">${drug.name}</div>
-            ${drug.unit ? `<div class="drug-unit">${drug.unit}</div>` : ''}
+        <tr class="${drug.isNew ? 'row-flash' : ''}">
+          <td style="color:var(--text-tertiary);font-weight:600;text-align:center;vertical-align:middle;">${i + 1}</td>
+          <td style="vertical-align:middle;">
+            <div class="drug-name fw-bold text-primary">${drug.name}</div>
+            ${drug.unit ? `<div class="drug-unit text-muted small">${drug.unit}</div>` : ''}
           </td>
-          <td style="font-weight:600;text-align:center;">${drug.qty}</td>
-          <td style="color:var(--text-secondary);">${drug.dosage}</td>
-          <td>
-            <button class="btn-icon sm" onclick="removeDrug(${i})" style="color:var(--danger);" title="Xóa">
-              <i class="bi bi-x-lg"></i>
+          <td style="font-weight:600;text-align:center;vertical-align:middle;">
+             <span class="badge" style="background:var(--bg-primary);color:var(--text-primary);border:1px solid var(--border-primary);padding:6px 10px;font-size:0.9rem;">${drug.qty}</span>
+          </td>
+          <td style="color:var(--text-secondary);vertical-align:middle;">${drug.dosage}</td>
+          <td style="text-align:center;vertical-align:middle;">
+            <button class="btn btn-sm btn-outline-danger rounded shadow-sm" onclick="removeDrug(${i})" title="Xóa" style="width:36px;height:36px;padding:0;display:inline-flex;align-items:center;justify-content:center;">
+              <i class="bi bi-trash"></i>
             </button>
           </td>
         </tr>
       `).join('');
+      
+      // Reset isNew flag after rendering so it doesn't flash again
+      prescriptionDrugs.forEach(d => d.isNew = false);
     }
 
     // ---- Submit record ----
@@ -307,9 +387,8 @@
         return;
       }
 
-      // Confirm
       App.confirm(
-        'Xác nhận ký số & Hoàn tất',
+        'Xác nhận ký số và Hoàn tất',
         `<div style="text-align:left;font-size:var(--text-sm);">
           <p><strong>Bệnh nhân:</strong> ${selectedAppointment.patientName}</p>
           <p><strong>Chẩn đoán:</strong> ${diagnosis}</p>
@@ -362,8 +441,26 @@
       document.getElementById('drugQty').value = '1';
       document.getElementById('drugDosage').value = '';
       renderPrescription();
-      document.getElementById('recordForm').style.display = 'none';
-      document.getElementById('patientSelector').style.display = 'block';
+      const selector = document.getElementById('patientSelector');
+      const form = document.getElementById('recordForm');
+
+      // Animate form out, selector in
+      form.classList.remove('fade-slide-enter-active');
+      form.classList.remove('fade-slide-enter'); // Prevent instant display: none
+      form.classList.add('fade-slide-exit');
+      
+      setTimeout(() => {
+        form.classList.remove('fade-slide-exit');
+        form.classList.add('fade-slide-enter'); // reset state
+        
+        selector.style.display = 'block';
+        selector.classList.add('fade-slide-enter-active');
+        
+        setTimeout(() => {
+          selector.classList.remove('fade-slide-enter-active');
+        }, 500);
+      }, 300);
+
       document.getElementById('patientSelect').value = '';
       document.getElementById('btnSelectPatient').disabled = true;
     }

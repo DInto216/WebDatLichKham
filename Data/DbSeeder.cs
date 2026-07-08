@@ -1,7 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Linq;
-using WebDatLichKham.Data;
 using WebDatLichKham.Models;
 
 namespace WebDatLichKham.Data
@@ -10,12 +7,12 @@ namespace WebDatLichKham.Data
     {
         public static void Seed(ApplicationDbContext context)
         {
-            context.Database.EnsureCreated();
+            context.Database.Migrate();
 
             // Seed Admin Account
             if (!context.Accounts.Any(a => a.Role == "admin"))
             {
-                context.Accounts.Add(new Account
+                _ = context.Accounts.Add(new Account
                 {
                     Id = "acc_admin",
                     Username = "admin",
@@ -35,13 +32,13 @@ namespace WebDatLichKham.Data
                     new Specialty { Id = "sp_03", Name = "Tai Mũi Họng", Icon = "bi-ear", Description = "Khám các bệnh lý về Tai Mũi Họng", DoctorCount = 1 }
                 );
             }
-            context.SaveChanges();
+            _ = context.SaveChanges();
 
             // Seed sample Doctor
             if (!context.Doctors.Any())
             {
                 var docId = "doc_" + Guid.NewGuid().ToString("N").Substring(0, 8);
-                context.Doctors.Add(new Doctor
+                _ = context.Doctors.Add(new Doctor
                 {
                     Id = docId,
                     Name = "PGS.TS Nguyễn Văn An",
@@ -59,7 +56,7 @@ namespace WebDatLichKham.Data
                 // Seed Doctor Account
                 if (!context.Accounts.Any(a => a.Username == "doctor01"))
                 {
-                    context.Accounts.Add(new Account
+                    _ = context.Accounts.Add(new Account
                     {
                         Id = "acc_" + docId,
                         Username = "doctor01",
@@ -72,7 +69,7 @@ namespace WebDatLichKham.Data
                 }
             }
 
-            context.SaveChanges();
+            _ = context.SaveChanges();
         }
     }
 }

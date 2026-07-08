@@ -309,54 +309,7 @@
               <div class="card-medical p-4 p-md-5">
                 <h4 class="mb-4"><i class="bi bi-credit-card text-primary-medical me-2"></i>Chọn Phương Thức Thanh Toán</h4>
                 <div class="d-flex flex-column gap-3" id="paymentMethods">
-                  <!-- Cash -->
-                  <label class="payment-method-card selected" id="pm-cash" onclick="BookingWizard.selectPayment('cash')">
-                    <input type="radio" name="paymentMethod" value="cash" class="d-none" checked>
-                    <div class="payment-method-icon" style="background:linear-gradient(135deg,#ecfdf5,#d1fae5);">💵</div>
-                    <div style="flex:1;">
-                      <div style="font-weight:700;font-size:var(--text-base);">Thanh toán tại quầy</div>
-                      <div style="font-size:var(--text-xs);color:var(--text-tertiary);">Thanh toán trực tiếp khi đến khám</div>
-                    </div>
-                    <i class="bi bi-check-circle-fill" style="color:var(--primary-500);font-size:1.25rem;opacity:1;" id="check-cash"></i>
-                  </label>
-                  
-                  <!-- Bank Transfer -->
-                  <label class="payment-method-card" id="pm-bank_transfer" onclick="BookingWizard.selectPayment('bank_transfer')">
-                    <input type="radio" name="paymentMethod" value="bank_transfer" class="d-none">
-                    <div class="payment-method-icon" style="background:linear-gradient(135deg,#eff6ff,#dbeafe);">🏦</div>
-                    <div style="flex:1;">
-                      <div style="font-weight:700;font-size:var(--text-base);">Chuyển khoản ngân hàng</div>
-                      <div style="font-size:var(--text-xs);color:var(--text-tertiary);">Vietcombank / BIDV / Techcombank...</div>
-                    </div>
-                    <i class="bi bi-check-circle-fill" style="color:var(--primary-500);font-size:1.25rem;opacity:0;" id="check-bank_transfer"></i>
-                  </label>
-
-                  <!-- MoMo -->
-                  <label class="payment-method-card" id="pm-momo" onclick="BookingWizard.selectPayment('momo')">
-                    <input type="radio" name="paymentMethod" value="momo" class="d-none">
-                    <div class="payment-method-icon" style="background:linear-gradient(135deg,#fce7f3,#fbcfe8);">
-                      <img src="https://upload.wikimedia.org/wikipedia/vi/f/fe/MoMo_Logo.png" alt="MoMo" style="width:28px;height:28px;border-radius:4px;">
-                    </div>
-                    <div style="flex:1;">
-                      <div style="font-weight:700;font-size:var(--text-base);">Ví MoMo</div>
-                      <div style="font-size:var(--text-xs);color:var(--text-tertiary);">Quét mã QR MoMo</div>
-                    </div>
-                    <i class="bi bi-check-circle-fill" style="color:var(--primary-500);font-size:1.25rem;opacity:0;" id="check-momo"></i>
-                  </label>
-
-                  <!-- ZaloPay -->
-                  <label class="payment-method-card" id="pm-zalopay" onclick="BookingWizard.selectPayment('zalopay')">
-                    <input type="radio" name="paymentMethod" value="zalopay" class="d-none">
-                    <div class="payment-method-icon" style="background:linear-gradient(135deg,#e0f2fe,#bae6fd);">
-                      <img src="https://cdn.haitrieu.com/wp-content/uploads/2022/10/Logo-ZaloPay-Square.png" alt="ZaloPay" style="width:28px;height:28px;border-radius:4px;">
-                    </div>
-                    <div style="flex:1;">
-                      <div style="font-weight:700;font-size:var(--text-base);">ZaloPay</div>
-                      <div style="font-size:var(--text-xs);color:var(--text-tertiary);">Thanh toán qua ZaloPay</div>
-                    </div>
-                    <i class="bi bi-check-circle-fill" style="color:var(--primary-500);font-size:1.25rem;opacity:0;" id="check-zalopay"></i>
-                  </label>
-
+                  <!-- Payment methods will be rendered dynamically here -->
                 </div>
 
                 <div id="paymentDetails" class="mt-4"></div>
@@ -419,12 +372,8 @@
       let specialties = [];
       let currentDoctorAppointments = [];
 
-      const PAYMENT_LABELS = {
-        cash: 'Thanh toán tại quầy',
-        bank_transfer: 'Chuyển khoản ngân hàng',
-        momo: 'Ví MoMo',
-        zalopay: 'ZaloPay'
-      };
+      let paymentSettings = [];
+      let PAYMENT_LABELS = {};
 
       const goToStep = (step) => {
         if (step > currentStep) {
@@ -618,6 +567,14 @@
         }
 
         const details = document.getElementById('paymentDetails');
+        const setting = paymentSettings.find(s => s.methodCode === method);
+        let additionalConfig = {};
+        try {
+            if (setting && setting.additionalConfigJson) {
+                additionalConfig = JSON.parse(setting.additionalConfigJson);
+            }
+        } catch (e) {}
+
         if (method === 'cash') {
           details.innerHTML = `
             <div class="cash-info" style="background:linear-gradient(135deg,var(--primary-50),var(--secondary-50));border:1px dashed var(--primary-300);border-radius:12px;padding:24px;text-align:center;">
@@ -628,21 +585,29 @@
           `;
         } else if (method === 'bank_transfer') {
           const doc = doctors.find(d => d.id === selectedDoctor);
-          const price = App.formatCurrency(getDoctorPrice(doc.id));
+          const priceStr = App.formatCurrency(getDoctorPrice(doc.id));
+          const priceRaw = getDoctorPrice(doc.id);
+          const bankName = additionalConfig.bankName || 'Vietcombank';
+          const accNumber = additionalConfig.accountNumber || '0123456789';
+          const accName = additionalConfig.accountName || 'MEDIBOOKING VN';
+          // Find bin code for VietQR based on bankName (Mocking here, but in real life it should be handled via proper bank code)
+          const bankCodeMap = { 'Vietcombank': '970436', 'BIDV': '970418', 'Techcombank': '970407', 'MB': '970422', 'Vietinbank': '970415' };
+          const bin = bankCodeMap[bankName] || '970436';
+          
           details.innerHTML = `
             <div class="payment-qr-box" style="background:white;border:1px solid #e2e8f0;border-radius:12px;padding:24px;text-align:center;box-shadow:0 10px 25px rgba(0,0,0,0.05);">
               <div style="background:linear-gradient(135deg, #1e3a8a, #3b82f6);color:white;padding:12px;border-radius:8px;margin-bottom:20px;font-weight:600;">
-                <i class="bi bi-bank2 me-1"></i> Chuyển khoản Vietcombank
+                <i class="bi bi-bank2 me-1"></i> Chuyển khoản ${bankName}
               </div>
               <div class="qr-image" style="width:180px;height:180px;border:3px solid #f1f5f9;border-radius:12px;margin:0 auto 20px;display:flex;align-items:center;justify-content:center;background:#fff;">
-                <img src="https://api.vietqr.io/image/970436-0123456789-Z33XqE5.jpg?amount=${getDoctorPrice(doc.id)}&addInfo=Thanh toan MediBooking&accountName=MEDIBOOKING VN" alt="QR Code" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">
+                <img src="https://api.vietqr.io/image/${bin}-${accNumber}-Z33XqE5.jpg?amount=${priceRaw}&addInfo=Thanh toan MediBooking&accountName=${encodeURIComponent(accName)}" alt="QR Code" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">
               </div>
               <div class="bank-info-box" style="background:#f8fafc;padding:16px;border-radius:8px;text-align:left;">
-                <div class="bank-info-row"><span class="label">Ngân hàng:</span><span class="value">Vietcombank</span></div>
-                <div class="bank-info-row"><span class="label">Số tài khoản:</span><span class="value text-primary fs-6">0123456789 <button type="button" class="copy-btn" onclick="BookingWizard.copyText('0123456789')"><i class="bi bi-files"></i></button></span></div>
-                <div class="bank-info-row"><span class="label">Chủ tài khoản:</span><span class="value">MEDIBOOKING VN</span></div>
+                <div class="bank-info-row"><span class="label">Ngân hàng:</span><span class="value">${bankName}</span></div>
+                <div class="bank-info-row"><span class="label">Số tài khoản:</span><span class="value text-primary fs-6">${accNumber} <button type="button" class="copy-btn" onclick="BookingWizard.copyText('${accNumber}')"><i class="bi bi-files"></i></button></span></div>
+                <div class="bank-info-row"><span class="label">Chủ tài khoản:</span><span class="value">${accName}</span></div>
                 <div class="bank-info-row"><span class="label">Nội dung:</span><span class="value">THANH TOAN KHAM <button type="button" class="copy-btn" onclick="BookingWizard.copyText('THANH TOAN KHAM')"><i class="bi bi-files"></i></button></span></div>
-                <div class="bank-info-row"><span class="label">Số tiền:</span><span class="value text-danger fs-6">${price}</span></div>
+                <div class="bank-info-row"><span class="label">Số tiền:</span><span class="value text-danger fs-6">${priceStr}</span></div>
               </div>
               <div class="mt-3 text-muted" style="font-size:0.8rem;"><i class="bi bi-info-circle me-1"></i>Hệ thống sẽ tự động xác nhận sau 1-2 phút khi nhận được tiền.</div>
             </div>`;
@@ -726,6 +691,72 @@
         }
       };
 
+      const loadPaymentSettings = async () => {
+        try {
+            const res = await fetch('/api/payments/settings');
+            if (!res.ok) throw new Error();
+            const allSettings = await res.json();
+            paymentSettings = allSettings.filter(s => s.isActive);
+            
+            // Generate Labels map
+            paymentSettings.forEach(s => {
+                PAYMENT_LABELS[s.methodCode] = s.displayName;
+            });
+
+            renderPaymentMethods();
+        } catch (err) {
+            console.error('Failed to load payment settings', err);
+        }
+      };
+
+      const renderPaymentMethods = () => {
+        const container = document.getElementById('paymentMethods');
+        container.innerHTML = paymentSettings.map((s, idx) => {
+            let iconHtml = `<i class="bi ${s.icon || 'bi-credit-card'}"></i>`;
+            let bgClass = '';
+            let subtitle = '';
+
+            if (s.methodCode === 'cash') {
+                iconHtml = '💵';
+                bgClass = 'background:linear-gradient(135deg,#ecfdf5,#d1fae5);';
+                subtitle = 'Thanh toán trực tiếp khi đến khám';
+            } else if (s.methodCode === 'bank_transfer') {
+                iconHtml = '🏦';
+                bgClass = 'background:linear-gradient(135deg,#eff6ff,#dbeafe);';
+                subtitle = 'Vietcombank / BIDV / Techcombank...';
+            } else if (s.methodCode === 'momo') {
+                iconHtml = '<img src="https://upload.wikimedia.org/wikipedia/vi/f/fe/MoMo_Logo.png" style="width:28px;height:28px;border-radius:4px;">';
+                bgClass = 'background:linear-gradient(135deg,#fce7f3,#fbcfe8);';
+                subtitle = 'Quét mã QR MoMo';
+            } else if (s.methodCode === 'zalopay') {
+                iconHtml = '<img src="https://cdn.haitrieu.com/wp-content/uploads/2022/10/Logo-ZaloPay-Square.png" style="width:28px;height:28px;border-radius:4px;">';
+                bgClass = 'background:linear-gradient(135deg,#e0f2fe,#bae6fd);';
+                subtitle = 'Thanh toán qua ZaloPay';
+            }
+
+            const isChecked = idx === 0 ? 'checked' : '';
+            const isSelected = idx === 0 ? 'selected' : '';
+            const opacity = idx === 0 ? '1' : '0';
+
+            return `
+              <label class="payment-method-card ${isSelected}" id="pm-${s.methodCode}" onclick="BookingWizard.selectPayment('${s.methodCode}')">
+                <input type="radio" name="paymentMethod" value="${s.methodCode}" class="d-none" ${isChecked}>
+                <div class="payment-method-icon" style="${bgClass}">${iconHtml}</div>
+                <div style="flex:1;">
+                  <div style="font-weight:700;font-size:var(--text-base);">${s.displayName}</div>
+                  <div style="font-size:var(--text-xs);color:var(--text-tertiary);">${subtitle}</div>
+                </div>
+                <i class="bi bi-check-circle-fill" style="color:var(--primary-500);font-size:1.25rem;opacity:${opacity};" id="check-${s.methodCode}"></i>
+              </label>
+            `;
+        }).join('');
+
+        if (paymentSettings.length > 0) {
+            selectedPaymentMethod = paymentSettings[0].methodCode;
+            selectPayment(selectedPaymentMethod);
+        }
+      };
+
       const init = () => {
         const dateInput = document.getElementById('bookingDate');
         const today = new Date();
@@ -737,6 +768,7 @@
 
         loadSpecialties();
         loadDoctors();
+        loadPaymentSettings();
       };
 
       return {

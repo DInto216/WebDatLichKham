@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using WebDatLichKham.Data;
 using WebDatLichKham.Models;
@@ -31,7 +27,8 @@ namespace WebDatLichKham.Services
 
         public async Task<IEnumerable<Appointment>> GetAllAsync(string? doctorId = null, string? date = null)
         {
-            var query = _context.Appointments.AsQueryable();
+            // TỐI ƯU HÓA: Sử dụng AsNoTracking cho các truy vấn chỉ đọc để vô hiệu hóa Tracking Snapshot, tiết kiệm RAM.
+            var query = _context.Appointments.AsNoTracking().AsQueryable();
 
             if (!string.IsNullOrEmpty(doctorId))
             {
@@ -85,21 +82,29 @@ namespace WebDatLichKham.Services
                 }
             }
 
-            _context.Appointments.Add(data);
-            await _context.SaveChangesAsync();
+            _ = _context.Appointments.Add(data);
+            _ = await _context.SaveChangesAsync();
 
             // Send email notification if email is provided
             if (!string.IsNullOrWhiteSpace(data.Email))
             {
-                await _emailService.SendBookingConfirmationAsync(
-                    toEmail: data.Email,
-                    patientName: data.PatientName,
-                    bookingId: data.BookingId,
-                    date: data.Date,
-                    time: data.Time,
-                    doctorName: data.DoctorName,
-                    specialty: data.Specialty
-                );
+                try
+                {
+                    await _emailService.SendBookingConfirmationAsync(
+                        toEmail: data.Email,
+                        patientName: data.PatientName,
+                        bookingId: data.BookingId,
+                        date: data.Date,
+                        time: data.Time,
+                        doctorName: data.DoctorName,
+                        specialty: data.Specialty
+                    );
+                }
+                catch (Exception ex)
+                {
+                    // LỖI ẨN ĐÃ FIX: Bỏ qua lỗi gửi Email để không làm Crash quá trình Đặt lịch của bệnh nhân
+                    Console.WriteLine($"Lỗi gửi email xác nhận đặt lịch (BookingId: {data.BookingId}): {ex.Message}");
+                }
             }
 
             return data;
@@ -111,7 +116,7 @@ namespace WebDatLichKham.Services
             if (appt == null) return null;
 
             appt.Status = status;
-            await _context.SaveChangesAsync();
+            _ = await _context.SaveChangesAsync();
             return appt;
         }
 
@@ -125,16 +130,16 @@ namespace WebDatLichKham.Services
             {
                 appt.PaidAt = DateTime.Now;
             }
-            await _context.SaveChangesAsync();
+            _ = await _context.SaveChangesAsync();
             return appt;
         }
 
         public async Task<IEnumerable<Appointment>> LookupAsync(string phone)
         {
             if (string.IsNullOrEmpty(phone)) return new List<Appointment>();
-            
+
             var cleanPhone = phone.Replace(" ", "");
-            return await _context.Appointments
+            return await _context.Appointments.AsNoTracking()
                 .Where(a => a.Phone == cleanPhone)
                 .OrderByDescending(a => a.Date)
                 .ThenByDescending(a => a.Time)
@@ -143,11 +148,11 @@ namespace WebDatLichKham.Services
 
         public async Task<IEnumerable<object>> GetPaymentsAsync()
         {
-            var list = await _context.Appointments
+            var list = await _context.Appointments.AsNoTracking()
                 .OrderByDescending(a => a.Date)
                 .ThenByDescending(a => a.Time)
                 .ToListAsync();
-            
+
             return list.Select(a => new
             {
                 id = a.Id,

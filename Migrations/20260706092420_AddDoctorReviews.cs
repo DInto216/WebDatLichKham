@@ -12,7 +12,7 @@ namespace WebDatLichKham.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Icon",
                 table: "Specialties",
                 type: "nvarchar(max)",
@@ -20,7 +20,7 @@ namespace WebDatLichKham.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Description",
                 table: "Specialties",
                 type: "nvarchar(max)",
@@ -28,7 +28,7 @@ namespace WebDatLichKham.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Unit",
                 table: "Medicines",
                 type: "nvarchar(max)",
@@ -36,7 +36,7 @@ namespace WebDatLichKham.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Ingredients",
                 table: "Medicines",
                 type: "nvarchar(max)",
@@ -44,7 +44,7 @@ namespace WebDatLichKham.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "ExpiryDate",
                 table: "Medicines",
                 type: "nvarchar(max)",
@@ -52,7 +52,7 @@ namespace WebDatLichKham.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "VisitDate",
                 table: "MedicalHistories",
                 type: "nvarchar(max)",
@@ -60,7 +60,7 @@ namespace WebDatLichKham.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Symptoms",
                 table: "MedicalHistories",
                 type: "nvarchar(max)",
@@ -68,7 +68,7 @@ namespace WebDatLichKham.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Specialty",
                 table: "MedicalHistories",
                 type: "nvarchar(max)",
@@ -76,7 +76,7 @@ namespace WebDatLichKham.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "SoDienThoai",
                 table: "MedicalHistories",
                 type: "nvarchar(max)",
@@ -84,7 +84,7 @@ namespace WebDatLichKham.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "PrescriptionItemsJson",
                 table: "MedicalHistories",
                 type: "nvarchar(max)",
@@ -92,7 +92,7 @@ namespace WebDatLichKham.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Prescription",
                 table: "MedicalHistories",
                 type: "nvarchar(max)",
@@ -100,7 +100,7 @@ namespace WebDatLichKham.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "PatientName",
                 table: "MedicalHistories",
                 type: "nvarchar(max)",
@@ -108,7 +108,7 @@ namespace WebDatLichKham.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Notes",
                 table: "MedicalHistories",
                 type: "nvarchar(max)",
@@ -116,7 +116,7 @@ namespace WebDatLichKham.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "DoctorName",
                 table: "MedicalHistories",
                 type: "nvarchar(max)",
@@ -124,7 +124,7 @@ namespace WebDatLichKham.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Diagnosis",
                 table: "MedicalHistories",
                 type: "nvarchar(max)",
@@ -132,7 +132,7 @@ namespace WebDatLichKham.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "SpecialtyName",
                 table: "Doctors",
                 type: "nvarchar(max)",
@@ -140,7 +140,7 @@ namespace WebDatLichKham.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "ScheduleJson",
                 table: "Doctors",
                 type: "nvarchar(max)",
@@ -148,7 +148,7 @@ namespace WebDatLichKham.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Degree",
                 table: "Doctors",
                 type: "nvarchar(max)",
@@ -156,7 +156,7 @@ namespace WebDatLichKham.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Bio",
                 table: "Doctors",
                 type: "nvarchar(max)",
@@ -164,7 +164,7 @@ namespace WebDatLichKham.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Avatar",
                 table: "Doctors",
                 type: "nvarchar(max)",
@@ -172,7 +172,7 @@ namespace WebDatLichKham.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Status",
                 table: "Appointments",
                 type: "nvarchar(max)",
@@ -180,7 +180,7 @@ namespace WebDatLichKham.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Specialty",
                 table: "Appointments",
                 type: "nvarchar(max)",
@@ -188,7 +188,7 @@ namespace WebDatLichKham.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Reason",
                 table: "Appointments",
                 type: "nvarchar(max)",
@@ -196,7 +196,7 @@ namespace WebDatLichKham.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "PaymentStatus",
                 table: "Appointments",
                 type: "nvarchar(max)",
@@ -204,7 +204,7 @@ namespace WebDatLichKham.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "PaymentMethod",
                 table: "Appointments",
                 type: "nvarchar(max)",
@@ -212,7 +212,7 @@ namespace WebDatLichKham.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Gender",
                 table: "Appointments",
                 type: "nvarchar(max)",
@@ -220,7 +220,7 @@ namespace WebDatLichKham.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Email",
                 table: "Appointments",
                 type: "nvarchar(max)",
@@ -228,7 +228,7 @@ namespace WebDatLichKham.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "DoctorName",
                 table: "Appointments",
                 type: "nvarchar(max)",
@@ -236,7 +236,7 @@ namespace WebDatLichKham.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Name",
                 table: "Accounts",
                 type: "nvarchar(max)",
@@ -244,7 +244,7 @@ namespace WebDatLichKham.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
 
-            migrationBuilder.CreateTable(
+            _ = migrationBuilder.CreateTable(
                 name: "DoctorReviews",
                 columns: table => new
                 {
@@ -259,10 +259,10 @@ namespace WebDatLichKham.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DoctorReviews", x => x.Id);
+                    _ = table.PrimaryKey("PK_DoctorReviews", x => x.Id);
                 });
 
-            migrationBuilder.InsertData(
+            _ = migrationBuilder.InsertData(
                 table: "DoctorReviews",
                 columns: new[] { "Id", "Comment", "Date", "DoctorId", "DoctorName", "PatientName", "Rating", "Specialty" },
                 values: new object[,]
@@ -279,10 +279,10 @@ namespace WebDatLichKham.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
+            _ = migrationBuilder.DropTable(
                 name: "DoctorReviews");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Icon",
                 table: "Specialties",
                 type: "nvarchar(max)",
@@ -292,7 +292,7 @@ namespace WebDatLichKham.Migrations
                 oldType: "nvarchar(max)",
                 oldNullable: true);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Description",
                 table: "Specialties",
                 type: "nvarchar(max)",
@@ -302,7 +302,7 @@ namespace WebDatLichKham.Migrations
                 oldType: "nvarchar(max)",
                 oldNullable: true);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Unit",
                 table: "Medicines",
                 type: "nvarchar(max)",
@@ -312,7 +312,7 @@ namespace WebDatLichKham.Migrations
                 oldType: "nvarchar(max)",
                 oldNullable: true);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Ingredients",
                 table: "Medicines",
                 type: "nvarchar(max)",
@@ -322,7 +322,7 @@ namespace WebDatLichKham.Migrations
                 oldType: "nvarchar(max)",
                 oldNullable: true);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "ExpiryDate",
                 table: "Medicines",
                 type: "nvarchar(max)",
@@ -332,7 +332,7 @@ namespace WebDatLichKham.Migrations
                 oldType: "nvarchar(max)",
                 oldNullable: true);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "VisitDate",
                 table: "MedicalHistories",
                 type: "nvarchar(max)",
@@ -342,7 +342,7 @@ namespace WebDatLichKham.Migrations
                 oldType: "nvarchar(max)",
                 oldNullable: true);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Symptoms",
                 table: "MedicalHistories",
                 type: "nvarchar(max)",
@@ -352,7 +352,7 @@ namespace WebDatLichKham.Migrations
                 oldType: "nvarchar(max)",
                 oldNullable: true);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Specialty",
                 table: "MedicalHistories",
                 type: "nvarchar(max)",
@@ -362,7 +362,7 @@ namespace WebDatLichKham.Migrations
                 oldType: "nvarchar(max)",
                 oldNullable: true);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "SoDienThoai",
                 table: "MedicalHistories",
                 type: "nvarchar(max)",
@@ -372,7 +372,7 @@ namespace WebDatLichKham.Migrations
                 oldType: "nvarchar(max)",
                 oldNullable: true);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "PrescriptionItemsJson",
                 table: "MedicalHistories",
                 type: "nvarchar(max)",
@@ -382,7 +382,7 @@ namespace WebDatLichKham.Migrations
                 oldType: "nvarchar(max)",
                 oldNullable: true);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Prescription",
                 table: "MedicalHistories",
                 type: "nvarchar(max)",
@@ -392,7 +392,7 @@ namespace WebDatLichKham.Migrations
                 oldType: "nvarchar(max)",
                 oldNullable: true);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "PatientName",
                 table: "MedicalHistories",
                 type: "nvarchar(max)",
@@ -402,7 +402,7 @@ namespace WebDatLichKham.Migrations
                 oldType: "nvarchar(max)",
                 oldNullable: true);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Notes",
                 table: "MedicalHistories",
                 type: "nvarchar(max)",
@@ -412,7 +412,7 @@ namespace WebDatLichKham.Migrations
                 oldType: "nvarchar(max)",
                 oldNullable: true);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "DoctorName",
                 table: "MedicalHistories",
                 type: "nvarchar(max)",
@@ -422,7 +422,7 @@ namespace WebDatLichKham.Migrations
                 oldType: "nvarchar(max)",
                 oldNullable: true);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Diagnosis",
                 table: "MedicalHistories",
                 type: "nvarchar(max)",
@@ -432,7 +432,7 @@ namespace WebDatLichKham.Migrations
                 oldType: "nvarchar(max)",
                 oldNullable: true);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "SpecialtyName",
                 table: "Doctors",
                 type: "nvarchar(max)",
@@ -442,7 +442,7 @@ namespace WebDatLichKham.Migrations
                 oldType: "nvarchar(max)",
                 oldNullable: true);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "ScheduleJson",
                 table: "Doctors",
                 type: "nvarchar(max)",
@@ -452,7 +452,7 @@ namespace WebDatLichKham.Migrations
                 oldType: "nvarchar(max)",
                 oldNullable: true);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Degree",
                 table: "Doctors",
                 type: "nvarchar(max)",
@@ -462,7 +462,7 @@ namespace WebDatLichKham.Migrations
                 oldType: "nvarchar(max)",
                 oldNullable: true);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Bio",
                 table: "Doctors",
                 type: "nvarchar(max)",
@@ -472,7 +472,7 @@ namespace WebDatLichKham.Migrations
                 oldType: "nvarchar(max)",
                 oldNullable: true);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Avatar",
                 table: "Doctors",
                 type: "nvarchar(max)",
@@ -482,7 +482,7 @@ namespace WebDatLichKham.Migrations
                 oldType: "nvarchar(max)",
                 oldNullable: true);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Status",
                 table: "Appointments",
                 type: "nvarchar(max)",
@@ -492,7 +492,7 @@ namespace WebDatLichKham.Migrations
                 oldType: "nvarchar(max)",
                 oldNullable: true);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Specialty",
                 table: "Appointments",
                 type: "nvarchar(max)",
@@ -502,7 +502,7 @@ namespace WebDatLichKham.Migrations
                 oldType: "nvarchar(max)",
                 oldNullable: true);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Reason",
                 table: "Appointments",
                 type: "nvarchar(max)",
@@ -512,7 +512,7 @@ namespace WebDatLichKham.Migrations
                 oldType: "nvarchar(max)",
                 oldNullable: true);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "PaymentStatus",
                 table: "Appointments",
                 type: "nvarchar(max)",
@@ -522,7 +522,7 @@ namespace WebDatLichKham.Migrations
                 oldType: "nvarchar(max)",
                 oldNullable: true);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "PaymentMethod",
                 table: "Appointments",
                 type: "nvarchar(max)",
@@ -532,7 +532,7 @@ namespace WebDatLichKham.Migrations
                 oldType: "nvarchar(max)",
                 oldNullable: true);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Gender",
                 table: "Appointments",
                 type: "nvarchar(max)",
@@ -542,7 +542,7 @@ namespace WebDatLichKham.Migrations
                 oldType: "nvarchar(max)",
                 oldNullable: true);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Email",
                 table: "Appointments",
                 type: "nvarchar(max)",
@@ -552,7 +552,7 @@ namespace WebDatLichKham.Migrations
                 oldType: "nvarchar(max)",
                 oldNullable: true);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "DoctorName",
                 table: "Appointments",
                 type: "nvarchar(max)",
@@ -562,7 +562,7 @@ namespace WebDatLichKham.Migrations
                 oldType: "nvarchar(max)",
                 oldNullable: true);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Name",
                 table: "Accounts",
                 type: "nvarchar(max)",

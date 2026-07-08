@@ -11,7 +11,7 @@ const API = (() => {
     try {
       const csrfToken = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
       const finalHeaders = {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json; charset=utf-8',
         ...options.headers
       };
       if (csrfToken) {
@@ -134,8 +134,8 @@ const API = (() => {
   };
 
   // ---- Lookup ----
-  const lookupAppointment = async (phone, bookingId) => {
-    const params = new URLSearchParams({ phone, bookingId });
+  const lookupAppointment = async (phone) => {
+    const params = new URLSearchParams({ phone });
     return await request(`/api/appointments/lookup?${params.toString()}`);
   };
 

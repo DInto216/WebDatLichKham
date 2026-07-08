@@ -1,0 +1,24 @@
+@* 
+    TỐI ƯU HÓA (REFACTORING): Partial View Bảng Kê Đơn Thuốc
+    Mục đích: Tái sử dụng bảng kê đơn cho toàn bộ các trang (ExamResult, Lập Bệnh Án, Lịch sử khám).
+    Nếu muốn sửa màu sắc hay cấu trúc bảng, chỉ cần sửa ở file này.
+*@
+
+<div class="rx-table-container">
+    <table class="rx-table w-100" id="@(ViewData["TableId"] ?? "prescriptionTable")">
+        <thead>
+            <tr>
+                <th style="width: 40px; text-align: center;">#</th>
+                <th>Tên thuốc & Cách dùng</th>
+                <th style="width: 80px; text-align: center;">Số lượng</th>
+                @if (ViewData["ShowAction"]?.ToString() == "true")
+                {
+                    <th style="width: 60px; text-align: center;">Xoá</th>
+                }
+            </tr>
+        </thead>
+        <tbody id="@(ViewData["TbodyId"] ?? "prescriptionTbody")">
+            <!-- Dữ liệu render qua JS hoặc server-side loop -->
+        </tbody>
+    </table>
+</div>

@@ -816,6 +816,81 @@ namespace WebDatLichKham.Migrations
                         });
                 });
 
+            modelBuilder.Entity("WebDatLichKham.Models.PaymentSetting", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AdditionalConfigJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Icon")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("MethodCode")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PaymentSettings");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            DisplayName = "Thanh toán tại quầy",
+                            Icon = "bi-cash",
+                            IsActive = true,
+                            MethodCode = "cash",
+                            UpdatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 2,
+                            AdditionalConfigJson = "{\"bankName\":\"Vietcombank\",\"accountNumber\":\"0123456789\",\"accountName\":\"MEDIBOOKING VN\"}",
+                            DisplayName = "Chuyển khoản Ngân hàng",
+                            Icon = "bi-bank2",
+                            IsActive = true,
+                            MethodCode = "bank_transfer",
+                            UpdatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 3,
+                            DisplayName = "Ví MoMo",
+                            Icon = "bi-qr-code",
+                            IsActive = true,
+                            MethodCode = "momo",
+                            UpdatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 4,
+                            DisplayName = "ZaloPay",
+                            Icon = "bi-qr-code",
+                            IsActive = true,
+                            MethodCode = "zalopay",
+                            UpdatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        });
+                });
+
             modelBuilder.Entity("WebDatLichKham.Models.Specialty", b =>
                 {
                     b.Property<string>("Id")

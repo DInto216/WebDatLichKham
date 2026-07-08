@@ -1,0 +1,287 @@
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewBag.Title = "Cấu hình Thanh toán - Admin";
+    ViewBag.ActiveMenu = "PaymentConfig";
+    ViewBag.PageTitle = "Cấu hình Thanh toán";
+    ViewBag.PageSubtitle = "Thiết lập các cổng thanh toán hiển thị cho bệnh nhân";
+}
+
+@section PageStyles {
+    <style>
+        .setting-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            border: 1px solid var(--bg-tertiary);
+            transition: transform 0.2s;
+            height: 100%;
+        }
+        .setting-card:hover {
+            transform: translateY(-5px);
+        }
+        .setting-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .setting-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            background: var(--bg-secondary);
+            color: var(--primary-600);
+        }
+        /* Custom Toggle Switch */
+        .form-switch .form-check-input {
+            width: 3em;
+            height: 1.5em;
+            cursor: pointer;
+        }
+        .config-section {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 16px;
+            border: 1px dashed #cbd5e1;
+        }
+    </style>
+}
+
+<div class="row g-4" id="paymentSettingsContainer">
+    <div class="col-12 text-center py-5">
+        <div class="spinner-border text-primary" role="status"></div>
+        <div class="mt-2 text-muted">Đang tải cấu hình...</div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const user = App.requireAuth(['admin']);
+        let settings = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSettings();
+        });
+
+        const loadSettings = async () => {
+            try {
+                const res = await fetch('/api/payments/settings');
+                if (!res.ok) throw new Error('Network error');
+                settings = await res.json();
+                renderSettings();
+            } catch (err) {
+                App.toast.error('Lỗi', 'Không thể tải cấu hình thanh toán');
+            }
+        };
+
+        const renderSettings = () => {
+            const container = document.getElementById('paymentSettingsContainer');
+            
+            if (settings.length === 0) {
+                container.innerHTML = '<div class="col-12 text-center text-muted">Chưa có dữ liệu cấu hình.</div>';
+                return;
+            }
+
+            container.innerHTML = settings.map(s => {
+                let configHtml = '';
+                let additionalConfig = {};
+                try {
+                    if (s.additionalConfigJson) {
+                        additionalConfig = JSON.parse(s.additionalConfigJson);
+                    }
+                } catch(e) {}
+
+                if (s.methodCode === 'bank_transfer') {
+                    configHtml = `
+                        <div class="config-section" id="config-${s.methodCode}" style="display: ${s.isActive ? 'block' : 'none'}">
+                            <h6 class="fw-bold mb-3">Thông tin chuyển khoản</h6>
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Ngân hàng <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="bankName-${s.id}" value="${additionalConfig.bankName || ''}">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Số tài khoản <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="accountNumber-${s.id}" value="${additionalConfig.accountNumber || ''}">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Chủ tài khoản <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="accountName-${s.id}" value="${additionalConfig.accountName || ''}">
+                            </div>
+                            <button class="btn btn-sm btn-primary-medical w-100" onclick="saveConfig(${s.id}, '${s.methodCode}')">
+                                <i class="bi bi-save me-1"></i> Lưu thông tin
+                            </button>
+                        </div>
+                    `;
+                } else if (s.methodCode === 'vnpay') {
+                    configHtml = `
+                        <div class="config-section" id="config-${s.methodCode}" style="display: ${s.isActive ? 'block' : 'none'}">
+                            <h6 class="fw-bold mb-3">Thông tin cấu hình VNPay</h6>
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">vnp_TmnCode (Mã Website) <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="vnpTmnCode-${s.id}" value="${additionalConfig.vnpTmnCode || ''}">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">vnp_HashSecret (Khóa bí mật) <span class="text-danger">*</span></label>
+                                <input type="password" class="form-control" id="vnpHashSecret-${s.id}" value="${additionalConfig.vnpHashSecret || ''}">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">vnp_Url (URL Cổng TT) <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="vnpUrl-${s.id}" value="${additionalConfig.vnpUrl || 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html'}">
+                            </div>
+                            <button class="btn btn-sm btn-primary-medical w-100" onclick="saveConfig(${s.id}, '${s.methodCode}')">
+                                <i class="bi bi-save me-1"></i> Lưu thông tin
+                            </button>
+                        </div>
+                    `;
+                } else if (s.methodCode === 'momo') {
+                    configHtml = `
+                        <div class="config-section" id="config-${s.methodCode}" style="display: ${s.isActive ? 'block' : 'none'}">
+                            <h6 class="fw-bold mb-3">Thông tin cấu hình MoMo</h6>
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Partner Code <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="momoPartnerCode-${s.id}" value="${additionalConfig.partnerCode || ''}">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Access Key <span class="text-danger">*</span></label>
+                                <input type="password" class="form-control" id="momoAccessKey-${s.id}" value="${additionalConfig.accessKey || ''}">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Secret Key <span class="text-danger">*</span></label>
+                                <input type="password" class="form-control" id="momoSecretKey-${s.id}" value="${additionalConfig.secretKey || ''}">
+                            </div>
+                            <button class="btn btn-sm btn-primary-medical w-100" onclick="saveConfig(${s.id}, '${s.methodCode}')">
+                                <i class="bi bi-save me-1"></i> Lưu thông tin
+                            </button>
+                        </div>
+                    `;
+                }
+
+                return `
+                    <div class="col-md-6 col-lg-4">
+                        <div class="setting-card">
+                            <div class="setting-header">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="setting-icon">
+                                        <i class="bi ${s.icon || 'bi-credit-card'}"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="mb-0 fw-bold">${s.displayName}</h5>
+                                        <span class="badge ${s.isActive ? 'bg-success' : 'bg-secondary'} mt-1">
+                                            ${s.isActive ? 'Đang bật' : 'Đã tắt'}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-check form-switch ms-auto">
+                                    <input class="form-check-input" type="checkbox" role="switch" 
+                                           id="toggle-${s.id}" ${s.isActive ? 'checked' : ''} 
+                                           onchange="toggleActive(${s.id}, this.checked)">
+                                </div>
+                            </div>
+                            ${configHtml}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        };
+
+        const toggleActive = async (id, isActive) => {
+            try {
+                const setting = settings.find(x => x.id === id);
+                if (!setting) return;
+                
+                const updatedData = {
+                    isActive: isActive,
+                    additionalConfigJson: setting.additionalConfigJson
+                };
+
+                const csrfToken = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+                const res = await fetch(`/api/payments/settings/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': csrfToken
+                    },
+                    body: JSON.stringify(updatedData)
+                });
+
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({}));
+                    throw new Error(err.message || 'Failed to update');
+                }
+
+                App.toast.success('Thành công', 'Đã ' + (isActive ? 'bật' : 'tắt') + ' phương thức thanh toán');
+                
+                // Cập nhật giao diện cục bộ
+                setting.isActive = isActive;
+                const configSection = document.getElementById(`config-${setting.methodCode}`);
+                if (configSection) {
+                    configSection.style.display = isActive ? 'block' : 'none';
+                }
+                renderSettings();
+            } catch (err) {
+                App.toast.error('Lỗi thay đổi trạng thái', err.message);
+                // Revert toggle
+                document.getElementById(`toggle-${id}`).checked = !isActive;
+            }
+        };
+
+        const saveConfig = async (id, methodCode) => {
+            try {
+                const setting = settings.find(x => x.id === id);
+                if (!setting) return;
+
+                let additionalConfig = {};
+                if (methodCode === 'bank_transfer') {
+                    additionalConfig = {
+                        bankName: document.getElementById(`bankName-${id}`).value.trim(),
+                        accountNumber: document.getElementById(`accountNumber-${id}`).value.trim(),
+                        accountName: document.getElementById(`accountName-${id}`).value.trim()
+                    };
+                } else if (methodCode === 'vnpay') {
+                    additionalConfig = {
+                        vnpTmnCode: document.getElementById(`vnpTmnCode-${id}`).value.trim(),
+                        vnpHashSecret: document.getElementById(`vnpHashSecret-${id}`).value.trim(),
+                        vnpUrl: document.getElementById(`vnpUrl-${id}`).value.trim()
+                    };
+                } else if (methodCode === 'momo') {
+                    additionalConfig = {
+                        partnerCode: document.getElementById(`momoPartnerCode-${id}`).value.trim(),
+                        accessKey: document.getElementById(`momoAccessKey-${id}`).value.trim(),
+                        secretKey: document.getElementById(`momoSecretKey-${id}`).value.trim()
+                    };
+                }
+
+                const updatedData = {
+                    isActive: setting.isActive,
+                    additionalConfigJson: JSON.stringify(additionalConfig)
+                };
+
+                const csrfToken = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+                const res = await fetch(`/api/payments/settings/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': csrfToken
+                    },
+                    body: JSON.stringify(updatedData)
+                });
+
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({}));
+                    throw new Error(err.message || 'Lưu cấu hình thất bại');
+                }
+
+                App.toast.success('Thành công', 'Đã lưu cấu hình thanh toán');
+                setting.additionalConfigJson = updatedData.additionalConfigJson;
+            } catch (err) {
+                App.toast.error('Lỗi lưu cấu hình', err.message);
+            }
+        };
+    </script>
+}

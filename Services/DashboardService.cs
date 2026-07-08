@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using WebDatLichKham.Data;
@@ -31,10 +27,10 @@ namespace WebDatLichKham.Services
             if (!_cache.TryGetValue(CacheKey, out object stats))
             {
                 var today = DateTime.Now.ToString("yyyy-MM-dd");
-                
+
                 var totalAppointments = await _context.Appointments.CountAsync();
                 var todayAppointments = await _context.Appointments.CountAsync(a => a.Date == today);
-                
+
                 var totalDoctors = await _context.Doctors.CountAsync();
                 var totalSpecialties = await _context.Specialties.CountAsync();
 
@@ -61,7 +57,8 @@ namespace WebDatLichKham.Services
                     monthlyData.Add(new { label, appointments = monthAppts, revenue = monthRevenue });
                 }
 
-                var specialties = await _context.Specialties.Take(6).ToListAsync();
+                // TỐI ƯU HÓA: Dùng AsNoTracking() trên Dashboard vì đây chỉ là màn hình hiển thị, không có logic cập nhật.
+                var specialties = await _context.Specialties.AsNoTracking().Take(6).ToListAsync();
                 var specialtyStats = new List<object>();
                 foreach (var s in specialties)
                 {
@@ -88,7 +85,7 @@ namespace WebDatLichKham.Services
 
                 var cacheOptions = new MemoryCacheEntryOptions()
                     .SetAbsoluteExpiration(TimeSpan.FromMinutes(5));
-                _cache.Set(CacheKey, stats, cacheOptions);
+                _ = _cache.Set(CacheKey, stats, cacheOptions);
             }
             return stats;
         }
@@ -112,7 +109,7 @@ namespace WebDatLichKham.Services
 
                 monthlyData.Add(new { label, appointments = monthAppts, revenue = monthRevenue });
             }
-            
+
             return monthlyData;
         }
     }

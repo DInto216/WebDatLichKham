@@ -1,12 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using WebDatLichKham.Data;
 using WebDatLichKham.Models;
-using BCrypt.Net;
 
 namespace WebDatLichKham.Services
 {
@@ -57,8 +52,8 @@ namespace WebDatLichKham.Services
             acc.Id = "acc_" + Guid.NewGuid().ToString("N").Substring(0, 8);
             acc.CreatedAt = DateTime.Now;
             acc.Password = BCrypt.Net.BCrypt.HashPassword(acc.Password);
-            _context.Accounts.Add(acc);
-            await _context.SaveChangesAsync();
+            _ = _context.Accounts.Add(acc);
+            _ = await _context.SaveChangesAsync();
             return acc;
         }
 
@@ -67,8 +62,8 @@ namespace WebDatLichKham.Services
             var acc = await _context.Accounts.FindAsync(id);
             if (acc == null) return false;
 
-            _context.Accounts.Remove(acc);
-            await _context.SaveChangesAsync();
+            _ = _context.Accounts.Remove(acc);
+            _ = await _context.SaveChangesAsync();
             return true;
         }
 
@@ -79,10 +74,13 @@ namespace WebDatLichKham.Services
 
             if (data.TryGetProperty("oldPassword", out var oldPwdProp) && data.TryGetProperty("newPassword", out var newPwdProp))
             {
-                bool oldMatch = false;
-                if (acc.Password.StartsWith("$2a$") || acc.Password.StartsWith("$2b$") || acc.Password.StartsWith("$2y$")) {
+                bool oldMatch;
+                if (acc.Password.StartsWith("$2a$") || acc.Password.StartsWith("$2b$") || acc.Password.StartsWith("$2y$"))
+                {
                     oldMatch = BCrypt.Net.BCrypt.Verify(oldPwdProp.GetString(), acc.Password);
-                } else {
+                }
+                else
+                {
                     oldMatch = (acc.Password == oldPwdProp.GetString());
                 }
 
@@ -103,11 +101,11 @@ namespace WebDatLichKham.Services
                 acc.Avatar = avatarProp.GetString() ?? acc.Avatar;
             }
 
-            await _context.SaveChangesAsync();
+            _ = await _context.SaveChangesAsync();
 
             if (acc.Role == "doctor")
             {
-                Doctor doc = null;
+                Doctor doc;
                 if (string.IsNullOrEmpty(acc.DoctorId))
                 {
                     // Tự động tạo hồ sơ Bác sĩ nếu chưa có
@@ -117,25 +115,30 @@ namespace WebDatLichKham.Services
                         Name = acc.Name,
                         Avatar = acc.Avatar ?? ""
                     };
-                    
-                    if (data.TryGetProperty("specialtyId", out var defSpecProp)) 
+
+                    if (data.TryGetProperty("specialtyId", out var defSpecProp))
                     {
                         var sid = defSpecProp.GetString();
-                        if (!string.IsNullOrEmpty(sid)) {
+                        if (!string.IsNullOrEmpty(sid))
+                        {
                             doc.SpecialtyId = sid;
                             var spec = await _context.Specialties.FindAsync(sid);
                             if (spec != null) doc.SpecialtyName = spec.Name;
-                        } else {
-                            doc.SpecialtyId = "UNKNOWN"; 
                         }
-                    } else {
-                        doc.SpecialtyId = "UNKNOWN"; 
+                        else
+                        {
+                            doc.SpecialtyId = "UNKNOWN";
+                        }
+                    }
+                    else
+                    {
+                        doc.SpecialtyId = "UNKNOWN";
                     }
 
-                    _context.Doctors.Add(doc);
+                    _ = _context.Doctors.Add(doc);
                     acc.DoctorId = doc.Id;
                 }
-                else 
+                else
                 {
                     doc = await _context.Doctors.FindAsync(acc.DoctorId);
                 }
@@ -150,7 +153,7 @@ namespace WebDatLichKham.Services
                     if (data.TryGetProperty("email", out var dEmailProp)) doc.Email = dEmailProp.GetString() ?? doc.Email;
                     if (data.TryGetProperty("phone", out var dPhoneProp)) doc.Phone = dPhoneProp.GetString() ?? doc.Phone;
                     if (data.TryGetProperty("experience", out var dExpProp)) doc.Experience = dExpProp.GetString() ?? doc.Experience;
-                    if (data.TryGetProperty("specialtyId", out var dSpecProp)) 
+                    if (data.TryGetProperty("specialtyId", out var dSpecProp))
                     {
                         var newSpecialtyId = dSpecProp.GetString();
                         if (!string.IsNullOrEmpty(newSpecialtyId))
@@ -160,7 +163,7 @@ namespace WebDatLichKham.Services
                             if (specialty != null) doc.SpecialtyName = specialty.Name;
                         }
                     }
-                    await _context.SaveChangesAsync();
+                    _ = await _context.SaveChangesAsync();
                     _cache.Remove("Doctors_All");
                     _cache.Remove("Doctors_" + doc.Id);
                 }
@@ -175,20 +178,20 @@ namespace WebDatLichKham.Services
             if (account == null) return null;
 
             bool passwordMatches = false;
-            if (account.Password.StartsWith("$2a$") || account.Password.StartsWith("$2b$") || account.Password.StartsWith("$2y$")) 
+            if (account.Password.StartsWith("$2a$") || account.Password.StartsWith("$2b$") || account.Password.StartsWith("$2y$"))
             {
                 passwordMatches = BCrypt.Net.BCrypt.Verify(password, account.Password);
-            } 
-            else 
+            }
+            else
             {
-                if (account.Password == password) 
+                if (account.Password == password)
                 {
                     passwordMatches = true;
                     account.Password = BCrypt.Net.BCrypt.HashPassword(password);
-                    await _context.SaveChangesAsync();
+                    _ = await _context.SaveChangesAsync();
                 }
             }
-            
+
             return passwordMatches ? account : null;
         }
     }

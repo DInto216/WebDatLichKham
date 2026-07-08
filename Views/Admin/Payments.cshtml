@@ -14,7 +14,6 @@
       text-transform: uppercase; letter-spacing: 0.5px;
     }
     .payment-badge.unpaid { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
-    .payment-badge.pending_bank { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
     .payment-badge.paid { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
     .payment-badge.refunded { background: #f3e8ff; color: #7e22ce; border: 1px solid #e9d5ff; }
 
@@ -88,7 +87,7 @@
 
 <!-- Stats Row -->
 <div class="row g-4 mb-4">
-  <div class="col-sm-6 col-xl-3">
+  <div class="col-sm-4 col-xl-4">
     <div class="stat-payment-card">
       <div class="stat-icon" style="background:linear-gradient(135deg,#fef3c7,#fde68a);color:#b45309;"><i class="bi bi-wallet2"></i></div>
       <div>
@@ -97,16 +96,7 @@
       </div>
     </div>
   </div>
-  <div class="col-sm-6 col-xl-3">
-    <div class="stat-payment-card">
-      <div class="stat-icon" style="background:linear-gradient(135deg,#e0f2fe,#bae6fd);color:#0369a1;"><i class="bi bi-hourglass-split"></i></div>
-      <div>
-        <div class="stat-value" id="statPendingCount">---</div>
-        <div class="stat-label">Chờ duyệt CK</div>
-      </div>
-    </div>
-  </div>
-  <div class="col-sm-6 col-xl-3">
+  <div class="col-sm-4 col-xl-4">
     <div class="stat-payment-card">
       <div class="stat-icon" style="background:linear-gradient(135deg,#dcfce7,#bbf7d0);color:#15803d;"><i class="bi bi-calendar-check"></i></div>
       <div>
@@ -115,7 +105,7 @@
       </div>
     </div>
   </div>
-  <div class="col-sm-6 col-xl-3">
+  <div class="col-sm-4 col-xl-4">
     <div class="stat-payment-card">
       <div class="stat-icon" style="background:linear-gradient(135deg,#f3e8ff,#e9d5ff);color:#7e22ce;"><i class="bi bi-arrow-return-left"></i></div>
       <div>
@@ -131,7 +121,6 @@
   <div class="d-flex flex-wrap gap-2">
     <button class="btn btn-primary-medical" data-filter="all"><i class="bi bi-grid-fill me-1"></i> Tất cả</button>
     <button class="btn btn-outline-primary" data-filter="paid"><i class="bi bi-check-circle-fill me-1"></i> Đã thanh toán</button>
-    <button class="btn btn-outline-primary" data-filter="pending_bank"><i class="bi bi-bank2 me-1"></i> Chờ duyệt CK</button>
     <button class="btn btn-outline-primary" data-filter="unpaid"><i class="bi bi-clock-fill me-1"></i> Chưa thanh toán</button>
     <button class="btn btn-outline-primary" data-filter="refunded"><i class="bi bi-arrow-return-left me-1"></i> Hoàn tiền</button>
   </div>
@@ -223,7 +212,6 @@
 
     const updateStats = () => {
       const totalPaid = payments.filter(p => p.status === 'paid').reduce((acc, p) => acc + p.amount, 0);
-      const pendingCount = payments.filter(p => p.status === 'pending_bank').length;
       
       const today = new Date().toISOString().split('T')[0];
       const todayCount = payments.filter(p => p.transactionDate && p.transactionDate.startsWith(today)).length;
@@ -231,7 +219,6 @@
       const refundCount = payments.filter(p => p.status === 'refunded').length;
 
       document.getElementById('statTotalRevenue').textContent = App.formatCurrency(totalPaid);
-      document.getElementById('statPendingCount').textContent = pendingCount;
       document.getElementById('statTodayCount').textContent = todayCount;
       document.getElementById('statRefundCount').textContent = refundCount;
     };
@@ -265,7 +252,6 @@
         switch(p.status) {
           case 'paid': statusHtml = '<span class="payment-badge paid"><i class="bi bi-check-circle-fill"></i> Đã thanh toán</span>'; break;
           case 'unpaid': statusHtml = '<span class="payment-badge unpaid"><i class="bi bi-clock-fill"></i> Chưa thanh toán</span>'; break;
-          case 'pending_bank': statusHtml = '<span class="payment-badge pending_bank"><i class="bi bi-bank2"></i> Chờ duyệt CK</span>'; break;
           case 'refunded': statusHtml = '<span class="payment-badge refunded"><i class="bi bi-arrow-return-left"></i> Đã hoàn tiền</span>'; break;
         }
 
@@ -279,7 +265,7 @@
         }
 
         let actionHtml = '';
-        if (p.status === 'pending_bank' || p.status === 'unpaid') {
+        if (p.status === 'unpaid') {
           actionHtml += `<button class="btn btn-sm btn-success me-1 rounded-circle" style="width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;transition:0.2s;" onclick="confirmPayment(event, '${p.id}')" title="Xác nhận đã nhận tiền"><i class="bi bi-check2-circle fs-6"></i></button>`;
         }
         if (p.status === 'paid') {
@@ -292,7 +278,6 @@
             <td><div class="fw-bold text-primary">#${p.transactionId || '---'}</div></td>
             <td>
               <div class="d-flex align-items-center gap-2">
-                <div style="width:32px;height:32px;background:var(--bg-secondary);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;color:var(--text-secondary);">${p.patientName.charAt(0)}</div>
                 <span class="fw-bold">${p.patientName}</span>
               </div>
             </td>

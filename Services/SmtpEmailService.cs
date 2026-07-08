@@ -1,9 +1,5 @@
-using System;
 using System.Net;
 using System.Net.Mail;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 
 namespace WebDatLichKham.Services
 {
@@ -61,7 +57,7 @@ namespace WebDatLichKham.Services
         {
             if (string.IsNullOrWhiteSpace(toEmail)) return;
 
-            var subject = $"[MediBooking] Đặt lịch khám thành công - Mã vé: {bookingId}";
+            var subject = $"[MediBooking] Đặt lịch khám thành công";
             var body = $@"
                 <div style='font-family: Arial, sans-serif; line-height: 1.6; color: #333;'>
                     <h2 style='color: #0ea5e9;'>Xác Nhận Đặt Lịch Khám</h2>
@@ -84,7 +80,7 @@ namespace WebDatLichKham.Services
         {
             if (string.IsNullOrWhiteSpace(toEmail)) return;
 
-            var subject = $"[MediBooking] Kết quả khám bệnh - Mã vé: {bookingId}";
+            var subject = $"[MediBooking] Kết quả khám bệnh";
             var body = $@"
                 <div style='font-family: Arial, sans-serif; line-height: 1.6; color: #333;'>
                     <h2 style='color: #10b981;'>Kết Quả Khám Bệnh</h2>

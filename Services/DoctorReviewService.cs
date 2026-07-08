@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using WebDatLichKham.Data;
 using WebDatLichKham.Models;
@@ -25,7 +21,8 @@ namespace WebDatLichKham.Services
 
         public async Task<IEnumerable<DoctorReview>> GetAllAsync()
         {
-            return await _context.DoctorReviews.OrderByDescending(r => r.Date).ToListAsync();
+            // TỐI ƯU HÓA: Sử dụng AsNoTracking cho List truy vấn
+            return await _context.DoctorReviews.AsNoTracking().OrderByDescending(r => r.Date).ToListAsync();
         }
 
         public async Task<DoctorReview> AddAsync(DoctorReview review)
@@ -35,9 +32,9 @@ namespace WebDatLichKham.Services
             {
                 review.Date = DateTime.Now.ToString("yyyy-MM-dd");
             }
-            
-            _context.DoctorReviews.Add(review);
-            await _context.SaveChangesAsync();
+
+            _ = _context.DoctorReviews.Add(review);
+            _ = await _context.SaveChangesAsync();
             return review;
         }
     }
