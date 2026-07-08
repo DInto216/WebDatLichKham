@@ -1,4 +1,4 @@
-﻿/* ============================================
+/* ============================================
    MEDICAL BOOKING - MAIN JS
    Global utilities, navigation, toast, scroll
    ============================================ */
@@ -344,10 +344,11 @@ const App = (() => {
   // ============================================
   // COUNTER ANIMATION
   // ============================================
-  const animateCounter = (element, target, duration = 1500) => {
+  const animateCounter = (element, target, duration = 1500, formatter = null) => {
     const originalText = element.textContent.trim();
     let suffix = originalText.replace(/[0-9,.]/g, ''); // Extract '+' or '%'
     if (suffix === '-') suffix = '';
+    if (suffix.trim() === 'đ' || suffix.trim() === '₫') suffix = ' ' + suffix.trim();
     
     let start = 0;
     const startTime = performance.now();
@@ -358,12 +359,20 @@ const App = (() => {
       const easeOut = 1 - Math.pow(1 - progress, 3);
       const current = Math.floor(easeOut * target);
 
-      element.textContent = new Intl.NumberFormat('vi-VN').format(current) + suffix;
+      if (formatter) {
+        element.textContent = formatter(current);
+      } else {
+        element.textContent = new Intl.NumberFormat('vi-VN').format(current) + suffix;
+      }
 
       if (progress < 1) {
         requestAnimationFrame(update);
       } else {
-        element.textContent = new Intl.NumberFormat('vi-VN').format(target) + suffix;
+        if (formatter) {
+          element.textContent = formatter(target);
+        } else {
+          element.textContent = new Intl.NumberFormat('vi-VN').format(target) + suffix;
+        }
       }
     };
 
@@ -460,7 +469,12 @@ const App = (() => {
   // ============================================
   // INITIALIZE
   // ============================================
-  const init = () => {
+  const init = async () => {
+    // Tự động đồng bộ Cookie Server với LocalStorage
+    if (localStorage.getItem('currentUser')) {
+      await API.syncAuth();
+    }
+
     toast.init();
     initNavbar();
     initScrollReveal();

@@ -96,6 +96,8 @@
       editingId = null;
       document.getElementById('modalTitle').textContent = 'Thêm Chuyên Khoa';
       document.getElementById('specialtyForm').reset();
+      const modalEl = document.getElementById('specialtyModal');
+      document.body.appendChild(modalEl);
     }
 
     async function openEditModal(id) {
@@ -107,7 +109,9 @@
       document.getElementById('spIcon').value = sp.icon;
       document.getElementById('spName').value = sp.name;
       document.getElementById('spDesc').value = sp.description || '';
-      new bootstrap.Modal(document.getElementById('specialtyModal')).show();
+      const modalEl = document.getElementById('specialtyModal');
+      document.body.appendChild(modalEl);
+      bootstrap.Modal.getOrCreateInstance(modalEl).show();
     }
 
     async function saveSpecialty() {

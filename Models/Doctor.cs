@@ -18,11 +18,18 @@ namespace WebDatLichKham.Models
 
         public string SpecialtyName { get; set; } = string.Empty;
 
+        [Column(TypeName = "decimal(18,2)")]
         public decimal Price { get; set; }
 
         public double Rating { get; set; }
 
         public int Reviews { get; set; }
+
+        public string Email { get; set; } = string.Empty;
+
+        public string Phone { get; set; } = string.Empty;
+
+        public string Experience { get; set; } = string.Empty;
 
         public string Avatar { get; set; } = string.Empty;
 

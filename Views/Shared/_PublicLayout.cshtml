@@ -27,6 +27,7 @@
     @RenderSection("PageStyles", required: false)
 </head>
 <body>
+    @Html.AntiForgeryToken()
 
     @await Html.PartialAsync("_PublicNavbar", (string)(ViewBag.ActiveNav ?? ""))
 

@@ -37,7 +37,6 @@ namespace WebDatLichKham.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Password")
@@ -107,7 +106,6 @@ namespace WebDatLichKham.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("BookingId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
@@ -122,15 +120,12 @@ namespace WebDatLichKham.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("DoctorName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Gender")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("PaidAt")
@@ -144,11 +139,9 @@ namespace WebDatLichKham.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("PaymentMethod")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PaymentStatus")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Phone")
@@ -156,15 +149,12 @@ namespace WebDatLichKham.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Reason")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Specialty")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Status")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Time")
@@ -310,19 +300,25 @@ namespace WebDatLichKham.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Avatar")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Bio")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Degree")
-                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Experience")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Phone")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Price")
@@ -335,7 +331,6 @@ namespace WebDatLichKham.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("ScheduleJson")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SpecialtyId")
@@ -343,7 +338,6 @@ namespace WebDatLichKham.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SpecialtyName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -357,7 +351,10 @@ namespace WebDatLichKham.Migrations
                             Avatar = "",
                             Bio = "Hơn 15 năm kinh nghiệm trong lĩnh vực Nội khoa tổng quát",
                             Degree = "PGS.TS",
+                            Email = "",
+                            Experience = "",
                             Name = "BS. Nguyễn Văn An",
+                            Phone = "",
                             Price = 350000m,
                             Rating = 4.7999999999999998,
                             Reviews = 124,
@@ -371,7 +368,10 @@ namespace WebDatLichKham.Migrations
                             Avatar = "",
                             Bio = "20 năm kinh nghiệm chuyên khoa Nhi, từng tu nghiệp tại Nhật Bản",
                             Degree = "TS.BS",
+                            Email = "",
+                            Experience = "",
                             Name = "BS. Trần Thị Bích",
+                            Phone = "",
                             Price = 400000m,
                             Rating = 4.9000000000000004,
                             Reviews = 210,
@@ -385,7 +385,10 @@ namespace WebDatLichKham.Migrations
                             Avatar = "",
                             Bio = "Chuyên gia tim mạch can thiệp, tốt nghiệp ĐH Y Hà Nội",
                             Degree = "ThS.BS",
+                            Email = "",
+                            Experience = "",
                             Name = "BS. Lê Minh Tuấn",
+                            Phone = "",
                             Price = 500000m,
                             Rating = 4.7000000000000002,
                             Reviews = 98,
@@ -399,7 +402,10 @@ namespace WebDatLichKham.Migrations
                             Avatar = "",
                             Bio = "Chuyên gia Da liễu thẩm mỹ, nhiều năm kinh nghiệm",
                             Degree = "BS.CKI",
+                            Email = "",
+                            Experience = "",
                             Name = "BS. Phạm Hồng Nhung",
+                            Phone = "",
                             Price = 300000m,
                             Rating = 4.5999999999999996,
                             Reviews = 156,
@@ -413,7 +419,10 @@ namespace WebDatLichKham.Migrations
                             Avatar = "",
                             Bio = "Phó Giáo sư chuyên ngành Tai Mũi Họng",
                             Degree = "PGS.TS",
+                            Email = "",
+                            Experience = "",
                             Name = "BS. Võ Thanh Hùng",
+                            Phone = "",
                             Price = 350000m,
                             Rating = 4.7999999999999998,
                             Reviews = 89,
@@ -427,13 +436,115 @@ namespace WebDatLichKham.Migrations
                             Avatar = "",
                             Bio = "Tiến sĩ chuyên ngành Sản phụ khoa, BV Từ Dũ",
                             Degree = "TS.BS",
+                            Email = "",
+                            Experience = "",
                             Name = "BS. Đặng Thị Mai",
+                            Phone = "",
                             Price = 450000m,
                             Rating = 4.9000000000000004,
                             Reviews = 175,
                             ScheduleJson = "{\"monday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\",\"14:00\",\"14:30\"],\"tuesday\":[\"08:00\",\"08:30\",\"09:00\"],\"wednesday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\",\"10:00\",\"14:00\",\"14:30\",\"15:00\"],\"thursday\":[\"08:00\",\"08:30\",\"09:00\"],\"friday\":[\"14:00\",\"14:30\",\"15:00\",\"15:30\"],\"saturday\":[\"08:00\",\"08:30\",\"09:00\"],\"sunday\":[]}",
                             SpecialtyId = "sp_10",
                             SpecialtyName = "Sản phụ khoa"
+                        });
+                });
+
+            modelBuilder.Entity("WebDatLichKham.Models.DoctorReview", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Comment")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Date")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DoctorId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DoctorName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PatientName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Specialty")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("DoctorReviews");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "rev_01",
+                            Comment = "Bác sĩ An tư vấn rất nhiệt tình, chu đáo. Quy trình khám diễn ra nhanh chóng, tôi rất hài lòng.",
+                            Date = "2026-06-15",
+                            DoctorId = "doc_01",
+                            DoctorName = "BS. Nguyễn Văn An",
+                            PatientName = "Nguyễn Tấn Đ.",
+                            Rating = 5,
+                            Specialty = "Nội tổng quát"
+                        },
+                        new
+                        {
+                            Id = "rev_02",
+                            Comment = "Phòng khám sạch sẽ, bác sĩ Bích giải thích kỹ càng về bệnh án và thuốc. Tuyệt vời!",
+                            Date = "2026-06-20",
+                            DoctorId = "doc_02",
+                            DoctorName = "BS. Trần Thị Bích",
+                            PatientName = "Lê Minh H.",
+                            Rating = 5,
+                            Specialty = "Nhi khoa"
+                        },
+                        new
+                        {
+                            Id = "rev_03",
+                            Comment = "Chuyên môn cao, dịch vụ tốt. Tuy nhiên lúc chờ lấy thuốc hơi lâu một chút.",
+                            Date = "2026-06-28",
+                            DoctorId = "doc_03",
+                            DoctorName = "BS. Lê Minh Tuấn",
+                            PatientName = "Trần Quyết T.",
+                            Rating = 4,
+                            Specialty = "Tim mạch"
+                        },
+                        new
+                        {
+                            Id = "rev_04",
+                            Comment = "Bác sĩ Nhung rất nhẹ nhàng, mát tay. Các nốt mẩn đỏ của tôi đã hết hẳn sau 1 tuần dùng thuốc.",
+                            Date = "2026-07-01",
+                            DoctorId = "doc_04",
+                            DoctorName = "BS. Phạm Hồng Nhung",
+                            PatientName = "Phạm Thị M.",
+                            Rating = 5,
+                            Specialty = "Da liễu"
+                        },
+                        new
+                        {
+                            Id = "rev_05",
+                            Comment = "Rất chuyên nghiệp, bác sĩ Hùng thao tác cực kỳ cẩn thận.",
+                            Date = "2026-07-02",
+                            DoctorId = "doc_05",
+                            DoctorName = "BS. Võ Thanh Hùng",
+                            PatientName = "Vũ Đức K.",
+                            Rating = 5,
+                            Specialty = "Tai Mũi Họng"
+                        },
+                        new
+                        {
+                            Id = "rev_06",
+                            Comment = "Hệ thống đặt lịch rất tiện, không phải chờ đợi. Bác sĩ siêu có tâm.",
+                            Date = "2026-07-03",
+                            DoctorId = "doc_01",
+                            DoctorName = "BS. Nguyễn Văn An",
+                            PatientName = "Đinh Tuấn N.",
+                            Rating = 5,
+                            Specialty = "Nội tổng quát"
                         });
                 });
 
@@ -449,46 +560,36 @@ namespace WebDatLichKham.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Diagnosis")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("DoctorName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("MaBenhAn")
                         .HasColumnType("int");
 
                     b.Property<string>("Notes")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PatientName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Prescription")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PrescriptionItemsJson")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SoDienThoai")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Specialty")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Symptoms")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("VisitDate")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("MaLichSu");
@@ -656,11 +757,9 @@ namespace WebDatLichKham.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ExpiryDate")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Ingredients")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
@@ -668,7 +767,6 @@ namespace WebDatLichKham.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Unit")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -724,14 +822,12 @@ namespace WebDatLichKham.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("DoctorCount")
                         .HasColumnType("int");
 
                     b.Property<string>("Icon")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")

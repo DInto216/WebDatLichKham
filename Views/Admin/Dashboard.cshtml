@@ -3,310 +3,555 @@
     ViewBag.Title = "Dashboard";
     ViewBag.ActiveMenu = "Dashboard";
     ViewBag.PageTitle = "Dashboard";
-    ViewBag.PageSubtitle = "";
+    ViewBag.PageSubtitle = "Tổng quan hệ thống";
 }
 
 @section TopbarActions {
     <span style="font-size:var(--text-sm);color:var(--text-tertiary);" id="currentDate"></span>
-        <button class="btn-icon" aria-label="Làm mới" onclick="loadDashboard()"><i class="bi bi-arrow-clockwise"></i></button>
+    <button class="btn-icon" aria-label="Làm mới" onclick="loadDashboard()"><i class="bi bi-arrow-clockwise"></i></button>
+}
+
+@section PageStyles {
+    <style>
+        .year-selector-container {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            background: white;
+            border: 1px solid rgba(0,0,0,0.08);
+            border-radius: 50px;
+            padding: 4px 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            transition: all 0.2s ease;
+        }
+        .year-selector-container:hover {
+            border-color: var(--primary-400);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+        }
+        .year-selector-container i {
+            color: var(--primary-600);
+            font-size: 1.1rem;
+            margin-right: 8px;
+        }
+        .year-select-styled {
+            border: none;
+            background: transparent;
+            font-weight: 700;
+            color: var(--text-primary);
+            padding: 4px 24px 4px 0;
+            width: auto;
+            min-width: 100px;
+            cursor: pointer;
+            outline: none;
+            box-shadow: none !important;
+        }
+        .year-select-styled:focus {
+            border: none;
+            box-shadow: none;
+        }
+        .stat-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            transition: all 0.3s ease;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.08);
+        }
+        .stat-card::after {
+            content: ''; position: absolute; top: 0; right: 0; width: 120px; height: 120px;
+            border-radius: 50%; opacity: 0.05; transform: translate(30%, -30%);
+        }
+        .stat-card.primary::after { background: var(--primary-600); }
+        .stat-card.success::after { background: var(--success); }
+        .stat-card.warning::after { background: var(--warning); }
+        .stat-card.info::after { background: var(--info); }
+        
+        .stat-icon {
+            width: 48px; height: 48px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px;
+        }
+        .stat-value { font-size: 28px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px; }
+        .stat-label { font-size: var(--text-sm); color: var(--text-secondary); font-weight: 500; }
+        
+        .chart-container { position: relative; width: 100%; }
+        
+        .badge-status {
+            padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;
+        }
+    </style>
 }
 
 <!-- ---- Stat Cards ---- -->
-      <div class="row g-4 mb-5">
-        <div class="col-sm-6 col-xl-3">
-          <div class="stat-card primary">
+<div class="row g-4 mb-5">
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card primary">
             <div class="d-flex align-items-center justify-content-between mb-3">
-              <div class="stat-icon" style="background:var(--primary-50);color:var(--primary-600)"><i class="bi bi-people-fill"></i></div>
-              <span class="stat-change up"><i class="bi bi-arrow-up"></i> 12%</span>
+                <div class="stat-icon" style="background:var(--primary-50);color:var(--primary-600)"><i class="bi bi-people-fill"></i></div>
             </div>
             <div class="stat-value" id="statPatients">-</div>
             <div class="stat-label">Tổng bệnh nhân</div>
-          </div>
         </div>
-        <div class="col-sm-6 col-xl-3">
-          <div class="stat-card success">
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card success">
             <div class="d-flex align-items-center justify-content-between mb-3">
-              <div class="stat-icon" style="background:var(--success-light);color:var(--success)"><i class="bi bi-calendar-check-fill"></i></div>
-              <span class="stat-change up"><i class="bi bi-arrow-up"></i> 5%</span>
+                <div class="stat-icon" style="background:var(--success-light);color:var(--success)"><i class="bi bi-calendar-check-fill"></i></div>
             </div>
             <div class="stat-value" id="statToday">-</div>
             <div class="stat-label">Lịch hẹn hôm nay</div>
-          </div>
         </div>
-        <div class="col-sm-6 col-xl-3">
-          <div class="stat-card warning">
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card warning">
             <div class="d-flex align-items-center justify-content-between mb-3">
-              <div class="stat-icon" style="background:var(--warning-light);color:var(--warning)"><i class="bi bi-hourglass-split"></i></div>
+                <div class="stat-icon" style="background:var(--warning-light);color:var(--warning)"><i class="bi bi-cash-coin"></i></div>
             </div>
-            <div class="stat-value" id="statPending">-</div>
-            <div class="stat-label">Chờ duyệt</div>
-          </div>
+            <div class="stat-value" id="statRevenue">-</div>
+            <div class="stat-label">Doanh thu tháng này</div>
         </div>
-        <div class="col-sm-6 col-xl-3">
-          <div class="stat-card info">
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card info">
             <div class="d-flex align-items-center justify-content-between mb-3">
-              <div class="stat-icon" style="background:var(--info-light);color:var(--info)"><i class="bi bi-person-badge-fill"></i></div>
+                <div class="stat-icon" style="background:var(--info-light);color:var(--info)"><i class="bi bi-person-badge-fill"></i></div>
             </div>
             <div class="stat-value" id="statDoctors">-</div>
             <div class="stat-label">Bác sĩ</div>
-          </div>
         </div>
-      </div>
+    </div>
+</div>
 
-      <!-- ---- Charts ---- -->
-      <div class="row g-4 mb-5">
-        <!-- Line Chart -->
-        <div class="col-lg-8">
-          <div class="card-medical p-4">
+<!-- ---- Charts ---- -->
+<div class="d-flex align-items-center justify-content-between mb-4 mt-5">
+    <h4 class="mb-0 fw-bold" style="color:var(--text-primary)">
+        <i class="bi bi-bar-chart-line-fill me-2" style="color:var(--primary-500)"></i>Thống kê theo năm
+    </h4>
+    <div class="year-selector-container">
+        <i class="bi bi-calendar-event-fill"></i>
+        <select id="yearSelector" class="form-select year-select-styled" onchange="loadRevenueByYear(this.value)">
+            <!-- Options populated by JS -->
+        </select>
+    </div>
+</div>
+<div class="row g-4 mb-5">
+    <!-- Revenue Bar Chart -->
+    <div class="col-lg-6">
+        <div class="card-medical p-4 h-100">
             <div class="d-flex align-items-center justify-content-between mb-4">
-              <h5 class="mb-0">Lịch hẹn theo tháng</h5>
-              <span class="badge-medical badge-approved"><span class="status-dot"></span> 6 tháng gần nhất</span>
+                <h5 class="mb-0">Doanh thu</h5>
             </div>
-            <div style="position: relative; height: 300px; width: 100%;">
-              <canvas id="appointmentsChart"></canvas>
+            <div class="chart-container" style="height: 300px;">
+                <canvas id="revenueChart"></canvas>
             </div>
-          </div>
+        </div>
+    </div>
+    
+    <!-- Appointments Line Chart -->
+    <div class="col-lg-6">
+        <div class="card-medical p-4 h-100">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <h5 class="mb-0">Lượt khám</h5>
+            </div>
+            <div class="chart-container" style="height: 300px;">
+                <canvas id="appointmentsChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ---- Status & Recent ---- -->
+<div class="row g-4">
+    <!-- Doughnut Chart & Statuses -->
+    <div class="col-lg-4">
+        <div class="card-medical p-4 mb-4">
+            <h5 class="mb-4">Phân bổ chuyên khoa</h5>
+            <div class="chart-container d-flex align-items-center justify-content-center" style="height: 240px;">
+                <canvas id="specialtyChart"></canvas>
+            </div>
         </div>
         
-        <!-- Doughnut Chart -->
-        <div class="col-lg-4">
-          <div class="card-medical p-4 h-100">
-            <div class="d-flex align-items-center justify-content-between mb-4">
-              <h5 class="mb-0">Phân bổ chuyên khoa</h5>
-              <button class="btn-icon" aria-label="Tải báo cáo"><i class="bi bi-download"></i></button>
-            </div>
-            <div style="position: relative; height: 260px; width: 100%; display: flex; align-items: center; justify-content: center;">
-              <canvas id="specialtyChart"></canvas>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ---- Status Summary & Recent ---- -->
-      <div class="row g-4">
-        <div class="col-lg-4">
-          <div class="card-medical p-4 h-100">
+        <div class="card-medical p-4">
             <h5 class="mb-4">Trạng thái lịch hẹn</h5>
             <div class="d-flex flex-column gap-3">
-              <div class="d-flex align-items-center justify-content-between p-3" style="background:var(--warning-light);border-radius:var(--radius-sm);">
-                <div class="d-flex align-items-center gap-2">
-                  <span style="color:var(--warning);font-size:1.25rem;"><i class="bi bi-hourglass-split"></i></span>
-                  <span style="font-weight:600;font-size:var(--text-sm);color:var(--warning-dark);">Chờ duyệt</span>
+                <div class="d-flex align-items-center justify-content-between p-3" style="background:var(--warning-light);border-radius:var(--radius-sm);">
+                    <div class="d-flex align-items-center gap-2">
+                        <span style="color:var(--warning);font-size:1.25rem;"><i class="bi bi-hourglass-split"></i></span>
+                        <span style="font-weight:600;font-size:var(--text-sm);color:var(--warning-dark);">Chờ duyệt</span>
+                    </div>
+                    <span style="font-weight:800;font-size:var(--text-xl);color:var(--warning-dark);" id="statPending">-</span>
                 </div>
-                <span style="font-weight:800;font-size:var(--text-xl);color:var(--warning-dark);" id="statPending2">-</span>
-              </div>
-              <div class="d-flex align-items-center justify-content-between p-3" style="background:var(--success-light);border-radius:var(--radius-sm);">
-                <div class="d-flex align-items-center gap-2">
-                  <span style="color:var(--success);font-size:1.25rem;"><i class="bi bi-check-circle-fill"></i></span>
-                  <span style="font-weight:600;font-size:var(--text-sm);color:var(--success-dark);">Đã duyệt</span>
+                <div class="d-flex align-items-center justify-content-between p-3" style="background:var(--success-light);border-radius:var(--radius-sm);">
+                    <div class="d-flex align-items-center gap-2">
+                        <span style="color:var(--success);font-size:1.25rem;"><i class="bi bi-check-circle-fill"></i></span>
+                        <span style="font-weight:600;font-size:var(--text-sm);color:var(--success-dark);">Đã duyệt</span>
+                    </div>
+                    <span style="font-weight:800;font-size:var(--text-xl);color:var(--success-dark);" id="statApproved">-</span>
                 </div>
-                <span style="font-weight:800;font-size:var(--text-xl);color:var(--success-dark);" id="statApproved">-</span>
-              </div>
-              <div class="d-flex align-items-center justify-content-between p-3" style="background:var(--info-light);border-radius:var(--radius-sm);">
-                <div class="d-flex align-items-center gap-2">
-                  <span style="color:var(--info);font-size:1.25rem;"><i class="bi bi-clipboard-check"></i></span>
-                  <span style="font-weight:600;font-size:var(--text-sm);color:var(--info-dark);">Hoàn thành</span>
+                <div class="d-flex align-items-center justify-content-between p-3" style="background:var(--info-light);border-radius:var(--radius-sm);">
+                    <div class="d-flex align-items-center gap-2">
+                        <span style="color:var(--info);font-size:1.25rem;"><i class="bi bi-clipboard-check"></i></span>
+                        <span style="font-weight:600;font-size:var(--text-sm);color:var(--info-dark);">Hoàn thành</span>
+                    </div>
+                    <span style="font-weight:800;font-size:var(--text-xl);color:var(--info-dark);" id="statCompleted">-</span>
                 </div>
-                <span style="font-weight:800;font-size:var(--text-xl);color:var(--info-dark);" id="statCompleted">-</span>
-              </div>
-              <div class="d-flex align-items-center justify-content-between p-3" style="background:var(--danger-light);border-radius:var(--radius-sm);">
-                <div class="d-flex align-items-center gap-2">
-                  <span style="color:var(--danger);font-size:1.25rem;"><i class="bi bi-x-circle-fill"></i></span>
-                  <span style="font-weight:600;font-size:var(--text-sm);color:var(--danger-dark);">Đã hủy</span>
-                </div>
-                <span style="font-weight:800;font-size:var(--text-xl);color:var(--danger-dark);" id="statCancelled">-</span>
-              </div>
             </div>
-          </div>
         </div>
-        <div class="col-lg-8">
-          <div class="card-medical p-4">
+    </div>
+    
+    <!-- Recent Appointments -->
+    <div class="col-lg-8">
+        <div class="card-medical p-4 h-100">
             <div class="d-flex align-items-center justify-content-between mb-4">
-              <h5 class="mb-0">Lịch hẹn gần đây</h5>
-              <a href="/Admin/Appointments" class="btn-ghost" style="color:var(--primary-600)">Xem tất cả <i class="bi bi-arrow-right"></i></a>
+                <h5 class="mb-0">Lịch hẹn gần đây</h5>
+                <a href="/Admin/Appointments" class="btn-ghost" style="color:var(--primary-600)">Xem tất cả <i class="bi bi-arrow-right"></i></a>
             </div>
             <div class="table-responsive-medical">
-              <table class="table-medical">
-                <thead>
-                  <tr>
-                    <th>Bệnh nhân</th>
-                    <th>Bác sĩ</th>
-                    <th>Ngày</th>
-                    <th>Giờ</th>
-                    <th>Trạng thái</th>
-                  </tr>
-                </thead>
-                <tbody id="recentAppointments">
-                  <!-- Rendered by JS -->
-                </tbody>
-              </table>
+                <table class="table-medical">
+                    <thead>
+                        <tr>
+                            <th>Bệnh nhân</th>
+                            <th>Bác sĩ</th>
+                            <th>Ngày</th>
+                            <th>Giờ</th>
+                            <th>Trạng thái</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recentAppointments">
+                        <!-- Rendered by JS -->
+                    </tbody>
+                </table>
             </div>
-          </div>
         </div>
-      </div>
     </div>
-  </div>
+</div>
 
 @section Scripts {
     <script>
     let appointmentsChart = null;
     let specialtyChart = null;
+    let revenueChart = null;
 
     async function loadDashboard() {
-      try {
-        const user = App.requireAuth(['admin']);
-        if (!user) return;
-        
-        const userNameEl = document.getElementById('sidebarUserName');
-        if (userNameEl) userNameEl.textContent = user.name;
-        
-        const dateEl = document.getElementById('currentDate');
-        if (dateEl) dateEl.textContent = new Date().toLocaleDateString('vi-VN', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' });
+        try {
+            const user = App.requireAuth(['admin']);
+            if (!user) return;
+            
+            const dateEl = document.getElementById('currentDate');
+            if (dateEl) dateEl.textContent = new Date().toLocaleDateString('vi-VN', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' });
 
-        const tbody = document.getElementById('recentAppointments');
-        if (tbody) App.showTableLoading(tbody, 5, 4);
-
-        const stats = await API.getDashboardStats();
-
-        // Animate stat cards
-        if (document.getElementById('statPatients')) App.animateCounter(document.getElementById('statPatients'), stats.totalPatients);
-        if (document.getElementById('statToday')) App.animateCounter(document.getElementById('statToday'), stats.todayAppointments);
-        if (document.getElementById('statPending')) App.animateCounter(document.getElementById('statPending'), stats.pending);
-        if (document.getElementById('statDoctors')) App.animateCounter(document.getElementById('statDoctors'), stats.totalDoctors);
-        
-        if (document.getElementById('statPending2')) document.getElementById('statPending2').textContent = stats.pending;
-        if (document.getElementById('statApproved')) document.getElementById('statApproved').textContent = stats.approved;
-        if (document.getElementById('statCompleted')) document.getElementById('statCompleted').textContent = stats.completed;
-        if (document.getElementById('statCancelled')) document.getElementById('statCancelled').textContent = stats.cancelled;
-
-        // ---- Line Chart: Appointments by month ----
-        const canvas1 = document.getElementById('appointmentsChart');
-        if (canvas1) {
-          const ctx1 = canvas1.getContext('2d');
-          if (appointmentsChart instanceof Chart) appointmentsChart.destroy();
-
-          const gradient = ctx1.createLinearGradient(0, 0, 0, 300);
-          gradient.addColorStop(0, 'rgba(37, 99, 235, 0.15)');
-          gradient.addColorStop(1, 'rgba(37, 99, 235, 0.01)');
-
-          appointmentsChart = new Chart(ctx1, {
-            type: 'line',
-            data: {
-              labels: stats.monthlyData.map(m => m.label),
-              datasets: [{
-                label: 'Lịch hẹn',
-                data: stats.monthlyData.map(m => m.appointments),
-                borderColor: '#2563EB',
-                backgroundColor: gradient,
-                borderWidth: 2.5,
-                fill: true,
-                tension: 0.4,
-                pointBackgroundColor: '#2563EB',
-                pointBorderColor: '#fff',
-                pointBorderWidth: 2,
-                pointRadius: 5,
-                pointHoverRadius: 7,
-              }]
-            },
-            options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: {
-                legend: { display: false },
-                tooltip: {
-                  backgroundColor: '#0F172A',
-                  titleColor: '#fff',
-                  bodyColor: '#fff',
-                  cornerRadius: 8,
-                  padding: 12,
-                  displayColors: false,
+            // Init Year Selector
+            const yearSel = document.getElementById('yearSelector');
+            if (yearSel && yearSel.options.length === 0) {
+                const currentYear = new Date().getFullYear();
+                for (let y = currentYear; y >= currentYear - 10; y--) {
+                    const opt = document.createElement('option');
+                    opt.value = y;
+                    opt.text = 'Năm ' + y;
+                    yearSel.appendChild(opt);
                 }
-              },
-              scales: {
-                y: {
-                  beginAtZero: true,
-                  grid: { color: 'rgba(15,23,42,0.05)' },
-                  ticks: { font: { size: 12, family: 'Plus Jakarta Sans' }, color: '#94A3B8' }
-                },
-                x: {
-                  grid: { display: false },
-                  ticks: { font: { size: 12, family: 'Plus Jakarta Sans' }, color: '#94A3B8' }
-                }
-              }
             }
-          });
-        }
 
-        // ---- Doughnut Chart: Specialty distribution ----
-        const canvas2 = document.getElementById('specialtyChart');
-        if (canvas2) {
-          const ctx2 = canvas2.getContext('2d');
-          if (specialtyChart instanceof Chart) specialtyChart.destroy();
+            const tbody = document.getElementById('recentAppointments');
+            if (tbody) App.showTableLoading(tbody, 5, 4);
 
-          const chartColors = ['#2563EB', '#059669', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899'];
+            const stats = await API.getDashboardStats();
 
-          specialtyChart = new Chart(ctx2, {
-            type: 'doughnut',
-            data: {
-              labels: stats.specialtyStats.map(s => s.name),
-              datasets: [{
-                data: stats.specialtyStats.map(s => s.count),
-                backgroundColor: chartColors,
-                borderWidth: 0,
-                hoverOffset: 8,
-              }]
-            },
-            options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              cutout: '65%',
-              plugins: {
-                legend: {
-                  position: 'bottom',
-                  labels: {
-                    padding: 12,
-                    usePointStyle: true,
-                    pointStyle: 'circle',
-                    font: { size: 11, family: 'Plus Jakarta Sans' },
-                    color: '#64748B'
-                  }
-                },
-                tooltip: {
-                  backgroundColor: '#0F172A',
-                  titleColor: '#fff',
-                  bodyColor: '#fff',
-                  cornerRadius: 8,
-                  padding: 12,
-                }
-              }
+            // Format Currency
+            const formatCurrency = (val) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val);
+
+            // Animate stat cards
+            if (document.getElementById('statPatients')) App.animateCounter(document.getElementById('statPatients'), stats.totalPatients);
+            if (document.getElementById('statToday')) App.animateCounter(document.getElementById('statToday'), stats.todayAppointments);
+            if (document.getElementById('statDoctors')) App.animateCounter(document.getElementById('statDoctors'), stats.totalDoctors);
+            
+            // Calc current month revenue
+            let currentRevenue = 0;
+            if (stats.monthlyData && stats.monthlyData.length > 0) {
+                currentRevenue = stats.monthlyData[stats.monthlyData.length - 1].revenue || 0;
             }
-          });
-        }
+            if (document.getElementById('statRevenue')) {
+                App.animateCounter(document.getElementById('statRevenue'), currentRevenue, 1500, (val) => formatCurrency(val));
+            }
 
-        // ---- Recent Appointments Table ----
-        if (tbody) {
-          const appointments = await API.getAppointments();
-          tbody.innerHTML = appointments.slice(0, 5).map(apt => `
-            <tr>
-              <td>
-                <div style="font-weight:600;">${apt.patientName}</div>
-                <div style="font-size:var(--text-xs);color:var(--text-tertiary);">${apt.phone}</div>
-              </td>
-              <td>${apt.doctorName}</td>
-              <td>${App.formatDate(apt.date)}</td>
-              <td style="font-weight:600;color:var(--primary-600);">${apt.time}</td>
-              <td>${App.renderStatusBadge(apt.status)}</td>
-            </tr>
-          `).join('');
+            if (document.getElementById('statPending')) App.animateCounter(document.getElementById('statPending'), stats.pending);
+            if (document.getElementById('statApproved')) App.animateCounter(document.getElementById('statApproved'), stats.approved);
+            if (document.getElementById('statCompleted')) App.animateCounter(document.getElementById('statCompleted'), stats.completed);
+
+            // Load charts with default year
+            if (yearSel) {
+                await loadRevenueByYear(yearSel.value);
+            }
+
+            // ---- Specialty Doughnut Chart ----
+            const ctxSpec = document.getElementById('specialtyChart');
+            if (ctxSpec) {
+                if (specialtyChart) specialtyChart.destroy();
+                const chartColors = ['#2563EB', '#059669', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899'];
+                specialtyChart = new Chart(ctxSpec, {
+                    type: 'doughnut',
+                    data: {
+                        labels: stats.specialtyStats.map(s => s.name),
+                        datasets: [{
+                            data: stats.specialtyStats.map(s => s.count),
+                            backgroundColor: chartColors,
+                            borderWidth: 0,
+                            hoverOffset: 8,
+                        }]
+                    },
+                    options: {
+                        animation: {
+                            animateScale: true,
+                            animateRotate: true,
+                            duration: 1500,
+                            easing: 'easeOutQuart'
+                        },
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '70%',
+                        plugins: {
+                            legend: { position: 'bottom', labels: { padding: 16, usePointStyle: true, pointStyle: 'circle', font: { family: 'Plus Jakarta Sans' }, color: '#64748B' } },
+                            tooltip: { backgroundColor: '#0F172A', titleColor: '#fff', bodyColor: '#fff', cornerRadius: 8, padding: 12 }
+                        }
+                    },
+                    plugins: [{
+                        id: 'doughnutDataLabels',
+                        afterDraw(chart) {
+                            const { ctx, data } = chart;
+                            ctx.save();
+                            chart.getDatasetMeta(0).data.forEach((datapoint, index) => {
+                                const value = data.datasets[0].data[index];
+                                if (value > 0) {
+                                    // Get center position of the slice
+                                    const { x, y } = datapoint.tooltipPosition();
+                                    ctx.textAlign = 'center';
+                                    ctx.textBaseline = 'middle';
+                                    ctx.font = 'bold 13px "Plus Jakarta Sans", sans-serif';
+                                    ctx.fillStyle = '#ffffff';
+                                    // Adding a slight text shadow for better readability
+                                    ctx.shadowColor = 'rgba(0,0,0,0.3)';
+                                    ctx.shadowBlur = 4;
+                                    ctx.fillText(value, x, y);
+                                    ctx.shadowBlur = 0; // reset
+                                }
+                            });
+                            ctx.restore();
+                        }
+                    }]
+                });
+            }
+
+            // ---- Recent Appointments Table ----
+            if (tbody) {
+                const appointments = await API.getAppointments();
+                tbody.innerHTML = appointments.slice(0, 7).map(apt => `
+                    <tr>
+                        <td>
+                            <div style="font-weight:600;color:var(--text-primary);">${apt.patientName}</div>
+                            <div style="font-size:var(--text-xs);color:var(--text-tertiary);">${apt.phone}</div>
+                        </td>
+                        <td style="color:var(--text-secondary);">${apt.doctorName}</td>
+                        <td style="color:var(--text-secondary);">${App.formatDate(apt.date)}</td>
+                        <td style="font-weight:600;color:var(--primary-600);">${apt.time}</td>
+                        <td>${App.renderStatusBadge(apt.status)}</td>
+                    </tr>
+                `).join('');
+            }
+        } catch (err) {
+            console.error('Lỗi khi tải Dashboard:', err);
+            if (App && App.toast) {
+                App.toast.error('Lỗi tải dữ liệu', 'Vui lòng tải lại trang.');
+            }
         }
-      } catch (err) {
-        console.error('Lỗi khi tải Dashboard:', err);
-        if (App && App.toast) {
-          App.toast.error('Lỗi tải dữ liệu', 'Vui lòng tải lại trang.');
+    }
+
+    async function loadRevenueByYear(year) {
+        try {
+            const formatCurrency = (val) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val);
+            const monthlyData = await API.getRevenueStats(year);
+
+            // ---- Revenue Bar Chart ----
+            const ctxRev = document.getElementById('revenueChart');
+            if (ctxRev) {
+                if (revenueChart) revenueChart.destroy();
+                revenueChart = new Chart(ctxRev, {
+                    type: 'bar',
+                    data: {
+                        labels: monthlyData.map(m => m.label),
+                        datasets: [{
+                            label: 'Doanh thu',
+                            data: monthlyData.map(m => m.revenue),
+                            backgroundColor: 'rgba(5, 150, 105, 0.8)',
+                            borderRadius: 6,
+                            borderWidth: 0,
+                            barPercentage: 0.6
+                        }]
+                    },
+                    plugins: [ChartDataLabels],
+                    options: {
+                        animation: {
+                            y: { duration: 1500, easing: 'easeOutQuart' },
+                            delay: (context) => {
+                                let delay = 0;
+                                if (context.type === 'data' && context.mode === 'default' && !context.chart.alreadyAnimated) {
+                                    delay = context.dataIndex * 150;
+                                }
+                                return delay;
+                            },
+                            onComplete: (context) => {
+                                context.chart.alreadyAnimated = true;
+                            }
+                        },
+                        layout: { padding: { top: 20 } },
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: '#0F172A', titleColor: '#fff', bodyColor: '#fff', cornerRadius: 8, padding: 12, displayColors: false,
+                                callbacks: {
+                                    label: function(context) { return formatCurrency(context.raw); }
+                                }
+                            },
+                            datalabels: {
+                                display: true,
+                                align: 'top',
+                                anchor: 'end',
+                                color: '#059669',
+                                font: {
+                                    family: 'Plus Jakarta Sans',
+                                    weight: 'bold',
+                                    size: 13
+                                },
+                                formatter: function(value) {
+                                    if (value === 0) return '';
+                                    let trValue = value / 1000000;
+                                    // if it's integer, don't show .0
+                                    let text = Number.isInteger(trValue) ? trValue : trValue.toFixed(1);
+                                    return text + ' Tr';
+                                },
+                                offset: 4
+                            }
+                        },
+                        scales: {
+                            y: { 
+                                beginAtZero: true, 
+                                suggestedMax: 5000000,
+                                grace: '10%',
+                                grid: { color: 'rgba(15,23,42,0.05)' }, 
+                                ticks: { 
+                                    stepSize: 1000000,
+                                    callback: function(value) { return Math.round(value/1000000) + ' Tr'; }, 
+                                    font: { family: 'Plus Jakarta Sans' }, 
+                                    color: '#94A3B8' 
+                                } 
+                            },
+                            x: { grid: { display: false }, ticks: { font: { family: 'Plus Jakarta Sans' }, color: '#94A3B8' } }
+                        }
+                    }
+                });
+            }
+
+            // ---- Appointments Line Chart ----
+            const ctxApp = document.getElementById('appointmentsChart');
+            if (ctxApp) {
+                if (appointmentsChart) appointmentsChart.destroy();
+                const ctx = ctxApp.getContext('2d');
+                const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+                gradient.addColorStop(0, 'rgba(37, 99, 235, 0.25)');
+                gradient.addColorStop(1, 'rgba(37, 99, 235, 0.01)');
+
+                appointmentsChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: monthlyData.map(m => m.label),
+                        datasets: [{
+                            label: 'Lịch hẹn',
+                            data: monthlyData.map(m => m.appointments),
+                            borderColor: '#2563EB',
+                            backgroundColor: gradient,
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointBackgroundColor: '#fff',
+                            pointBorderColor: '#2563EB',
+                            pointBorderWidth: 2,
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                        }]
+                    },
+                    plugins: [ChartDataLabels],
+                    options: {
+                        animation: {
+                            x: {
+                                type: 'number',
+                                easing: 'linear',
+                                duration: 800,
+                                from: NaN, // the point is initially skipped
+                                delay: (ctx) => {
+                                    if (ctx.type !== 'data' || ctx.xStarted) return 0;
+                                    ctx.xStarted = true;
+                                    return ctx.index * 100;
+                                }
+                            },
+                            y: {
+                                type: 'number',
+                                easing: 'linear',
+                                duration: 800,
+                                delay: (ctx) => {
+                                    if (ctx.type !== 'data' || ctx.yStarted) return 0;
+                                    ctx.yStarted = true;
+                                    return ctx.index * 100;
+                                }
+                            }
+                        },
+                        layout: { padding: { top: 20 } },
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: { backgroundColor: '#0F172A', titleColor: '#fff', bodyColor: '#fff', cornerRadius: 8, padding: 12, displayColors: false },
+                            datalabels: {
+                                display: true,
+                                align: 'top',
+                                anchor: 'end',
+                                color: '#2563EB',
+                                font: {
+                                    family: 'Plus Jakarta Sans',
+                                    weight: 'bold',
+                                    size: 13
+                                },
+                                formatter: function(value) {
+                                    return value;
+                                },
+                                offset: 4
+                            }
+                        },
+                        scales: {
+                            y: { 
+                                beginAtZero: true, 
+                                suggestedMax: 10,
+                                grace: '10%',
+                                grid: { color: 'rgba(15,23,42,0.05)' }, 
+                                ticks: { precision: 0, font: { family: 'Plus Jakarta Sans' }, color: '#94A3B8' } 
+                            },
+                            x: { grid: { display: false }, ticks: { font: { family: 'Plus Jakarta Sans' }, color: '#94A3B8' } }
+                        }
+                    }
+                });
+            }
+        } catch(err) {
+            console.error('Error loading revenue chart:', err);
         }
-      }
     }
 
     document.addEventListener('DOMContentLoaded', loadDashboard);
-  </script>
+    </script>
 }

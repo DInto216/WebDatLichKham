@@ -6,86 +6,191 @@
     ViewBag.PageSubtitle = "Quản lý thông tin quản trị và đổi mật khẩu";
 }
 
+@section PageStyles {
+<style>
+  /* Premium Profile Styles */
+  .profile-cover {
+    height: 160px;
+    background: linear-gradient(135deg, var(--primary-600) 0%, var(--secondary-600) 100%);
+    border-radius: var(--radius-lg);
+    position: relative;
+    margin-bottom: 60px;
+  }
+  .profile-header-card {
+    position: absolute;
+    bottom: -30px;
+    left: var(--space-6);
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
+  }
+  .profile-avatar-premium {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 4px solid var(--bg-body);
+    background: var(--bg-card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    font-weight: bold;
+    color: var(--primary-600);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    box-shadow: var(--shadow-md);
+    transition: var(--transition-base);
+  }
+  .profile-avatar-premium:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
+  .profile-avatar-premium img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .profile-avatar-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 24px;
+    opacity: 0;
+    backdrop-filter: blur(2px);
+    transition: opacity 0.3s;
+  }
+  .profile-avatar-premium:hover .profile-avatar-overlay {
+    opacity: 1;
+  }
+  .profile-header-info {
+    padding-bottom: 15px; /* Push it slightly up to perfectly center in the visible banner part */
+  }
+  .profile-header-info h4 {
+    font-weight: 800;
+    color: white;
+    margin-bottom: 6px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  }
+  .profile-header-info span {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+</style>
+}
+
 <!-- Profile banner -->
-      <div class="profile-hero animate-fade-in-up">
-        <div class="profile-avatar-large" id="profileAvatar" onclick="triggerAvatarUpload()">
-          🔑
-          <div class="profile-avatar-overlay"><i class="bi bi-camera"></i></div>
-        </div>
-        <input type="file" id="avatarFileInput" accept="image/*" style="display: none;" onchange="handleAvatarFile(event)">
-        <div class="profile-meta">
-          <h4 id="profileDisplayName">Đang tải...</h4>
-          <span id="profileRole">Quản trị viên</span>
-        </div>
-      </div>
-
-      <div class="row g-4">
-        <!-- Edit Profile Column -->
-        <div class="col-lg-8">
-          <div class="card-medical p-4">
-            <h5 class="fw-bold mb-4"><i class="bi bi-person-lines-fill text-primary me-2"></i>Cập nhật thông tin</h5>
-            <form id="profileForm" class="form-medical" novalidate>
-              <div class="mb-3">
-                <label class="form-label">Tên hiển thị <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" id="adminName" required>
-                <div class="invalid-feedback">Vui lòng nhập tên hiển thị</div>
-              </div>
-              <div class="mb-4">
-                <label class="form-label">Tên đăng nhập / Username (Đọc duy nhất)</label>
-                <input type="text" class="form-control" id="adminUsername" readonly style="background:var(--bg-tertiary);">
-              </div>
-              <button type="submit" class="btn-primary-medical" id="saveProfileBtn">
-                <i class="bi bi-save me-1"></i> Lưu thay đổi
-              </button>
-            </form>
-          </div>
-        </div>
-
-        <!-- Security / Password Column -->
-        <div class="col-lg-4">
-          <div class="card-medical p-4">
-            <h5 class="fw-bold mb-4"><i class="bi bi-shield-lock text-primary me-2"></i>Đổi mật khẩu</h5>
-            <form id="passwordForm" class="form-medical" novalidate>
-              <div class="mb-3">
-                <label class="form-label">Mật khẩu hiện tại <span class="text-danger">*</span></label>
-                <input type="password" class="form-control" id="oldPassword" required>
-                <div class="invalid-feedback">Vui lòng nhập mật khẩu cũ</div>
-              </div>
-              <div class="mb-3">
-                <label class="form-label">Mật khẩu mới <span class="text-danger">*</span></label>
-                <input type="password" class="form-control" id="newPassword" minlength="3" required>
-                <div class="invalid-feedback">Mật khẩu mới tối thiểu 3 ký tự</div>
-              </div>
-              <div class="mb-4">
-                <label class="form-label">Xác nhận mật khẩu mới <span class="text-danger">*</span></label>
-                <input type="password" class="form-control" id="confirmPassword" required>
-                <div class="invalid-feedback">Mật khẩu xác nhận không đúng</div>
-              </div>
-              <button type="submit" class="btn-primary-medical w-100 justify-content-center" id="changePasswordBtn">
-                <i class="bi bi-key me-1"></i> Cập nhật mật khẩu
-              </button>
-            </form>
-          </div>
-        </div>
-      </div>
+<div class="profile-cover shadow-medical animate-fade-in-up">
+  <div class="profile-header-card">
+    <div class="profile-avatar-premium" id="profileAvatar" onclick="triggerAvatarUpload()">
+      A
+      <div class="profile-avatar-overlay"><i class="bi bi-camera-fill"></i></div>
+    </div>
+    <input type="file" id="avatarFileInput" accept="image/*" style="display: none;" onchange="handleAvatarFile(event)">
+    <div class="profile-header-info">
+      <h4 id="profileDisplayName">Đang tải...</h4>
+      <span id="profileRole"><i class="bi bi-shield-check me-1"></i>Quản trị viên</span>
     </div>
   </div>
+</div>
+
+<div class="row g-4 animate-fade-in-up" style="animation-delay: 0.1s;">
+  <!-- Edit Profile Column -->
+  <div class="col-lg-7">
+    <div class="card-medical p-4 h-100">
+      <h5 class="fw-bold mb-4 d-flex align-items-center">
+        <div class="card-icon primary me-3" style="width:40px;height:40px;font-size:1.2rem;"><i class="bi bi-person-lines-fill"></i></div>
+        Cập nhật thông tin
+      </h5>
+      <form id="profileForm" class="form-medical" novalidate>
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Tên hiển thị <span class="text-danger">*</span></label>
+          <input type="text" class="form-control form-control-lg" id="adminName" required placeholder="Nhập tên của bạn">
+          <div class="invalid-feedback">Vui lòng nhập tên hiển thị</div>
+        </div>
+        <div class="mb-4">
+          <label class="form-label fw-semibold">Tên đăng nhập / Username</label>
+          <input type="text" class="form-control form-control-lg" id="adminUsername" readonly style="background:var(--bg-tertiary); cursor:not-allowed;" title="Tên đăng nhập không thể thay đổi">
+        </div>
+        <button type="submit" class="btn-primary-medical px-4 py-2" id="saveProfileBtn">
+          <i class="bi bi-check2-circle me-2"></i> Lưu thay đổi
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Security / Password Column -->
+  <div class="col-lg-5">
+    <div class="card-medical p-4 h-100">
+      <h5 class="fw-bold mb-4 d-flex align-items-center">
+        <div class="card-icon warning me-3" style="width:40px;height:40px;font-size:1.2rem;"><i class="bi bi-shield-lock"></i></div>
+        Đổi mật khẩu
+      </h5>
+      <form id="passwordForm" class="form-medical" novalidate>
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Mật khẩu hiện tại <span class="text-danger">*</span></label>
+          <div class="position-relative">
+            <input type="password" class="form-control form-control-lg pe-5" id="oldPassword" required placeholder="••••••••">
+          </div>
+          <div class="invalid-feedback">Vui lòng nhập mật khẩu cũ</div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Mật khẩu mới <span class="text-danger">*</span></label>
+          <div class="position-relative">
+            <input type="password" class="form-control form-control-lg pe-5" id="newPassword" minlength="3" required placeholder="••••••••">
+          </div>
+          <div class="invalid-feedback">Mật khẩu mới tối thiểu 3 ký tự</div>
+        </div>
+        <div class="mb-4">
+          <label class="form-label fw-semibold">Xác nhận mật khẩu mới <span class="text-danger">*</span></label>
+          <div class="position-relative">
+            <input type="password" class="form-control form-control-lg pe-5" id="confirmPassword" required placeholder="••••••••">
+          </div>
+          <div class="invalid-feedback">Mật khẩu xác nhận không đúng</div>
+        </div>
+        <button type="submit" class="btn-primary-medical w-100 py-2 d-flex justify-content-center align-items-center" id="changePasswordBtn" style="background: var(--warning); color: white;">
+          <i class="bi bi-key me-2"></i> Cập nhật mật khẩu
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
 
 @section Scripts {
     <script>
     const user = App.requireAuth(['admin']);
 
-    function initProfile() {
+    async function initProfile() {
       if (!user) return;
-      const currentUser = API.getCurrentUser() || user;
-      document.getElementById('sidebarAdminName').textContent = currentUser.name;
+      
+      // Đồng bộ dữ liệu mới nhất từ server
+      let currentUser = API.getCurrentUser() || user;
+      try {
+        const freshData = await API.syncAuth();
+        if (freshData) currentUser = freshData;
+      } catch (e) {
+        console.error('Failed to sync auth', e);
+      }
+
+      document.getElementById('sidebarUserName').textContent = currentUser.name;
       document.getElementById('profileDisplayName').textContent = currentUser.name;
       
       const avatarContainer = document.getElementById('profileAvatar');
       if (currentUser.avatar) {
         avatarContainer.innerHTML = `<img src="${currentUser.avatar}" alt="Avatar"><div class="profile-avatar-overlay"><i class="bi bi-camera"></i></div>`;
       } else {
-        avatarContainer.innerHTML = `${currentUser.name.charAt(0).toUpperCase() || '🔑'}<div class="profile-avatar-overlay"><i class="bi bi-camera"></i></div>`;
+        avatarContainer.innerHTML = `${(currentUser.name || 'Admin').charAt(0).toUpperCase()}<div class="profile-avatar-overlay"><i class="bi bi-camera"></i></div>`;
       }
       
       document.getElementById('adminName').value = currentUser.name || '';
@@ -145,7 +250,7 @@
         
         // Update user session in memory/local
         const updatedUser = API.getCurrentUser();
-        document.getElementById('sidebarAdminName').textContent = updatedUser.name;
+        document.getElementById('sidebarUserName').textContent = updatedUser.name;
         document.getElementById('profileDisplayName').textContent = updatedUser.name;
       } catch (err) {
         App.toast.error('Lỗi', err.message);

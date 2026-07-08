@@ -2,28 +2,117 @@
     Layout = "~/Views/Shared/_DoctorLayout.cshtml";
     ViewBag.Title = "Thông Tin Cá Nhân";
     ViewBag.ActiveMenu = "Profile";
-    ViewBag.PageTitle = "Thông Tin Cá Nhân";
-    ViewBag.PageSubtitle = "Quản lý hồ sơ cá nhân và đổi mật khẩu";
+    ViewBag.PageTitle = "Hồ sơ Bác sĩ";
+    ViewBag.PageSubtitle = "Cập nhật thông tin cá nhân và chuyên môn";
+}
+
+@section PageStyles {
+<style>
+  /* Premium Profile Styles */
+  .profile-cover {
+    height: 160px;
+    background: linear-gradient(135deg, var(--success) 0%, var(--primary-600) 100%);
+    border-radius: var(--radius-lg);
+    position: relative;
+    margin-bottom: 60px;
+  }
+  .profile-header-card {
+    position: absolute;
+    bottom: -30px;
+    left: var(--space-6);
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
+  }
+  .profile-avatar-premium {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 4px solid var(--bg-body);
+    background: var(--bg-card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    font-weight: bold;
+    color: var(--success);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    box-shadow: var(--shadow-md);
+    transition: var(--transition-base);
+  }
+  .profile-avatar-premium:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
+  .profile-avatar-premium img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .profile-avatar-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 24px;
+    opacity: 0;
+    backdrop-filter: blur(2px);
+    transition: opacity 0.3s;
+  }
+  .profile-avatar-premium:hover .profile-avatar-overlay {
+    opacity: 1;
+  }
+  .profile-header-info {
+    padding-bottom: 15px; /* Push it slightly up to perfectly center in the visible banner part */
+  }
+  .profile-header-info h4 {
+    font-weight: 800;
+    color: white;
+    margin-bottom: 6px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  }
+  .profile-header-info span {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+</style>
 }
 
 <!-- Profile banner -->
-      <div class="profile-hero animate-fade-in-up">
-        <div class="profile-avatar-large" id="profileAvatar" onclick="triggerAvatarUpload()">
-          👨‍⚕️
-          <div class="profile-avatar-overlay"><i class="bi bi-camera"></i></div>
-        </div>
-        <input type="file" id="avatarFileInput" accept="image/*" style="display: none;" onchange="handleAvatarFile(event)">
-        <div class="profile-meta">
-          <h4 id="profileDisplayName">Đang tải...</h4>
-          <span id="profileRole">Bác sĩ</span>
-        </div>
-      </div>
+<div class="profile-cover shadow-medical animate-fade-in-up">
+  <div class="profile-header-card">
+    <div class="profile-avatar-premium" id="profileAvatar" onclick="triggerAvatarUpload()">
+      BS
+      <div class="profile-avatar-overlay"><i class="bi bi-camera-fill"></i></div>
+    </div>
+    <input type="file" id="avatarFileInput" accept="image/*" style="display: none;" onchange="handleAvatarFile(event)">
+    <div class="profile-header-info">
+      <h4 id="profileDisplayName">Đang tải...</h4>
+      <span id="profileRole"><i class="bi bi-heart-pulse-fill me-1"></i>Bác sĩ</span>
+    </div>
+  </div>
+</div>
 
-      <div class="row g-4">
-        <!-- Edit Profile Column -->
-        <div class="col-lg-8">
-          <div class="card-medical p-4">
-            <h5 class="fw-bold mb-4"><i class="bi bi-person-lines-fill text-primary me-2"></i>Cập nhật thông tin hồ sơ</h5>
+<div class="row g-4 animate-fade-in-up" style="animation-delay: 0.1s;">
+  <!-- Edit Profile Column -->
+  <div class="col-lg-8">
+    <div class="card-medical p-4 h-100">
+      <h5 class="fw-bold mb-4 d-flex align-items-center">
+        <div class="card-icon success me-3" style="width:40px;height:40px;font-size:1.2rem;"><i class="bi bi-person-lines-fill"></i></div>
+        Cập nhật thông tin hồ sơ
+      </h5>
             <form id="profileForm" class="form-medical" novalidate>
               <div class="row">
                 <div class="col-md-6 mb-3">
@@ -32,8 +121,10 @@
                   <div class="invalid-feedback">Vui lòng nhập họ và tên</div>
                 </div>
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Chuyên khoa (Đọc duy nhất)</label>
-                  <input type="text" class="form-control" id="docSpecialty" readonly style="background:var(--bg-tertiary);">
+                  <label class="form-label">Chuyên khoa <span class="text-danger">*</span></label>
+                  <select class="form-select" id="docSpecialty" required>
+                    <option value="">Chọn chuyên khoa...</option>
+                  </select>
                 </div>
               </div>
               <div class="row">
@@ -47,11 +138,23 @@
                 </div>
               </div>
               <div class="row">
-                <div class="col-md-6 mb-3">
+                <div class="col-md-4 mb-3">
                   <label class="form-label">Học hàm / Học vị</label>
-                  <input type="text" class="form-control" id="docDegree" placeholder="VD: Thạc sĩ Y khoa, Bác sĩ CKI">
+                  <select class="form-select" id="docDegree">
+                    <option value="BS">BS</option>
+                    <option value="BS.CKI">BS.CKI</option>
+                    <option value="BS.CKII">BS.CKII</option>
+                    <option value="ThS.BS">ThS.BS</option>
+                    <option value="TS.BS">TS.BS</option>
+                    <option value="PGS.TS">PGS.TS</option>
+                    <option value="GS.TS">GS.TS</option>
+                  </select>
                 </div>
-                <div class="col-md-6 mb-3">
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Giá khám (VNĐ)</label>
+                  <input type="number" class="form-control" id="docPrice" min="0">
+                </div>
+                <div class="col-md-4 mb-3">
                   <label class="form-label">Kinh nghiệm làm việc</label>
                   <input type="text" class="form-control" id="docExperience" placeholder="VD: 10 năm kinh nghiệm">
                 </div>
@@ -115,17 +218,24 @@
         avatarContainer.innerHTML = `👨‍⚕️<div class="profile-avatar-overlay"><i class="bi bi-camera"></i></div>`;
       }
       
+      // Load specialties
+      const specialties = await API.getSpecialties();
+      const specSelect = document.getElementById('docSpecialty');
+      specSelect.innerHTML = '<option value="">Chọn chuyên khoa...</option>' + 
+        specialties.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+
       // Load detailed doctor profile
       if (currentUser.doctorId) {
         docProfile = await API.getDoctorById(currentUser.doctorId);
         if (docProfile) {
           document.getElementById('docName').value = docProfile.name || '';
-          document.getElementById('docSpecialty').value = docProfile.specialty || '';
+          document.getElementById('docSpecialty').value = docProfile.specialtyId || '';
           document.getElementById('docEmail').value = docProfile.email || '';
           document.getElementById('docPhone').value = docProfile.phone || '';
-          document.getElementById('docDegree').value = docProfile.degree || '';
+          document.getElementById('docDegree').value = docProfile.degree || 'BS';
+          document.getElementById('docPrice').value = docProfile.price || 0;
           document.getElementById('docExperience').value = docProfile.experience || '';
-          document.getElementById('docBiography').value = docProfile.biography || '';
+          document.getElementById('docBiography').value = docProfile.bio || '';
         }
       }
     }
@@ -178,6 +288,8 @@
         email: document.getElementById('docEmail').value.trim(),
         phone: document.getElementById('docPhone').value.trim(),
         degree: document.getElementById('docDegree').value.trim(),
+        price: parseInt(document.getElementById('docPrice').value) || 0,
+        specialtyId: document.getElementById('docSpecialty').value,
         experience: document.getElementById('docExperience').value.trim(),
         biography: document.getElementById('docBiography').value.trim(),
       };

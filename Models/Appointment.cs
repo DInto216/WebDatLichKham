@@ -1,5 +1,5 @@
-using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WebDatLichKham.Models
 {
@@ -8,13 +8,13 @@ namespace WebDatLichKham.Models
         [Key]
         public string Id { get; set; } = string.Empty;
 
-        [Required]
         public string BookingId { get; set; } = string.Empty;
 
         [Required]
         public string PatientName { get; set; } = string.Empty;
 
         [Required]
+        [RegularExpression(@"^\d{10,11}$", ErrorMessage = "Số điện thoại phải từ 10 đến 11 ký tự số.")]
         public string Phone { get; set; } = string.Empty;
 
         public string Email { get; set; } = string.Empty;
@@ -49,6 +49,7 @@ namespace WebDatLichKham.Models
         /// <summary>unpaid | pending_bank | paid | refunded</summary>
         public string PaymentStatus { get; set; } = "unpaid";
 
+        [Column(TypeName = "decimal(18,2)")]
         public decimal PaymentAmount { get; set; } = 0;
 
         public DateTime? PaidAt { get; set; }

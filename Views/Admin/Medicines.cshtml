@@ -131,6 +131,8 @@
       document.getElementById('modalTitle').textContent = 'Thêm Thuốc Mới';
       document.getElementById('medicineForm').reset();
       document.getElementById('medicineForm').classList.remove('was-validated');
+      const modalEl = document.getElementById('medicineModal');
+      document.body.appendChild(modalEl);
     }
 
     async function openEditModal(id) {
@@ -145,7 +147,9 @@
       document.getElementById('medUnit').value = med.unit || 'Viên';
       document.getElementById('medExpiryDate').value = med.expiryDate || '';
       
-      new bootstrap.Modal(document.getElementById('medicineModal')).show();
+      const modalEl = document.getElementById('medicineModal');
+      document.body.appendChild(modalEl);
+      bootstrap.Modal.getOrCreateInstance(modalEl).show();
     }
 
     async function saveMedicine() {

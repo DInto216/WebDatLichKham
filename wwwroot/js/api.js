@@ -9,16 +9,24 @@ const API = (() => {
   // ---- Helper for Fetch API ----
   const request = async (url, options = {}) => {
     try {
+      const csrfToken = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+      const finalHeaders = {
+        'Content-Type': 'application/json',
+        ...options.headers
+      };
+      if (csrfToken) {
+        finalHeaders['RequestVerificationToken'] = csrfToken;
+      }
+      
       const response = await fetch(url, {
-        headers: {
-          'Content-Type': 'application/json',
-          ...options.headers
-        },
+        headers: finalHeaders,
         ...options
       });
       if (response.status === 401 || response.status === 403) {
-        localStorage.removeItem('currentUser');
-        window.location.href = '/Account/Login';
+        if (localStorage.getItem('currentUser')) {
+          localStorage.removeItem('currentUser');
+          window.location.href = '/Account/Login';
+        }
         throw new Error('Unauthorized');
       }
       if (!response.ok) {
@@ -118,6 +126,13 @@ const API = (() => {
     });
   };
 
+  const updatePayment = async (id, status) => {
+    return await request(`/api/appointments/${id}/payment`, {
+      method: 'PUT',
+      body: JSON.stringify({ status })
+    });
+  };
+
   // ---- Lookup ----
   const lookupAppointment = async (phone, bookingId) => {
     const params = new URLSearchParams({ phone, bookingId });
@@ -149,7 +164,7 @@ const API = (() => {
     });
     const current = getCurrentUser();
     if (current && current.id === accountId) {
-      const merged = { ...current, name: updated.name, avatar: updated.avatar };
+      const merged = { ...current, name: updated.name, avatar: updated.avatar, doctorId: updated.doctorId };
       localStorage.setItem('currentUser', JSON.stringify(merged));
     }
     return updated;
@@ -161,22 +176,35 @@ const API = (() => {
       method: 'POST',
       body: JSON.stringify({ username, password })
     });
-    localStorage.setItem('currentUser', JSON.stringify(session));
-    return session;
+    // Lấy thông tin user chuẩn từ backend sau khi có Cookie
+    const me = await request('/api/auth/me', { method: 'GET' });
+    localStorage.setItem('currentUser', JSON.stringify(me));
+    return me;
   };
 
   const logout = async () => {
-    // Fix #5: Gọi API trước, xóa localStorage sau
     try {
-      await fetch('/api/auth/logout', { method: 'POST' });
+      await request('/api/auth/logout', { method: 'POST' });
     } catch (e) {}
     localStorage.removeItem('currentUser');
+    window.location.href = '/Account/Login';
   };
 
   const getCurrentUser = () => {
     try {
       return JSON.parse(localStorage.getItem('currentUser')) || null;
     } catch {
+      return null;
+    }
+  };
+
+  const syncAuth = async () => {
+    try {
+      const me = await request('/api/auth/me', { method: 'GET' });
+      localStorage.setItem('currentUser', JSON.stringify(me));
+      return me;
+    } catch (e) {
+      localStorage.removeItem('currentUser');
       return null;
     }
   };
@@ -220,13 +248,38 @@ const API = (() => {
     });
   };
 
-  const getExamResult = async (bookingId) => {
-    return await request(`/api/medical-history/result?bookingId=${bookingId}`);
+  const getExamResult = async (idOrBookingId) => {
+    if (idOrBookingId && !isNaN(idOrBookingId)) {
+      return await request(`/api/medical-history/result?id=${idOrBookingId}`);
+    } else {
+      return await request(`/api/medical-history/result?bookingId=${idOrBookingId}`);
+    }
+  };
+
+  // ---- Payments ----
+  const getPayments = async () => {
+    return await request('/api/payments');
   };
 
   // ---- Dashboard Stats ----
   const getDashboardStats = async () => {
     return await request('/api/dashboard/stats');
+  };
+
+  const getRevenueStats = async (year) => {
+    return await request(`/api/dashboard/revenue?year=${year}`);
+  };
+
+  // ---- Doctor Reviews ----
+  const getDoctorReviews = async () => {
+    return await request('/api/doctor-reviews');
+  };
+
+  const addDoctorReview = async (data) => {
+    return await request('/api/doctor-reviews', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
   };
 
   // ---- Utilities ----
@@ -273,6 +326,7 @@ const API = (() => {
     login,
     logout,
     getCurrentUser,
+    syncAuth,
     updateProfile,
     getMedicines,
     addMedicine,
@@ -282,6 +336,11 @@ const API = (() => {
     addMedicalHistory,
     getExamResult,
     getDashboardStats,
+    getRevenueStats,
+    getDoctorReviews,
+    addDoctorReview,
+    getPayments,
+    updatePayment,
     maskName,
     maskPhone,
     generateBookingId

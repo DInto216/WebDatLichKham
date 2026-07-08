@@ -29,6 +29,7 @@
     @RenderSection("PageStyles", required: false)
 </head>
 <body class="admin-layout">
+    @Html.AntiForgeryToken()
 
     @await Html.PartialAsync("_DoctorSidebar", (string)(ViewBag.ActiveMenu ?? ""))
 
@@ -55,7 +56,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/api.js?v=1.1"></script>
+    <script src="/js/api.js?v=1.2"></script>
     <script src="/js/main.js?v=1.1"></script>
     <script>
         // ---- Common Doctor JS: Sidebar Toggle ----
@@ -71,6 +72,13 @@
             _sidebar.classList.remove('open');
             _overlay.classList.remove('open');
         });
+
+        // ---- Update sidebar doctor name from session ----
+        try {
+            const session = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            const nameEl = document.getElementById('sidebarDoctorName');
+            if (nameEl && session.name) nameEl.textContent = session.name;
+        } catch(e) {}
     </script>
 
     @RenderSection("Scripts", required: false)

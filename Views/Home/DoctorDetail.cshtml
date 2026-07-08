@@ -1,0 +1,463 @@
+@model WebDatLichKham.Models.Doctor
+@{
+    Layout = "~/Views/Shared/_PublicLayout.cshtml";
+    ViewBag.Title = Model.Name + " - Chi tiết Bác sĩ";
+    ViewBag.ActiveNav = "Index";
+}
+
+@section PageStyles {
+    <style>
+        .doctor-hero {
+            background: linear-gradient(135deg, var(--primary-50), var(--secondary-50));
+            padding: 8rem 0 4rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .doctor-avatar-large {
+            width: 250px;
+            height: 250px;
+            border-radius: 24px;
+            object-fit: cover;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            transform: translateY(0);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+        }
+
+        .doctor-avatar-large:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 50px rgba(0,0,0,0.15);
+        }
+
+        .doctor-meta-card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            margin-top: -60px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            border-radius: 16px;
+            background: var(--bg-body);
+            transition: all 0.3s ease;
+        }
+
+        .stat-item:hover {
+            background: var(--primary-50);
+            transform: translateY(-5px);
+        }
+
+        .stat-item h3 {
+            color: var(--primary);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-item p {
+            color: var(--text-secondary);
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        /* Review Styles */
+        .review-card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .review-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+            border-color: var(--primary-300);
+        }
+
+        .patient-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-300), var(--primary-600));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-right: 1rem;
+        }
+
+        .stars {
+            color: #ffc107;
+            font-size: 1.1rem;
+        }
+
+        .stars-empty {
+            color: #e4e5e9;
+        }
+
+        .filter-btn {
+            border: 1px solid var(--border-color);
+            background: white;
+            color: var(--text-secondary);
+            border-radius: 100px;
+            padding: 0.5rem 1.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        @@keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+}
+
+<!-- Hero Section -->
+<section class="doctor-hero">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-4 text-center mb-4 mb-lg-0 fade-in-up" style="animation-delay: 0.1s">
+                @if (!string.IsNullOrEmpty(Model.Avatar))
+                {
+                    <img src="@Model.Avatar" alt="@Model.Name" class="doctor-avatar-large">
+                }
+                else
+                {
+                    <div class="doctor-avatar-large d-flex align-items-center justify-content-center mx-auto" style="background:linear-gradient(135deg, var(--primary-100), var(--primary-200)); font-size: 80px;">
+                        👨‍⚕️
+                    </div>
+                }
+            </div>
+            <div class="col-lg-8 fade-in-up" style="animation-delay: 0.2s">
+                <div class="d-inline-flex align-items-center bg-white px-3 py-1 rounded-pill shadow-sm mb-3 text-primary fw-medium" style="font-size: 0.9rem;">
+                    <i class="bi bi-patch-check-fill me-2"></i> @Model.SpecialtyName
+                </div>
+                <h1 class="fw-bold mb-2">@Model.Degree @Model.Name</h1>
+                <p class="text-secondary fs-5 mb-4"><i class="bi bi-geo-alt me-2"></i>MediBooking Clinic</p>
+                
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="/Home/Booking?doctor=@Model.Id" class="btn-primary-medical px-4 py-2" style="text-decoration: none;">
+                        <i class="bi bi-calendar-check me-2"></i> Đặt lịch ngay
+                    </a>
+                    <button class="btn-secondary-medical px-4 py-2" onclick="document.getElementById('reviews-section').scrollIntoView({behavior: 'smooth'})">
+                        <i class="bi bi-star me-2"></i> Xem đánh giá
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Content Section -->
+<section class="py-5" style="background: var(--bg-body)">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mb-5 mb-lg-0">
+                <div class="doctor-meta-card fade-in-up" style="animation-delay: 0.3s">
+                    <h4 class="fw-bold mb-4">Tiểu sử</h4>
+                    <p class="text-secondary mb-4" style="line-height: 1.8;">
+                        @(string.IsNullOrEmpty(Model.Bio) ? "Bác sĩ chưa cập nhật tiểu sử." : Model.Bio)
+                    </p>
+                    
+                    <hr class="my-4 border-light">
+                    
+                    <h5 class="fw-bold mb-3"><i class="bi bi-briefcase text-primary me-2"></i>Kinh nghiệm làm việc</h5>
+                    <p class="text-secondary mb-0">
+                        @(string.IsNullOrEmpty(Model.Experience) ? "Nhiều năm kinh nghiệm trong lĩnh vực y tế." : Model.Experience)
+                    </p>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="doctor-meta-card fade-in-up" style="animation-delay: 0.4s; margin-top: 0;">
+                    <h4 class="fw-bold mb-4">Thông tin</h4>
+                    
+                    <div class="mb-4">
+                        <label class="text-muted" style="font-size: 0.9rem;">Giá khám</label>
+                        <h4 class="text-success fw-bold mt-1 mb-0">@Model.Price.ToString("N0") ₫</h4>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="text-muted" style="font-size: 0.9rem;">Đánh giá trung bình</label>
+                        <div class="d-flex align-items-center mt-1">
+                            <h4 class="text-warning fw-bold mb-0 me-2">@Model.Rating</h4>
+                            <div class="stars">
+                                @for(int i=1; i<=5; i++) {
+                                    if(i <= Math.Round(Model.Rating)) {
+                                        <i class="bi bi-star-fill"></i>
+                                    } else {
+                                        <i class="bi bi-star-fill stars-empty"></i>
+                                    }
+                                }
+                            </div>
+                            <span class="text-muted ms-2">(@Model.Reviews lượt)</span>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="text-muted" style="font-size: 0.9rem;">Email liên hệ</label>
+                        <p class="fw-medium mt-1 mb-0">
+                            @(string.IsNullOrEmpty(Model.Email) ? "Đang cập nhật" : Model.Email)
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Reviews Section -->
+<section id="reviews-section" class="py-5" style="background: #fff">
+    <div class="container">
+        <div class="text-center mb-5 fade-in-up" style="animation-delay: 0.5s">
+            <h2 class="fw-bold mb-3">Đánh Giá Từ Bệnh Nhân</h2>
+            <p class="text-secondary">Những phản hồi chân thực về bác sĩ @Model.Name</p>
+        </div>
+
+        <div class="row align-items-center mb-4 fade-in-up" style="animation-delay: 0.6s">
+            <div class="col-md-8">
+                <div class="d-flex flex-wrap gap-2" id="reviewFilter">
+                    <button class="filter-btn active" data-filter="all">Tất cả</button>
+                    <button class="filter-btn" data-filter="5">5 Sao <i class="bi bi-star-fill text-warning"></i></button>
+                    <button class="filter-btn" data-filter="4">4 Sao <i class="bi bi-star-fill text-warning"></i></button>
+                    <button class="filter-btn" data-filter="3">3 Sao <i class="bi bi-star-fill text-warning"></i></button>
+                    <button class="filter-btn" data-filter="2">2 Sao <i class="bi bi-star-fill text-warning"></i></button>
+                    <button class="filter-btn" data-filter="1">1 Sao <i class="bi bi-star-fill text-warning"></i></button>
+                </div>
+            </div>
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <button class="btn-primary-medical" data-bs-toggle="modal" data-bs-target="#reviewModal">
+                    <i class="bi bi-pencil-square me-2"></i> Viết đánh giá
+                </button>
+            </div>
+        </div>
+
+        <div class="row" id="reviewsGrid">
+            <!-- Reviews will be rendered here by JS -->
+            <div class="col-12 text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Đang tải...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Review Modal -->
+<div class="modal fade" id="reviewModal" tabindex="-1" aria-labelledby="reviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0" style="border-radius: 20px; overflow: hidden;">
+            <div class="modal-header border-0 bg-light px-4 py-3">
+                <h5 class="modal-title fw-bold" id="reviewModalLabel">Đánh giá Bác sĩ @Model.Name</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body px-4 py-4">
+                <form id="submitReviewForm">
+                    <input type="hidden" id="doctorId" value="@Model.Id">
+                    <input type="hidden" id="doctorName" value="@Model.Name">
+                    <input type="hidden" id="doctorSpecialty" value="@Model.SpecialtyName">
+                    
+                    <div class="mb-4 text-center">
+                        <label class="form-label fw-medium mb-3 d-block">Bạn đánh giá bác sĩ thế nào?</label>
+                        <div class="d-flex justify-content-center gap-3 rating-selector" style="direction: rtl;">
+                            <!-- CSS will handle RTL for correct star filling logic -->
+                            <input type="radio" class="btn-check" name="rating" id="star5" value="5" autocomplete="off" checked>
+                            <label class="btn btn-outline-warning rounded-circle p-2 lh-1" for="star5" title="5 sao"><i class="bi bi-star-fill"></i></label>
+
+                            <input type="radio" class="btn-check" name="rating" id="star4" value="4" autocomplete="off">
+                            <label class="btn btn-outline-warning rounded-circle p-2 lh-1" for="star4" title="4 sao"><i class="bi bi-star-fill"></i></label>
+
+                            <input type="radio" class="btn-check" name="rating" id="star3" value="3" autocomplete="off">
+                            <label class="btn btn-outline-warning rounded-circle p-2 lh-1" for="star3" title="3 sao"><i class="bi bi-star-fill"></i></label>
+
+                            <input type="radio" class="btn-check" name="rating" id="star2" value="2" autocomplete="off">
+                            <label class="btn btn-outline-warning rounded-circle p-2 lh-1" for="star2" title="2 sao"><i class="bi bi-star-fill"></i></label>
+
+                            <input type="radio" class="btn-check" name="rating" id="star1" value="1" autocomplete="off">
+                            <label class="btn btn-outline-warning rounded-circle p-2 lh-1" for="star1" title="1 sao"><i class="bi bi-star-fill"></i></label>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-medium">Họ và tên của bạn</label>
+                        <input type="text" id="patientNameInput" class="form-control" placeholder="Nhập tên của bạn..." required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-medium">Chi tiết đánh giá</label>
+                        <textarea id="reviewCommentInput" class="form-control" rows="4" placeholder="Chia sẻ trải nghiệm khám bệnh của bạn..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary-medical w-100 py-3">
+                        Gửi Đánh Giá <i class="bi bi-send ms-2"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // CSS for rating selector hover effect
+        const style = document.createElement('style');
+        style.textContent = `
+            .rating-selector { display: flex; flex-direction: row-reverse; justify-content: center; }
+            .rating-selector input { display: none; }
+            .rating-selector label { font-size: 1.5rem; color: #e4e5e9; cursor: pointer; transition: color 0.2s; border: none; background: transparent !important; box-shadow: none !important; }
+            .rating-selector label:hover,
+            .rating-selector label:hover ~ label,
+            .rating-selector input:checked ~ label { color: #ffc107 !important; }
+        `;
+        document.head.appendChild(style);
+
+        let allReviews = [];
+        const currentDoctorId = '@Model.Id';
+
+        async function loadReviews() {
+            try {
+                // Fetch mock data from API
+                const data = await API.getDoctorReviews();
+                
+                // Filter to only show reviews for THIS doctor
+                // Note: The mock API currently might not have doctorId, so we fallback to matching doctorName if needed.
+                // But we'll try doctorId first.
+                allReviews = data.filter(r => r.doctorId === currentDoctorId || r.doctorName === '@Html.Raw(Model.Name)');
+                
+                renderReviews('all');
+            } catch (err) {
+                console.error(err);
+                document.getElementById('reviewsGrid').innerHTML = '<div class="col-12 text-center text-danger">Không thể tải dữ liệu đánh giá.</div>';
+            }
+        }
+
+        function renderReviews(filterValue) {
+            const grid = document.getElementById('reviewsGrid');
+            grid.innerHTML = '';
+            
+            let filtered = allReviews;
+            if (filterValue !== 'all') {
+                const rating = parseInt(filterValue);
+                filtered = allReviews.filter(r => r.rating === rating);
+            }
+            
+            if (filtered.length === 0) {
+                grid.innerHTML = '<div class="col-12 text-center py-5 text-secondary">Chưa có đánh giá nào.</div>';
+                return;
+            }
+            
+            filtered.forEach((review, index) => {
+                const fullStars = '<i class="bi bi-star-fill"></i>'.repeat(review.rating);
+                const emptyStars = '<i class="bi bi-star-fill stars-empty"></i>'.repeat(5 - review.rating);
+                
+                const cardHtml = `
+                    <div class="col-md-6 fade-in-up" style="animation-delay: ${0.1 + (index * 0.1)}s">
+                        <div class="review-card">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="patient-avatar">${review.patientName.charAt(0)}</div>
+                                <div>
+                                    <h6 class="mb-1 fw-bold">${review.patientName}</h6>
+                                    <div class="text-tertiary" style="font-size:var(--text-xs)">
+                                        <i class="bi bi-calendar3 me-1"></i> ${App.formatDate(review.date)}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="stars mb-2">
+                                ${fullStars}${emptyStars}
+                            </div>
+                            
+                            <p class="review-text">"${review.comment}"</p>
+                        </div>
+                    </div>
+                `;
+                grid.insertAdjacentHTML('beforeend', cardHtml);
+            });
+        }
+
+        // Handle Filter Clicks
+        document.getElementById('reviewFilter').addEventListener('click', function(e) {
+            if (e.target.classList.contains('filter-btn')) {
+                // Update active state
+                document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+                e.target.classList.add('active');
+                
+                // Re-render
+                renderReviews(e.target.getAttribute('data-filter'));
+            }
+        });
+
+        // Handle Form Submit
+        document.getElementById('submitReviewForm').addEventListener('submit', async function(e) {
+            e.preventDefault(); // Prevent standard form submission
+            
+            const form = e.target;
+            const rating = document.querySelector('input[name="rating"]:checked').value;
+            const patientName = document.getElementById('patientNameInput').value.trim();
+            const comment = document.getElementById('reviewCommentInput').value.trim();
+            
+            if (!patientName) {
+                App.toast.warning('Lưu ý', 'Vui lòng nhập tên của bạn.');
+                return;
+            }
+            if (!comment) {
+                App.toast.warning('Lưu ý', 'Vui lòng nhập chi tiết đánh giá.');
+                return;
+            }
+            
+            const newReview = {
+                doctorId: document.getElementById('doctorId').value,
+                doctorName: document.getElementById('doctorName').value,
+                patientName: patientName,
+                rating: parseInt(rating),
+                comment: comment,
+                specialty: document.getElementById('doctorSpecialty').value
+            };
+            
+            try {
+                await API.addDoctorReview(newReview);
+                
+                // Re-fetch all reviews from server
+                await loadReviews();
+                document.querySelector('[data-filter="all"]').click();
+                
+                // Close modal & reset
+                bootstrap.Modal.getInstance(document.getElementById('reviewModal')).hide();
+                form.reset();
+                
+                // Make sure star rating is reset to 5
+                document.getElementById('star5').checked = true;
+                
+                App.toast.success('Thành công', 'Cảm ơn bạn đã gửi đánh giá!');
+            } catch (err) {
+                App.toast.error('Lỗi', 'Có lỗi xảy ra khi gửi đánh giá.');
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', loadReviews);
+    </script>
+}

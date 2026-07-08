@@ -21,10 +21,6 @@ namespace WebDatLichKham.Controllers
             return View();
         }
 
-        public IActionResult Doctors()
-        {
-            return View();
-        }
 
         public IActionResult MedicalHistory()
         {

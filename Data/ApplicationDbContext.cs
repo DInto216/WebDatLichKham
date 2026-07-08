@@ -18,6 +18,7 @@ namespace WebDatLichKham.Data
         public DbSet<Medicine> Medicines { get; set; } = null!;
         public DbSet<Appointment> Appointments { get; set; } = null!;
         public DbSet<MedicalHistory> MedicalHistories { get; set; } = null!;
+        public DbSet<DoctorReview> DoctorReviews { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -240,6 +241,16 @@ namespace WebDatLichKham.Data
                     Prescription = "Amoxicillin 250mg x3, Xịt mũi Nasonex", VisitDate = "2026-02-28", Notes = "Rửa mũi bằng nước muối sinh lý hàng ngày",
                     PrescriptionItemsJson = "[{\"name\":\"Amoxicillin 250mg\",\"qty\":21,\"unit\":\"Viên\",\"dosage\":\"Ngày 3 lần, mỗi lần 1 viên\"},{\"name\":\"Xịt mũi Nasonex\",\"qty\":1,\"unit\":\"Chai\",\"dosage\":\"Xịt 2 nhát mỗi bên mũi, ngày 1 lần\"}]"
                 }
+            );
+
+            // Seed Doctor Reviews
+            modelBuilder.Entity<DoctorReview>().HasData(
+                new DoctorReview { Id = "rev_01", DoctorId = "doc_01", DoctorName = "BS. Nguyễn Văn An", PatientName = "Nguyễn Tấn Đ.", Rating = 5, Date = "2026-06-15", Comment = "Bác sĩ An tư vấn rất nhiệt tình, chu đáo. Quy trình khám diễn ra nhanh chóng, tôi rất hài lòng.", Specialty = "Nội tổng quát" },
+                new DoctorReview { Id = "rev_02", DoctorId = "doc_02", DoctorName = "BS. Trần Thị Bích", PatientName = "Lê Minh H.", Rating = 5, Date = "2026-06-20", Comment = "Phòng khám sạch sẽ, bác sĩ Bích giải thích kỹ càng về bệnh án và thuốc. Tuyệt vời!", Specialty = "Nhi khoa" },
+                new DoctorReview { Id = "rev_03", DoctorId = "doc_03", DoctorName = "BS. Lê Minh Tuấn", PatientName = "Trần Quyết T.", Rating = 4, Date = "2026-06-28", Comment = "Chuyên môn cao, dịch vụ tốt. Tuy nhiên lúc chờ lấy thuốc hơi lâu một chút.", Specialty = "Tim mạch" },
+                new DoctorReview { Id = "rev_04", DoctorId = "doc_04", DoctorName = "BS. Phạm Hồng Nhung", PatientName = "Phạm Thị M.", Rating = 5, Date = "2026-07-01", Comment = "Bác sĩ Nhung rất nhẹ nhàng, mát tay. Các nốt mẩn đỏ của tôi đã hết hẳn sau 1 tuần dùng thuốc.", Specialty = "Da liễu" },
+                new DoctorReview { Id = "rev_05", DoctorId = "doc_05", DoctorName = "BS. Võ Thanh Hùng", PatientName = "Vũ Đức K.", Rating = 5, Date = "2026-07-02", Comment = "Rất chuyên nghiệp, bác sĩ Hùng thao tác cực kỳ cẩn thận.", Specialty = "Tai Mũi Họng" },
+                new DoctorReview { Id = "rev_06", DoctorId = "doc_01", DoctorName = "BS. Nguyễn Văn An", PatientName = "Đinh Tuấn N.", Rating = 5, Date = "2026-07-03", Comment = "Hệ thống đặt lịch rất tiện, không phải chờ đợi. Bác sĩ siêu có tâm.", Specialty = "Nội tổng quát" }
             );
         }
     }
