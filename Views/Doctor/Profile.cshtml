@@ -138,16 +138,22 @@
                 </div>
               </div>
               <div class="row">
-                <div class="col-md-4 mb-3">
-                  <label class="form-label">Học hàm / Học vị</label>
+                <div class="col-md-2 mb-3">
+                  <label class="form-label">Học hàm</label>
+                  <select class="form-select" id="docAcademicTitle">
+                    <option value="">Không có</option>
+                    <option value="GS">GS</option>
+                    <option value="PGS">PGS</option>
+                  </select>
+                </div>
+                <div class="col-md-2 mb-3">
+                  <label class="form-label">Học vị</label>
                   <select class="form-select" id="docDegree">
                     <option value="BS">BS</option>
-                    <option value="BS.CKI">BS.CKI</option>
-                    <option value="BS.CKII">BS.CKII</option>
-                    <option value="ThS.BS">ThS.BS</option>
-                    <option value="TS.BS">TS.BS</option>
-                    <option value="PGS.TS">PGS.TS</option>
-                    <option value="GS.TS">GS.TS</option>
+                    <option value="ThS">ThS</option>
+                    <option value="TS">TS</option>
+                    <option value="CKI">CKI</option>
+                    <option value="CKII">CKII</option>
                   </select>
                 </div>
                 <div class="col-md-4 mb-3">
@@ -232,6 +238,7 @@
           document.getElementById('docSpecialty').value = docProfile.specialtyId || '';
           document.getElementById('docEmail').value = docProfile.email || '';
           document.getElementById('docPhone').value = docProfile.phone || '';
+          document.getElementById('docAcademicTitle').value = docProfile.academicTitle || '';
           document.getElementById('docDegree').value = docProfile.degree || 'BS';
           document.getElementById('docPrice').value = docProfile.price || 0;
           document.getElementById('docExperience').value = docProfile.experience || '';
@@ -287,6 +294,7 @@
         name: document.getElementById('docName').value.trim(),
         email: document.getElementById('docEmail').value.trim(),
         phone: document.getElementById('docPhone').value.trim(),
+        academicTitle: document.getElementById('docAcademicTitle').value.trim(),
         degree: document.getElementById('docDegree').value.trim(),
         price: parseInt(document.getElementById('docPrice').value) || 0,
         specialtyId: document.getElementById('docSpecialty').value,

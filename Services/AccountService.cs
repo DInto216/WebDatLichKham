@@ -147,6 +147,7 @@ namespace WebDatLichKham.Services
                 {
                     if (data.TryGetProperty("name", out var dNameProp)) doc.Name = dNameProp.GetString() ?? doc.Name;
                     if (data.TryGetProperty("degree", out var dDegProp)) doc.Degree = dDegProp.GetString() ?? doc.Degree;
+                    if (data.TryGetProperty("academicTitle", out var acadProp)) doc.AcademicTitle = acadProp.GetString() ?? doc.AcademicTitle;
                     if (data.TryGetProperty("biography", out var dBioProp)) doc.Bio = dBioProp.GetString() ?? doc.Bio;
                     if (data.TryGetProperty("avatar", out var dAvatarProp)) doc.Avatar = dAvatarProp.GetString() ?? doc.Avatar;
                     if (data.TryGetProperty("price", out var dPriceProp) && dPriceProp.ValueKind == JsonValueKind.Number) doc.Price = dPriceProp.GetDecimal();
@@ -156,16 +157,31 @@ namespace WebDatLichKham.Services
                     if (data.TryGetProperty("specialtyId", out var dSpecProp))
                     {
                         var newSpecialtyId = dSpecProp.GetString();
-                        if (!string.IsNullOrEmpty(newSpecialtyId))
+                        if (!string.IsNullOrEmpty(newSpecialtyId) && doc.SpecialtyId != newSpecialtyId)
                         {
+                            var oldSpecialtyId = doc.SpecialtyId;
+                            
+                            // Giảm số lượng bác sĩ ở chuyên khoa cũ
+                            if (!string.IsNullOrEmpty(oldSpecialtyId))
+                            {
+                                var oldSpec = await _context.Specialties.FindAsync(oldSpecialtyId);
+                                if (oldSpec != null && oldSpec.DoctorCount > 0) oldSpec.DoctorCount--;
+                            }
+
+                            // Tăng số lượng bác sĩ ở chuyên khoa mới
                             doc.SpecialtyId = newSpecialtyId;
-                            var specialty = await _context.Specialties.FindAsync(newSpecialtyId);
-                            if (specialty != null) doc.SpecialtyName = specialty.Name;
+                            var newSpec = await _context.Specialties.FindAsync(newSpecialtyId);
+                            if (newSpec != null)
+                            {
+                                doc.SpecialtyName = newSpec.Name;
+                                newSpec.DoctorCount++;
+                            }
                         }
                     }
                     _ = await _context.SaveChangesAsync();
                     _cache.Remove("Doctors_All");
                     _cache.Remove("Doctors_" + doc.Id);
+                    _cache.Remove("SpecialtiesList");
                 }
             }
 

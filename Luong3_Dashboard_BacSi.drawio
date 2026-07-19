@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2024-01-01T00:00:00.000Z" agent="Mozilla/5.0" version="21.0.0" type="device">
+  <diagram id="luong3" name="Luồng 3 - Dashboard Bác sĩ">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="f3_start" value="Bác sĩ truy cập&amp;#10;Area Doctor" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="340" y="50" width="140" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="f3_auth" value="Authorize Middleware" style="shape=process;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="340" y="140" width="140" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="f3_check" value="Role == &amp;quot;Doctor&amp;quot;?" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="340" y="230" width="140" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="f3_deny" value="Từ chối truy cập" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="540" y="245" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="f3_query" value="Truy vấn Async&amp;#10;DS lịch khám hôm nay" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="340" y="350" width="140" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="f3_dash" value="Hiển thị Dashboard&amp;#10;(Table HTML)" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="340" y="440" width="140" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="e3_1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="f3_start" target="f3_auth"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e3_2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="f3_auth" target="f3_check"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e3_3" value="False" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="f3_check" target="f3_deny"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e3_4" value="True" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="f3_check" target="f3_query"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e3_5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="f3_query" target="f3_dash"><mxGeometry relative="1" as="geometry" /></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

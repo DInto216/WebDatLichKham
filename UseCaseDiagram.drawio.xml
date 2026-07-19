@@ -1,0 +1,281 @@
+<mxfile host="app.diagrams.net" agent="Antigravity">
+  <diagram id="use_case_diagram_detailed_1frame" name="Sơ đồ Use Case Chi Tiết">
+    <mxGraphModel dx="1471" dy="764" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="1654" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="system_boundary" parent="1" style="swimlane;whiteSpace=wrap;html=1;startSize=30;fontStyle=1;fontSize=14;" value="Hệ thống Đặt lịch khám bệnh trực tuyến" vertex="1">
+          <mxGeometry height="1250" width="650" x="200" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_lookup" parent="system_boundary" style="ellipse;whiteSpace=wrap;html=1;" value="Tra cứu bác sĩ và chuyên khoa" vertex="1">
+          <mxGeometry height="60" width="180" x="50" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_booking" parent="system_boundary" style="ellipse;whiteSpace=wrap;html=1;fontStyle=1" value="Đăng ký lịch hẹn trực tuyến" vertex="1">
+          <mxGeometry height="60" width="180" x="50" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_symptoms" parent="system_boundary" style="ellipse;whiteSpace=wrap;html=1;" value="Nhập triệu chứng ban đầu" vertex="1">
+          <mxGeometry height="60" width="180" x="380" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_payment" parent="system_boundary" style="ellipse;whiteSpace=wrap;html=1;" value="Thanh toán trực tuyến" vertex="1">
+          <mxGeometry height="60" width="180" x="380" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_email" parent="system_boundary" style="ellipse;whiteSpace=wrap;html=1;" value="Tự động gửi mail xác nhận" vertex="1">
+          <mxGeometry height="60" width="180" x="380" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_print_ticket" parent="system_boundary" style="ellipse;whiteSpace=wrap;html=1;" value="In phiếu hẹn khám bệnh" vertex="1">
+          <mxGeometry height="60" width="180" x="380" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_result" parent="system_boundary" style="ellipse;whiteSpace=wrap;html=1;" value="Xem kết quả khám và đơn thuốc" vertex="1">
+          <mxGeometry height="60" width="180" x="50" y="280" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_review" parent="system_boundary" style="ellipse;whiteSpace=wrap;html=1;" value="Viết đánh giá bác sĩ" vertex="1">
+          <mxGeometry height="60" width="180" x="50" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_doc_login" parent="system_boundary" style="ellipse;whiteSpace=wrap;html=1;" value="Đăng nhập phân hệ Doctor" vertex="1">
+          <mxGeometry height="60" width="180" x="380" y="550" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_doc_manage" parent="system_boundary" style="ellipse;whiteSpace=wrap;html=1;" value="Quản lý lịch khám được giao" vertex="1">
+          <mxGeometry height="60" width="180" x="50" y="470" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_doc_schedule" parent="system_boundary" style="ellipse;whiteSpace=wrap;html=1;" value="Đăng ký và Xem lịch làm việc" vertex="1">
+          <mxGeometry height="60" width="180" x="50" y="550" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_doc_record" parent="system_boundary" style="ellipse;whiteSpace=wrap;html=1;fontStyle=1;fillColor=default;" value="Lập bệnh án điện tử và Kê đơn" vertex="1">
+          <mxGeometry height="60" width="180" x="50" y="630" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_doc_history" parent="system_boundary" style="ellipse;whiteSpace=wrap;html=1;" value="Xem lịch sử khám bệnh" vertex="1">
+          <mxGeometry height="60" width="180" x="50" y="710" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_doc_profile" parent="system_boundary" style="ellipse;whiteSpace=wrap;html=1;" value="Cập nhật hồ sơ cá nhân" vertex="1">
+          <mxGeometry height="60" width="180" x="50" y="790" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_doc_print" parent="system_boundary" style="ellipse;whiteSpace=wrap;html=1;" value="Xuất bản và In ấn đơn thuốc" vertex="1">
+          <mxGeometry height="60" width="180" x="380" y="670" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_admin_login" parent="system_boundary" style="ellipse;whiteSpace=wrap;html=1;" value="Đăng nhập phân hệ Admin" vertex="1">
+          <mxGeometry height="60" width="180" x="380" y="1030" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_admin_chart" parent="system_boundary" style="ellipse;whiteSpace=wrap;html=1;" value="Xem biểu đồ thống kê trực quan" vertex="1">
+          <mxGeometry height="60" width="180" x="50" y="890" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_admin_acc" parent="system_boundary" style="ellipse;whiteSpace=wrap;html=1;" value="Quản lý Tài khoản (Bác sĩ, Bệnh nhân)" vertex="1">
+          <mxGeometry height="60" width="180" x="50" y="960" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_admin_core" parent="system_boundary" style="ellipse;whiteSpace=wrap;html=1;" value="Quản lý danh mục cốt lõi (Chuyên khoa, Thuốc)" vertex="1">
+          <mxGeometry height="60" width="180" x="50" y="1030" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_admin_app" parent="system_boundary" style="ellipse;whiteSpace=wrap;html=1;" value="Quản lý Lịch hẹn và Thanh toán" vertex="1">
+          <mxGeometry height="60" width="180" x="50" y="1100" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_admin_config" parent="system_boundary" style="ellipse;whiteSpace=wrap;html=1;" value="Cấu hình tham số hệ thống động" vertex="1">
+          <mxGeometry height="60" width="180" x="50" y="1170" as="geometry" />
+        </mxCell>
+        <mxCell id="actor_patient" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" value="Patient&#xa;(Bệnh nhân)" vertex="1">
+          <mxGeometry height="80" width="40" x="80" y="200" as="geometry" />
+        </mxCell>
+        <mxCell id="actor_doctor" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" value="Doctor&#xa;(Bác sĩ)" vertex="1">
+          <mxGeometry height="80" width="40" x="80" y="620" as="geometry" />
+        </mxCell>
+        <mxCell id="actor_admin" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" value="Admin&#xa;(Quản trị viên)" vertex="1">
+          <mxGeometry height="80" width="40" x="80" y="1020" as="geometry" />
+        </mxCell>
+        <mxCell id="actor_payment" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" value="Cổng thanh toán&#xa;&lt;System&gt;" vertex="1">
+          <mxGeometry height="80" width="40" x="920" y="210" as="geometry" />
+        </mxCell>
+        <mxCell id="actor_email" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" value="Hệ thống Email&#xa;(MailKit) &lt;System&gt;" vertex="1">
+          <mxGeometry height="80" width="40" x="920" y="310" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_pat_lookup" edge="1" parent="1" source="actor_patient" style="edgeStyle=none;html=1;endArrow=none;endFill=0;" target="uc_lookup">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_pat_book" edge="1" parent="1" source="actor_patient" style="edgeStyle=none;html=1;endArrow=none;endFill=0;" target="uc_booking">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_pat_res" edge="1" parent="1" source="actor_patient" style="edgeStyle=none;html=1;endArrow=none;endFill=0;" target="uc_result">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_pat_rev" edge="1" parent="1" source="actor_patient" style="edgeStyle=none;html=1;endArrow=none;endFill=0;" target="uc_review">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="190" y="370" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_sys_pay" edge="1" parent="1" source="uc_payment" style="edgeStyle=none;html=1;endArrow=none;endFill=0;entryX=0;entryY=0.3333333333333333;entryDx=0;entryDy=0;entryPerimeter=0;" target="actor_payment">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="860" y="220" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_sys_email" edge="1" parent="1" source="uc_email" style="edgeStyle=none;html=1;endArrow=none;endFill=0;entryX=0;entryY=0.3333333333333333;entryDx=0;entryDy=0;entryPerimeter=0;" target="actor_email">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="840" y="360" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="inc_symp" edge="1" parent="1" source="uc_booking" style="edgeStyle=none;html=1;endArrow=open;endFill=0;dashed=1;" target="uc_symptoms">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lbl_inc_symp" connectable="0" parent="inc_symp" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;" vertex="1">
+          <mxGeometry relative="1" x="-0.2" y="2" as="geometry" />
+        </mxCell>
+        <mxCell id="inc_pay" edge="1" parent="1" source="uc_booking" style="edgeStyle=none;html=1;endArrow=open;endFill=0;dashed=1;" target="uc_payment">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lbl_inc_pay" connectable="0" parent="inc_pay" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;" vertex="1">
+          <mxGeometry relative="1" x="-0.2" y="2" as="geometry" />
+        </mxCell>
+        <mxCell id="ext_email" edge="1" parent="1" source="uc_email" style="edgeStyle=none;html=1;endArrow=open;endFill=0;dashed=1;" target="uc_booking">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lbl_ext_email" connectable="0" parent="ext_email" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="&amp;lt;&amp;lt;extend&amp;gt;&amp;gt;" vertex="1">
+          <mxGeometry relative="1" x="-0.2" y="2" as="geometry" />
+        </mxCell>
+        <mxCell id="ext_print" edge="1" parent="1" source="uc_print_ticket" style="edgeStyle=none;html=1;endArrow=open;endFill=0;dashed=1;" target="uc_booking">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lbl_ext_print" connectable="0" parent="ext_print" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="&amp;lt;&amp;lt;extend&amp;gt;&amp;gt;" vertex="1">
+          <mxGeometry relative="1" x="-0.2" y="2" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_doc_manage" edge="1" parent="1" source="actor_doctor" style="edgeStyle=none;html=1;endArrow=none;endFill=0;" target="uc_doc_manage">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="180" y="560" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_doc_sched" edge="1" parent="1" source="actor_doctor" style="edgeStyle=none;html=1;endArrow=none;endFill=0;" target="uc_doc_schedule">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="190" y="630" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_doc_rec" edge="1" parent="1" source="actor_doctor" style="edgeStyle=none;html=1;endArrow=none;endFill=0;" target="uc_doc_record">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_doc_hist" edge="1" parent="1" source="actor_doctor" style="edgeStyle=none;html=1;endArrow=none;endFill=0;" target="uc_doc_history">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_doc_prof" edge="1" parent="1" source="actor_doctor" style="edgeStyle=none;html=1;endArrow=none;endFill=0;" target="uc_doc_profile">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="160" y="810" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="inc_doc_log1" edge="1" parent="1" source="uc_doc_manage" style="edgeStyle=none;html=1;endArrow=open;endFill=0;dashed=1;" target="uc_doc_login">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lbl_inc_doc_log1" connectable="0" parent="inc_doc_log1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;" vertex="1">
+          <mxGeometry relative="1" x="-0.2" y="2" as="geometry" />
+        </mxCell>
+        <mxCell id="inc_doc_log4" edge="1" parent="1" source="uc_doc_schedule" style="edgeStyle=none;html=1;endArrow=open;endFill=0;dashed=1;" target="uc_doc_login">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lbl_inc_doc_log4" connectable="0" parent="inc_doc_log4" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;" vertex="1">
+          <mxGeometry relative="1" x="-0.2" y="2" as="geometry" />
+        </mxCell>
+        <mxCell id="inc_doc_log2" edge="1" parent="1" source="uc_doc_profile" style="edgeStyle=none;html=1;endArrow=open;endFill=0;dashed=1;" target="uc_doc_login">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="520" y="780" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="lbl_inc_doc_log2" connectable="0" parent="inc_doc_log2" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;" vertex="1">
+          <mxGeometry relative="1" x="-0.2" y="2" as="geometry" />
+        </mxCell>
+        <mxCell id="inc_doc_log3" edge="1" parent="1" source="uc_doc_record" style="edgeStyle=none;html=1;endArrow=open;endFill=0;dashed=1;" target="uc_doc_login">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lbl_inc_doc_log3" connectable="0" parent="inc_doc_log3" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;" vertex="1">
+          <mxGeometry relative="1" x="-0.2" y="2" as="geometry" />
+        </mxCell>
+        <mxCell id="inc_doc_log5" edge="1" parent="1" source="uc_doc_history" style="edgeStyle=none;html=1;endArrow=open;endFill=0;dashed=1;" target="uc_doc_login">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="490" y="700" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="lbl_inc_doc_log5" connectable="0" parent="inc_doc_log5" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;" vertex="1">
+          <mxGeometry relative="1" x="-0.2" y="2" as="geometry" />
+        </mxCell>
+        <mxCell id="inc_doc_print" edge="1" parent="1" source="uc_doc_record" style="edgeStyle=none;html=1;endArrow=open;endFill=0;dashed=1;" target="uc_doc_print">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="470" y="750" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="lbl_inc_doc_print" connectable="0" parent="inc_doc_print" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;" vertex="1">
+          <mxGeometry relative="1" x="-0.2" y="2" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_adm_chart" edge="1" parent="1" source="actor_admin" style="edgeStyle=none;html=1;endArrow=none;endFill=0;" target="uc_admin_chart">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="170" y="990" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_adm_acc" edge="1" parent="1" source="actor_admin" style="edgeStyle=none;html=1;endArrow=none;endFill=0;" target="uc_admin_acc">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="190" y="1030" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_adm_core" edge="1" parent="1" source="actor_admin" style="edgeStyle=none;html=1;endArrow=none;endFill=0;" target="uc_admin_core">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_adm_app" edge="1" parent="1" source="actor_admin" style="edgeStyle=none;html=1;endArrow=none;endFill=0;" target="uc_admin_app">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="190" y="1140" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_adm_config" edge="1" parent="1" source="actor_admin" style="edgeStyle=none;html=1;endArrow=none;endFill=0;" target="uc_admin_config">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="170" y="1190" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="inc_adm_log1" edge="1" parent="1" source="uc_admin_chart" style="edgeStyle=none;html=1;endArrow=open;endFill=0;dashed=1;" target="uc_admin_login">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lbl_inc_adm_log1" connectable="0" parent="inc_adm_log1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;" vertex="1">
+          <mxGeometry relative="1" x="-0.2" y="2" as="geometry" />
+        </mxCell>
+        <mxCell id="inc_adm_log2" edge="1" parent="1" source="uc_admin_acc" style="edgeStyle=none;html=1;endArrow=open;endFill=0;dashed=1;" target="uc_admin_login">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lbl_inc_adm_log2" connectable="0" parent="inc_adm_log2" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;" vertex="1">
+          <mxGeometry relative="1" x="-0.2" y="2" as="geometry" />
+        </mxCell>
+        <mxCell id="inc_adm_log3" edge="1" parent="1" source="uc_admin_core" style="edgeStyle=none;html=1;endArrow=open;endFill=0;dashed=1;" target="uc_admin_login">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lbl_inc_adm_log3" connectable="0" parent="inc_adm_log3" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;" vertex="1">
+          <mxGeometry relative="1" x="-0.2" y="2" as="geometry" />
+        </mxCell>
+        <mxCell id="inc_adm_log4" edge="1" parent="1" source="uc_admin_app" style="edgeStyle=none;html=1;endArrow=open;endFill=0;dashed=1;" target="uc_admin_login">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lbl_inc_adm_log4" connectable="0" parent="inc_adm_log4" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;" vertex="1">
+          <mxGeometry relative="1" x="-0.2" y="2" as="geometry" />
+        </mxCell>
+        <mxCell id="inc_adm_log5" edge="1" parent="1" source="uc_admin_config" style="edgeStyle=none;html=1;endArrow=open;endFill=0;dashed=1;" target="uc_admin_login">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lbl_inc_adm_log5" connectable="0" parent="inc_adm_log5" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;" vertex="1">
+          <mxGeometry relative="1" x="-0.2" y="2" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

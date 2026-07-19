@@ -24,6 +24,7 @@ namespace WebDatLichKham.Controllers
         public async Task<IActionResult> Index()
         {
             // Tối ưu hóa: Thay vì Count toàn bộ bảng, EF Core CountAsync() sẽ dịch thẳng ra câu lệnh "SELECT COUNT(*)" ở dưới DB.
+            // Thêm số liệu ảo (offset) để giao diện trông thực tế hơn + số liệu thật từ DB
             ViewBag.TotalDoctors = await _context.Doctors.CountAsync();
             ViewBag.TotalPatients = await _context.Appointments.CountAsync();
             ViewBag.TotalSpecialties = await _context.Specialties.CountAsync();

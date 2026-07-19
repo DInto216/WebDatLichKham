@@ -272,8 +272,8 @@ namespace WebDatLichKham.Controllers
                 setting.AdditionalConfigJson = configElement.ValueKind == JsonValueKind.Null ? null : configElement.GetString();
             }
 
-            // [VALIDATION BẮT BUỘC]: Nếu kích hoạt (isActive = true) thì cấu hình không được phép trống
-            if (setting.IsActive)
+            // [VALIDATION BẮT BUỘC]: Nếu kích hoạt (isActive = true) thì cấu hình không được phép trống (Trừ tiền mặt)
+            if (setting.IsActive && setting.MethodCode != "cash")
             {
                 if (string.IsNullOrWhiteSpace(setting.AdditionalConfigJson))
                 {

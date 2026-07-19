@@ -33,7 +33,10 @@ namespace WebDatLichKham.Services
             var cacheKey = CacheKeyPrefix + "All";
             if (!_cache.TryGetValue(cacheKey, out IEnumerable<Doctor> doctors))
             {
-                doctors = await _context.Doctors.AsNoTracking().ToListAsync();
+                doctors = await _context.Doctors
+                    .Include(d => d.Specialty)
+                    .AsNoTracking()
+                    .ToListAsync();
                 var cacheOptions = new MemoryCacheEntryOptions()
                     .SetAbsoluteExpiration(TimeSpan.FromMinutes(15));
                 _ = _cache.Set(cacheKey, doctors, cacheOptions);
@@ -46,7 +49,10 @@ namespace WebDatLichKham.Services
             var cacheKey = CacheKeyPrefix + id;
             if (!_cache.TryGetValue(cacheKey, out Doctor doctor))
             {
-                doctor = await _context.Doctors.AsNoTracking().FirstOrDefaultAsync(d => d.Id == id);
+                doctor = await _context.Doctors
+                    .Include(d => d.Specialty)
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(d => d.Id == id);
                 if (doctor != null)
                 {
                     var cacheOptions = new MemoryCacheEntryOptions()
@@ -99,6 +105,7 @@ namespace WebDatLichKham.Services
             if (data.TryGetProperty("name", out var nameProp)) doctor.Name = nameProp.GetString() ?? doctor.Name;
             if (data.TryGetProperty("avatar", out var avatarProp)) doctor.Avatar = avatarProp.GetString() ?? doctor.Avatar;
             if (data.TryGetProperty("bio", out var bioProp)) doctor.Bio = bioProp.GetString() ?? doctor.Bio;
+            if (data.TryGetProperty("academicTitle", out var acadProp)) doctor.AcademicTitle = acadProp.GetString() ?? doctor.AcademicTitle;
             if (data.TryGetProperty("degree", out var degreeProp)) doctor.Degree = degreeProp.GetString() ?? doctor.Degree;
 
             if (data.TryGetProperty("price", out var priceProp) && priceProp.TryGetDecimal(out var price))

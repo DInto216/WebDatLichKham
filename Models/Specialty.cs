@@ -15,5 +15,8 @@ namespace WebDatLichKham.Models
         public string Description { get; set; } = string.Empty;
 
         public int DoctorCount { get; set; }
+
+        [System.Text.Json.Serialization.JsonIgnore]
+        public virtual ICollection<Doctor> Doctors { get; set; } = new List<Doctor>();
     }
 }

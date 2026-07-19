@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2024-01-01T00:00:00.000Z" agent="Mozilla/5.0" version="21.0.0" type="device">
+  <diagram id="erd_diagram_style2" name="ERD">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Account -->
+        <mxCell id="t_account" value="Account" style="swimlane;whiteSpace=wrap;html=1;align=center;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="50" y="50" width="180" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="t_account_attrs" value="- Id (PK)&lt;br&gt;- Username&lt;br&gt;- Password&lt;br&gt;- Role&lt;br&gt;- DoctorId (FK)&lt;br&gt;- Name&lt;br&gt;- Avatar&lt;br&gt;- CreatedAt" style="text;html=1;align=left;verticalAlign=top;spacingLeft=10;spacingTop=5;" vertex="1" parent="t_account">
+          <mxGeometry y="26" width="180" height="154" as="geometry" />
+        </mxCell>
+
+        <!-- Doctor -->
+        <mxCell id="t_doctor" value="Doctor" style="swimlane;whiteSpace=wrap;html=1;align=center;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="450" y="50" width="200" height="260" as="geometry" />
+        </mxCell>
+        <mxCell id="t_doctor_attrs" value="- Id (PK)&lt;br&gt;- SpecialtyId (FK)&lt;br&gt;- Name&lt;br&gt;- AcademicTitle&lt;br&gt;- Degree&lt;br&gt;- Price&lt;br&gt;- Rating&lt;br&gt;- Reviews&lt;br&gt;- Email&lt;br&gt;- Phone&lt;br&gt;- Experience&lt;br&gt;- Avatar&lt;br&gt;- Bio&lt;br&gt;- ScheduleJson" style="text;html=1;align=left;verticalAlign=top;spacingLeft=10;spacingTop=5;" vertex="1" parent="t_doctor">
+          <mxGeometry y="26" width="200" height="234" as="geometry" />
+        </mxCell>
+
+        <!-- Specialty -->
+        <mxCell id="t_specialty" value="Specialty" style="swimlane;whiteSpace=wrap;html=1;align=center;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="850" y="50" width="180" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="t_specialty_attrs" value="- Id (PK)&lt;br&gt;- Name&lt;br&gt;- Icon&lt;br&gt;- Description&lt;br&gt;- DoctorCount" style="text;html=1;align=left;verticalAlign=top;spacingLeft=10;spacingTop=5;" vertex="1" parent="t_specialty">
+          <mxGeometry y="26" width="180" height="104" as="geometry" />
+        </mxCell>
+
+        <!-- DoctorReview -->
+        <mxCell id="t_doctorreview" value="DoctorReview" style="swimlane;whiteSpace=wrap;html=1;align=center;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="850" y="250" width="180" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="t_doctorreview_attrs" value="- Id (PK)&lt;br&gt;- DoctorId (FK)&lt;br&gt;- DoctorName&lt;br&gt;- PatientName&lt;br&gt;- Rating&lt;br&gt;- Date&lt;br&gt;- Comment&lt;br&gt;- Specialty" style="text;html=1;align=left;verticalAlign=top;spacingLeft=10;spacingTop=5;" vertex="1" parent="t_doctorreview">
+          <mxGeometry y="26" width="180" height="134" as="geometry" />
+        </mxCell>
+
+        <!-- Appointment -->
+        <mxCell id="t_appointment" value="Appointment" style="swimlane;whiteSpace=wrap;html=1;align=center;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="450" y="400" width="200" height="310" as="geometry" />
+        </mxCell>
+        <mxCell id="t_appointment_attrs" value="- Id (PK)&lt;br&gt;- DoctorId (FK)&lt;br&gt;- BookingId&lt;br&gt;- PatientName&lt;br&gt;- Phone&lt;br&gt;- Email&lt;br&gt;- Gender&lt;br&gt;- BirthYear&lt;br&gt;- Reason&lt;br&gt;- Date / Time&lt;br&gt;- Status&lt;br&gt;- PaymentMethod&lt;br&gt;- PaymentStatus&lt;br&gt;- PaymentAmount&lt;br&gt;- PaidAt&lt;br&gt;- CreatedAt" style="text;html=1;align=left;verticalAlign=top;spacingLeft=10;spacingTop=5;" vertex="1" parent="t_appointment">
+          <mxGeometry y="26" width="200" height="284" as="geometry" />
+        </mxCell>
+
+        <!-- PaymentSetting -->
+        <mxCell id="t_payment" value="PaymentSetting" style="swimlane;whiteSpace=wrap;html=1;align=center;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="50" y="400" width="200" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="t_payment_attrs" value="- Id (PK)&lt;br&gt;- MethodCode&lt;br&gt;- DisplayName&lt;br&gt;- IsActive&lt;br&gt;- Icon&lt;br&gt;- AdditionalConfigJson&lt;br&gt;- UpdatedAt" style="text;html=1;align=left;verticalAlign=top;spacingLeft=10;spacingTop=5;" vertex="1" parent="t_payment">
+          <mxGeometry y="26" width="200" height="124" as="geometry" />
+        </mxCell>
+
+        <!-- MedicalHistory -->
+        <mxCell id="t_history" value="MedicalHistory" style="swimlane;whiteSpace=wrap;html=1;align=center;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="450" y="780" width="220" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="t_history_attrs" value="- MaLichSu (PK)&lt;br&gt;- BookingId (FK)&lt;br&gt;- SoDienThoai&lt;br&gt;- MaBenhAn&lt;br&gt;- PatientName&lt;br&gt;- DoctorName&lt;br&gt;- Specialty&lt;br&gt;- Symptoms&lt;br&gt;- Diagnosis&lt;br&gt;- Prescription&lt;br&gt;- VisitDate&lt;br&gt;- Notes&lt;br&gt;- PrescriptionItemsJson" style="text;html=1;align=left;verticalAlign=top;spacingLeft=10;spacingTop=5;" vertex="1" parent="t_history">
+          <mxGeometry y="26" width="220" height="214" as="geometry" />
+        </mxCell>
+
+        <!-- Medicine -->
+        <mxCell id="t_medicine" value="Medicine" style="swimlane;whiteSpace=wrap;html=1;align=center;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="850" y="780" width="180" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="t_medicine_attrs" value="- Id (PK)&lt;br&gt;- Name&lt;br&gt;- Ingredients&lt;br&gt;- Unit&lt;br&gt;- ExpiryDate" style="text;html=1;align=left;verticalAlign=top;spacingLeft=10;spacingTop=5;" vertex="1" parent="t_medicine">
+          <mxGeometry y="26" width="180" height="94" as="geometry" />
+        </mxCell>
+
+        <!-- Diamonds -->
+        <mxCell id="d_1" value="là" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="290" y="100" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="d_2" value="thuộc" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="700" y="100" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="d_3" value="nhận" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="700" y="270" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="d_4" value="có" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="510" y="335" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="d_5" value="áp dụng" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="300" y="450" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="d_6" value="tạo ra" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="510" y="725" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="d_7" value="gồm" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="730" y="820" width="80" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Edges -->
+        <mxCell id="e_1a" value="" style="endArrow=none;html=1;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="t_account" target="d_1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e_1b" value="" style="endArrow=none;html=1;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="d_1" target="t_doctor"><mxGeometry relative="1" as="geometry" /></mxCell>
+        
+        <mxCell id="e_2a" value="" style="endArrow=none;html=1;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="t_specialty" target="d_2"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e_2b" value="" style="endArrow=none;html=1;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="d_2" target="t_doctor"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <mxCell id="e_3a" value="" style="endArrow=none;html=1;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="t_doctor" target="d_3"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e_3b" value="" style="endArrow=none;html=1;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="d_3" target="t_doctorreview"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <mxCell id="e_4a" value="" style="endArrow=none;html=1;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="t_doctor" target="d_4"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e_4b" value="" style="endArrow=none;html=1;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="d_4" target="t_appointment"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <mxCell id="e_5a" value="" style="endArrow=none;html=1;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="t_appointment" target="d_5"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e_5b" value="" style="endArrow=none;html=1;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="d_5" target="t_payment"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <mxCell id="e_6a" value="" style="endArrow=none;html=1;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="t_appointment" target="d_6"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e_6b" value="" style="endArrow=none;html=1;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="d_6" target="t_history"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <mxCell id="e_7a" value="" style="end,Arrow=none;html=1;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="t_history" target="d_7"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e_7b" value="" style="endArrow=none;html=1;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="d_7" target="t_medicine"><mxGeometry relative="1" as="geometry" /></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

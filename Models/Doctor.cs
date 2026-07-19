@@ -11,10 +11,17 @@ namespace WebDatLichKham.Models
         [Required]
         public string Name { get; set; } = string.Empty;
 
+        // Học hàm (Ví dụ: GS, PGS). Đảm bảo không bị null.
+        public string AcademicTitle { get; set; } = string.Empty;
+
+        // Học vị (Ví dụ: ThS, TS, BS, BSCKI, BSCKII).
         public string Degree { get; set; } = string.Empty;
 
         [Required]
         public string SpecialtyId { get; set; } = string.Empty;
+
+        [ForeignKey("SpecialtyId")]
+        public virtual Specialty? Specialty { get; set; }
 
         public string SpecialtyName { get; set; } = string.Empty;
 

@@ -299,6 +299,9 @@ namespace WebDatLichKham.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("AcademicTitle")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Avatar")
                         .HasColumnType("nvarchar(max)");
 
@@ -335,12 +338,14 @@ namespace WebDatLichKham.Migrations
 
                     b.Property<string>("SpecialtyId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("SpecialtyName")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("SpecialtyId");
 
                     b.ToTable("Doctors");
 
@@ -348,9 +353,10 @@ namespace WebDatLichKham.Migrations
                         new
                         {
                             Id = "doc_01",
+                            AcademicTitle = "PGS",
                             Avatar = "",
                             Bio = "Hơn 15 năm kinh nghiệm trong lĩnh vực Nội khoa tổng quát",
-                            Degree = "PGS.TS",
+                            Degree = "TS",
                             Email = "",
                             Experience = "",
                             Name = "BS. Nguyễn Văn An",
@@ -365,9 +371,10 @@ namespace WebDatLichKham.Migrations
                         new
                         {
                             Id = "doc_02",
+                            AcademicTitle = "",
                             Avatar = "",
                             Bio = "20 năm kinh nghiệm chuyên khoa Nhi, từng tu nghiệp tại Nhật Bản",
-                            Degree = "TS.BS",
+                            Degree = "TS",
                             Email = "",
                             Experience = "",
                             Name = "BS. Trần Thị Bích",
@@ -382,9 +389,10 @@ namespace WebDatLichKham.Migrations
                         new
                         {
                             Id = "doc_03",
+                            AcademicTitle = "",
                             Avatar = "",
                             Bio = "Chuyên gia tim mạch can thiệp, tốt nghiệp ĐH Y Hà Nội",
-                            Degree = "ThS.BS",
+                            Degree = "ThS",
                             Email = "",
                             Experience = "",
                             Name = "BS. Lê Minh Tuấn",
@@ -399,9 +407,10 @@ namespace WebDatLichKham.Migrations
                         new
                         {
                             Id = "doc_04",
+                            AcademicTitle = "",
                             Avatar = "",
                             Bio = "Chuyên gia Da liễu thẩm mỹ, nhiều năm kinh nghiệm",
-                            Degree = "BS.CKI",
+                            Degree = "CKI",
                             Email = "",
                             Experience = "",
                             Name = "BS. Phạm Hồng Nhung",
@@ -416,9 +425,10 @@ namespace WebDatLichKham.Migrations
                         new
                         {
                             Id = "doc_05",
+                            AcademicTitle = "PGS",
                             Avatar = "",
                             Bio = "Phó Giáo sư chuyên ngành Tai Mũi Họng",
-                            Degree = "PGS.TS",
+                            Degree = "TS",
                             Email = "",
                             Experience = "",
                             Name = "BS. Võ Thanh Hùng",
@@ -433,9 +443,10 @@ namespace WebDatLichKham.Migrations
                         new
                         {
                             Id = "doc_06",
+                            AcademicTitle = "",
                             Avatar = "",
                             Bio = "Tiến sĩ chuyên ngành Sản phụ khoa, BV Từ Dũ",
-                            Degree = "TS.BS",
+                            Degree = "TS",
                             Email = "",
                             Experience = "",
                             Name = "BS. Đặng Thị Mai",
@@ -994,6 +1005,22 @@ namespace WebDatLichKham.Migrations
                             Icon = "🤰",
                             Name = "Sản phụ khoa"
                         });
+                });
+
+            modelBuilder.Entity("WebDatLichKham.Models.Doctor", b =>
+                {
+                    b.HasOne("WebDatLichKham.Models.Specialty", "Specialty")
+                        .WithMany("Doctors")
+                        .HasForeignKey("SpecialtyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Specialty");
+                });
+
+            modelBuilder.Entity("WebDatLichKham.Models.Specialty", b =>
+                {
+                    b.Navigation("Doctors");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,0 +1,55 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0">
+  <diagram id="luong2" name="Luồng 2 - Thanh toán">
+    <mxGraphModel dx="1084" dy="563" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="f2_start" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="Nhận IPN/Callback&amp;#10;Thanh toán" vertex="1">
+          <mxGeometry height="50" width="140" x="340" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="f2_update" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="Cập nhật trạng thái&amp;#10;&amp;quot;Đã thanh toán&amp;quot;" vertex="1">
+          <mxGeometry height="50" width="140" x="340" y="140" as="geometry" />
+        </mxCell>
+        <mxCell id="f2_fork" parent="1" style="rhombus;whiteSpace=wrap;html=1;" value="" vertex="1">
+          <mxGeometry height="20" width="20" x="400" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="f2_bg" parent="1" style="shape=process;whiteSpace=wrap;html=1;" value="Background Task:&amp;#10;Gửi Email (MailKit)" vertex="1">
+          <mxGeometry height="50" width="140" x="190" y="280" as="geometry" />
+        </mxCell>
+        <mxCell id="f2_ui" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="Hiển thị UI&amp;#10;&amp;quot;Đặt lịch thành công&amp;quot;" vertex="1">
+          <mxGeometry height="50" width="140" x="490" y="280" as="geometry" />
+        </mxCell>
+        <mxCell id="f2_print" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="Nhấn nút &amp;quot;In phiếu hẹn&amp;quot;" vertex="1">
+          <mxGeometry height="50" width="140" x="490" y="370" as="geometry" />
+        </mxCell>
+        <mxCell id="f2_css" parent="1" style="shape=document;whiteSpace=wrap;html=1;" value="CSS @media print&amp;#10;(Ẩn Navbar/Footer)" vertex="1">
+          <mxGeometry height="60" width="140" x="490" y="460" as="geometry" />
+        </mxCell>
+        <mxCell id="f2_end" parent="1" style="ellipse;whiteSpace=wrap;html=1;" value="Phiếu hẹn giấy&amp;#10;chuẩn quy cách" vertex="1">
+          <mxGeometry height="50" width="140" x="490" y="550" as="geometry" />
+        </mxCell>
+        <mxCell id="e2_1" edge="1" parent="1" source="f2_start" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="f2_update" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2_2" edge="1" parent="1" source="f2_update" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="f2_fork" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2_3" edge="1" parent="1" source="f2_fork" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="f2_bg" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2_4" edge="1" parent="1" source="f2_fork" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="f2_ui" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2_5" edge="1" parent="1" source="f2_ui" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="f2_print" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2_6" edge="1" parent="1" source="f2_print" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="f2_css" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2_7" edge="1" parent="1" source="f2_css" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="f2_end" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

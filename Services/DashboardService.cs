@@ -57,14 +57,15 @@ namespace WebDatLichKham.Services
                     monthlyData.Add(new { label, appointments = monthAppts, revenue = monthRevenue });
                 }
 
-                // TỐI ƯU HÓA: Dùng AsNoTracking() trên Dashboard vì đây chỉ là màn hình hiển thị, không có logic cập nhật.
-                var specialties = await _context.Specialties.AsNoTracking().Take(6).ToListAsync();
-                var specialtyStats = new List<object>();
-                foreach (var s in specialties)
-                {
-                    var count = await _context.Appointments.CountAsync(a => a.Specialty == s.Name);
-                    specialtyStats.Add(new { name = s.Name, count });
-                }
+                var rawStats = await _context.Appointments
+                    .Where(a => !string.IsNullOrEmpty(a.Specialty))
+                    .GroupBy(a => a.Specialty)
+                    .Select(g => new { name = g.Key, count = g.Count() })
+                    .OrderByDescending(x => x.count)
+                    .Take(6)
+                    .ToListAsync();
+                
+                var specialtyStats = rawStats.Cast<object>().ToList();
 
                 var globalAvgPrice = await _context.Doctors.AverageAsync(d2 => (decimal?)d2.Price) ?? 350000;
 

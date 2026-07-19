@@ -375,7 +375,7 @@
                 </div>
                 <div class="doctor-info">
                   <div class="doctor-specialty"><i class="bi bi-patch-check-fill"></i> ${doc.specialtyName}</div>
-                  <h5 class="doctor-name">${doc.degree} ${doc.name}</h5>
+                  <h5 class="doctor-name">${doc.academicTitle ? doc.academicTitle + ' ' : ''}${doc.degree ? doc.degree + ' ' : ''}${doc.name}</h5>
                   <p style="font-size:var(--text-sm);color:var(--text-tertiary);margin-bottom:12px;">${doc.bio}</p>
                   <div class="doctor-meta">
                     <span class="doctor-price">${App.formatCurrency(doc.price)}</span>
@@ -405,7 +405,7 @@
       const loadMoreBtn = document.getElementById('loadMoreDoctorsBtn');
       if (loadMoreBtn) {
         loadMoreBtn.addEventListener('click', () => {
-          visibleCount = allDoctors.length;
+          visibleCount += 6;
           renderDoctors(visibleCount);
         });
       }

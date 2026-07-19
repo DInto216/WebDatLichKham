@@ -55,7 +55,8 @@ namespace WebDatLichKham.Data
                 {
                     Id = "doc_01",
                     Name = "BS. Nguyễn Văn An",
-                    Degree = "PGS.TS",
+                    AcademicTitle = "PGS",
+                    Degree = "TS",
                     SpecialtyId = "sp_01",
                     SpecialtyName = "Nội tổng quát",
                     Price = 350000,
@@ -69,7 +70,8 @@ namespace WebDatLichKham.Data
                 {
                     Id = "doc_02",
                     Name = "BS. Trần Thị Bích",
-                    Degree = "TS.BS",
+                    AcademicTitle = "",
+                    Degree = "TS",
                     SpecialtyId = "sp_02",
                     SpecialtyName = "Nhi khoa",
                     Price = 400000,
@@ -83,7 +85,8 @@ namespace WebDatLichKham.Data
                 {
                     Id = "doc_03",
                     Name = "BS. Lê Minh Tuấn",
-                    Degree = "ThS.BS",
+                    AcademicTitle = "",
+                    Degree = "ThS",
                     SpecialtyId = "sp_03",
                     SpecialtyName = "Tim mạch",
                     Price = 500000,
@@ -97,7 +100,8 @@ namespace WebDatLichKham.Data
                 {
                     Id = "doc_04",
                     Name = "BS. Phạm Hồng Nhung",
-                    Degree = "BS.CKI",
+                    AcademicTitle = "",
+                    Degree = "CKI",
                     SpecialtyId = "sp_04",
                     SpecialtyName = "Da liễu",
                     Price = 300000,
@@ -111,7 +115,8 @@ namespace WebDatLichKham.Data
                 {
                     Id = "doc_05",
                     Name = "BS. Võ Thanh Hùng",
-                    Degree = "PGS.TS",
+                    AcademicTitle = "PGS",
+                    Degree = "TS",
                     SpecialtyId = "sp_05",
                     SpecialtyName = "Tai Mũi Họng",
                     Price = 350000,
@@ -125,7 +130,8 @@ namespace WebDatLichKham.Data
                 {
                     Id = "doc_06",
                     Name = "BS. Đặng Thị Mai",
-                    Degree = "TS.BS",
+                    AcademicTitle = "",
+                    Degree = "TS",
                     SpecialtyId = "sp_10",
                     SpecialtyName = "Sản phụ khoa",
                     Price = 450000,

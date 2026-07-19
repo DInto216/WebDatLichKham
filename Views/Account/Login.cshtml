@@ -27,15 +27,15 @@
         <p>Đăng nhập để quản lý lịch hẹn, theo dõi bệnh nhân và nhiều hơn nữa.</p>
         <div style="display:flex;gap:16px;justify-content:center;margin-top:32px;">
           <div style="background:rgba(255,255,255,0.1);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.15);border-radius:var(--radius-md);padding:16px 20px;text-align:center;">
-            <div class="stat-number" data-count="50" style="font-size:24px;font-weight:800;color:white;">50+</div>
+            <div class="stat-number" data-count="@ViewBag.DoctorCount" style="font-size:24px;font-weight:800;color:white;">@ViewBag.DoctorCount+</div>
             <div style="font-size:12px;color:rgba(255,255,255,0.6);">Bác sĩ</div>
           </div>
           <div style="background:rgba(255,255,255,0.1);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.15);border-radius:var(--radius-md);padding:16px 20px;text-align:center;">
-            <div class="stat-number" data-count="10" style="font-size:24px;font-weight:800;color:white;">10k+</div>
+            <div class="stat-number" data-count="@ViewBag.AppointmentCount" style="font-size:24px;font-weight:800;color:white;">@ViewBag.AppointmentCount+</div>
             <div style="font-size:12px;color:rgba(255,255,255,0.6);">Lượt khám</div>
           </div>
           <div style="background:rgba(255,255,255,0.1);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.15);border-radius:var(--radius-md);padding:16px 20px;text-align:center;">
-            <div class="stat-number" data-count="15" style="font-size:24px;font-weight:800;color:white;">15+</div>
+            <div class="stat-number" data-count="@ViewBag.SpecialtyCount" style="font-size:24px;font-weight:800;color:white;">@ViewBag.SpecialtyCount+</div>
             <div style="font-size:12px;color:rgba(255,255,255,0.6);">Chuyên khoa</div>
           </div>
         </div>
