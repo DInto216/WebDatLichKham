@@ -140,6 +140,96 @@ namespace WebDatLichKham.Data
                     Avatar = "",
                     Bio = "Tiến sĩ chuyên ngành Sản phụ khoa, BV Từ Dũ",
                     ScheduleJson = "{\"monday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\",\"14:00\",\"14:30\"],\"tuesday\":[\"08:00\",\"08:30\",\"09:00\"],\"wednesday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\",\"10:00\",\"14:00\",\"14:30\",\"15:00\"],\"thursday\":[\"08:00\",\"08:30\",\"09:00\"],\"friday\":[\"14:00\",\"14:30\",\"15:00\",\"15:30\"],\"saturday\":[\"08:00\",\"08:30\",\"09:00\"],\"sunday\":[]}"
+                },
+                new Doctor
+                {
+                    Id = "doc_07",
+                    Name = "BS. Hoàng Minh Đức",
+                    AcademicTitle = "ThS",
+                    Degree = "BSCKII",
+                    SpecialtyId = "sp_06",
+                    SpecialtyName = "Mắt",
+                    Price = 350000,
+                    Rating = 4.9,
+                    Reviews = 142,
+                    Avatar = "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=150",
+                    Bio = "Hơn 12 năm kinh nghiệm phẫu thuật khúc xạ và điều trị các bệnh lý về Mắt, Bệnh viện Mắt Trung ương.",
+                    ScheduleJson = "{\"monday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\",\"14:00\",\"14:30\",\"15:00\"],\"tuesday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\"],\"wednesday\":[\"08:00\",\"08:30\",\"09:00\",\"14:00\",\"14:30\",\"15:00\",\"15:30\"],\"thursday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\"],\"friday\":[\"08:00\",\"08:30\",\"09:00\",\"14:00\",\"14:30\",\"15:00\"],\"saturday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\"],\"sunday\":[]}"
+                },
+                new Doctor
+                {
+                    Id = "doc_08",
+                    Name = "BS. Nguyễn Phương Thảo",
+                    AcademicTitle = "ThS",
+                    Degree = "BS",
+                    SpecialtyId = "sp_07",
+                    SpecialtyName = "Răng Hàm Mặt",
+                    Price = 300000,
+                    Rating = 4.8,
+                    Reviews = 189,
+                    Avatar = "https://images.unsplash.com/photo-1594824813589-73e4a30a84d4?w=150",
+                    Bio = "Chuyên gia nắn chỉnh răng thẩm mỹ, cấy ghép Implant và nha khoa phục hình cao cấp.",
+                    ScheduleJson = "{\"monday\":[\"08:30\",\"09:00\",\"09:30\",\"10:00\",\"14:00\",\"14:30\",\"15:00\",\"15:30\"],\"tuesday\":[\"08:30\",\"09:00\",\"09:30\",\"14:00\",\"14:30\"],\"wednesday\":[\"08:30\",\"09:00\",\"09:30\",\"10:00\",\"14:00\",\"14:30\"],\"thursday\":[\"08:30\",\"09:00\",\"09:30\",\"10:00\"],\"friday\":[\"08:30\",\"09:00\",\"09:30\",\"14:00\",\"14:30\",\"15:00\"],\"saturday\":[\"08:30\",\"09:00\",\"09:30\",\"10:00\"],\"sunday\":[]}"
+                },
+                new Doctor
+                {
+                    Id = "doc_09",
+                    Name = "BS. Vũ Tuấn Phong",
+                    AcademicTitle = "PGS",
+                    Degree = "TS",
+                    SpecialtyId = "sp_08",
+                    SpecialtyName = "Chấn thương chỉnh hình",
+                    Price = 500000,
+                    Rating = 4.9,
+                    Reviews = 205,
+                    Avatar = "https://images.unsplash.com/photo-1537368910025-700350fe46c7?w=150",
+                    Bio = "Chuyên gia đầu ngành cơ xương khớp và phẫu thuật chỉnh hình chấn thương thể thao.",
+                    ScheduleJson = "{\"monday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\",\"10:00\"],\"tuesday\":[\"14:00\",\"14:30\",\"15:00\",\"15:30\"],\"wednesday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\",\"10:00\"],\"thursday\":[\"14:00\",\"14:30\",\"15:00\"],\"friday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\",\"10:00\"],\"saturday\":[],\"sunday\":[]}"
+                },
+                new Doctor
+                {
+                    Id = "doc_10",
+                    Name = "BS. Đỗ Quang Huy",
+                    AcademicTitle = "TS",
+                    Degree = "BS",
+                    SpecialtyId = "sp_09",
+                    SpecialtyName = "Thần kinh",
+                    Price = 450000,
+                    Rating = 4.8,
+                    Reviews = 118,
+                    Avatar = "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=150",
+                    Bio = "Nhiều năm tu nghiệp tại Pháp, chuyên sâu điều trị đau nửa đầu Migraine, rối loạn tiền đình và thần kinh cơ.",
+                    ScheduleJson = "{\"monday\":[\"08:00\",\"08:30\",\"09:00\",\"14:00\",\"14:30\",\"15:00\"],\"tuesday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\"],\"wednesday\":[\"08:00\",\"08:30\",\"09:00\",\"14:00\",\"14:30\"],\"thursday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\"],\"friday\":[\"08:00\",\"08:30\",\"09:00\",\"14:00\",\"14:30\",\"15:00\"],\"saturday\":[\"08:00\",\"08:30\",\"09:00\"],\"sunday\":[]}"
+                },
+                new Doctor
+                {
+                    Id = "doc_11",
+                    Name = "BS. Bùi Khánh Linh",
+                    AcademicTitle = "ThS",
+                    Degree = "BSCKI",
+                    SpecialtyId = "sp_01",
+                    SpecialtyName = "Nội tổng quát",
+                    Price = 350000,
+                    Rating = 4.7,
+                    Reviews = 95,
+                    Avatar = "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=150",
+                    Bio = "Chuyên gia điều trị tiểu đường, tăng huyết áp và theo dõi sức khỏe nội khoa định kỳ.",
+                    ScheduleJson = "{\"monday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\",\"14:00\",\"14:30\"],\"tuesday\":[\"08:00\",\"08:30\",\"09:00\",\"14:00\",\"14:30\"],\"wednesday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\"],\"thursday\":[\"08:00\",\"08:30\",\"09:00\",\"14:00\",\"14:30\"],\"friday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\"],\"saturday\":[\"08:00\",\"08:30\",\"09:00\"],\"sunday\":[]}"
+                },
+                new Doctor
+                {
+                    Id = "doc_12",
+                    Name = "BS. Lê Thảo Trang",
+                    AcademicTitle = "",
+                    Degree = "BSCKII",
+                    SpecialtyId = "sp_02",
+                    SpecialtyName = "Nhi khoa",
+                    Price = 380000,
+                    Rating = 4.9,
+                    Reviews = 168,
+                    Avatar = "https://images.unsplash.com/photo-1594824813589-73e4a30a84d4?w=150",
+                    Bio = "Bác sĩ chuyên khoa Nhi BV Nhi Đồng, tận tâm, thấu hiểu tâm lý trẻ nhỏ và tư vấn dinh dưỡng.",
+                    ScheduleJson = "{\"monday\":[\"08:00\",\"08:30\",\"09:00\",\"14:00\",\"14:30\",\"15:00\"],\"tuesday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\",\"10:00\"],\"wednesday\":[\"08:00\",\"08:30\",\"09:00\",\"14:00\",\"14:30\"],\"thursday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\"],\"friday\":[\"08:00\",\"08:30\",\"09:00\",\"14:00\",\"14:30\"],\"saturday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\"],\"sunday\":[]}"
                 }
             );
 
@@ -148,7 +238,16 @@ namespace WebDatLichKham.Data
                 new Account { Id = "acc_admin", Username = "admin", Password = "admin123", Role = "admin", Name = "Quản trị viên", CreatedAt = new DateTime(2025, 1, 1) },
                 new Account { Id = "acc_doc01", Username = "doctor01", Password = "doctor123", Role = "doctor", DoctorId = "doc_01", Name = "BS. Nguyễn Văn An", CreatedAt = new DateTime(2025, 1, 15) },
                 new Account { Id = "acc_doc02", Username = "doctor02", Password = "doctor123", Role = "doctor", DoctorId = "doc_02", Name = "BS. Trần Thị Bích", CreatedAt = new DateTime(2025, 2, 1) },
-                new Account { Id = "acc_doc03", Username = "doctor03", Password = "doctor123", Role = "doctor", DoctorId = "doc_03", Name = "BS. Lê Minh Tuấn", CreatedAt = new DateTime(2025, 2, 10) }
+                new Account { Id = "acc_doc03", Username = "doctor03", Password = "doctor123", Role = "doctor", DoctorId = "doc_03", Name = "BS. Lê Minh Tuấn", CreatedAt = new DateTime(2025, 2, 10) },
+                new Account { Id = "acc_doc04", Username = "doctor04", Password = "doctor123", Role = "doctor", DoctorId = "doc_04", Name = "BS. Phạm Hồng Nhung", CreatedAt = new DateTime(2025, 2, 15) },
+                new Account { Id = "acc_doc05", Username = "doctor05", Password = "doctor123", Role = "doctor", DoctorId = "doc_05", Name = "BS. Võ Thanh Hùng", CreatedAt = new DateTime(2025, 2, 20) },
+                new Account { Id = "acc_doc06", Username = "doctor06", Password = "doctor123", Role = "doctor", DoctorId = "doc_06", Name = "BS. Đặng Thị Mai", CreatedAt = new DateTime(2025, 3, 1) },
+                new Account { Id = "acc_doc07", Username = "doctor07", Password = "doctor123", Role = "doctor", DoctorId = "doc_07", Name = "BS. Hoàng Minh Đức", CreatedAt = new DateTime(2025, 3, 5) },
+                new Account { Id = "acc_doc08", Username = "doctor08", Password = "doctor123", Role = "doctor", DoctorId = "doc_08", Name = "BS. Nguyễn Phương Thảo", CreatedAt = new DateTime(2025, 3, 10) },
+                new Account { Id = "acc_doc09", Username = "doctor09", Password = "doctor123", Role = "doctor", DoctorId = "doc_09", Name = "BS. Vũ Tuấn Phong", CreatedAt = new DateTime(2025, 3, 15) },
+                new Account { Id = "acc_doc10", Username = "doctor10", Password = "doctor123", Role = "doctor", DoctorId = "doc_10", Name = "BS. Đỗ Quang Huy", CreatedAt = new DateTime(2025, 3, 20) },
+                new Account { Id = "acc_doc11", Username = "doctor11", Password = "doctor123", Role = "doctor", DoctorId = "doc_11", Name = "BS. Bùi Khánh Linh", CreatedAt = new DateTime(2025, 3, 25) },
+                new Account { Id = "acc_doc12", Username = "doctor12", Password = "doctor123", Role = "doctor", DoctorId = "doc_12", Name = "BS. Lê Thảo Trang", CreatedAt = new DateTime(2025, 3, 28) }
             );
 
             // Seed Medicines
@@ -443,7 +542,11 @@ namespace WebDatLichKham.Data
                 new DoctorReview { Id = "rev_03", DoctorId = "doc_03", DoctorName = "BS. Lê Minh Tuấn", PatientName = "Trần Quyết T.", Rating = 4, Date = "2026-06-28", Comment = "Chuyên môn cao, dịch vụ tốt. Tuy nhiên lúc chờ lấy thuốc hơi lâu một chút.", Specialty = "Tim mạch" },
                 new DoctorReview { Id = "rev_04", DoctorId = "doc_04", DoctorName = "BS. Phạm Hồng Nhung", PatientName = "Phạm Thị M.", Rating = 5, Date = "2026-07-01", Comment = "Bác sĩ Nhung rất nhẹ nhàng, mát tay. Các nốt mẩn đỏ của tôi đã hết hẳn sau 1 tuần dùng thuốc.", Specialty = "Da liễu" },
                 new DoctorReview { Id = "rev_05", DoctorId = "doc_05", DoctorName = "BS. Võ Thanh Hùng", PatientName = "Vũ Đức K.", Rating = 5, Date = "2026-07-02", Comment = "Rất chuyên nghiệp, bác sĩ Hùng thao tác cực kỳ cẩn thận.", Specialty = "Tai Mũi Họng" },
-                new DoctorReview { Id = "rev_06", DoctorId = "doc_01", DoctorName = "BS. Nguyễn Văn An", PatientName = "Đinh Tuấn N.", Rating = 5, Date = "2026-07-03", Comment = "Hệ thống đặt lịch rất tiện, không phải chờ đợi. Bác sĩ siêu có tâm.", Specialty = "Nội tổng quát" }
+                new DoctorReview { Id = "rev_06", DoctorId = "doc_01", DoctorName = "BS. Nguyễn Văn An", PatientName = "Đinh Tuấn N.", Rating = 5, Date = "2026-07-03", Comment = "Hệ thống đặt lịch rất tiện, không phải chờ đợi. Bác sĩ siêu có tâm.", Specialty = "Nội tổng quát" },
+                new DoctorReview { Id = "rev_07", DoctorId = "doc_07", DoctorName = "BS. Hoàng Minh Đức", PatientName = "Hoàng Long V.", Rating = 5, Date = "2026-07-04", Comment = "Bác sĩ Đức khám mắt rất kỹ, máy móc hiện đại và tư vấn phẫu thuật khúc xạ tận tâm.", Specialty = "Mắt" },
+                new DoctorReview { Id = "rev_08", DoctorId = "doc_08", DoctorName = "BS. Nguyễn Phương Thảo", PatientName = "Ngô Mai P.", Rating = 5, Date = "2026-07-05", Comment = "Bác sĩ Thảo làm răng rất nhẹ nhàng, không đau một chút nào. 10 điểm chất lượng!", Specialty = "Răng Hàm Mặt" },
+                new DoctorReview { Id = "rev_09", DoctorId = "doc_09", DoctorName = "BS. Vũ Tuấn Phong", PatientName = "Trịnh Quốc K.", Rating = 5, Date = "2026-07-06", Comment = "Chấn thương dây chằng của tôi hồi phục rất nhanh nhờ phác đồ của PGS Phong.", Specialty = "Chấn thương chỉnh hình" },
+                new DoctorReview { Id = "rev_10", DoctorId = "doc_10", DoctorName = "BS. Đỗ Quang Huy", PatientName = "Lâm Ánh T.", Rating = 5, Date = "2026-07-07", Comment = "Bác sĩ Huy chữa đau nửa đầu tiền đình rất hiệu quả, tôi ngủ ngon hơn nhiều.", Specialty = "Thần kinh" }
             );
 
             // Seed Payment Settings
