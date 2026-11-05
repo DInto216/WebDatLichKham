@@ -20,7 +20,10 @@ builder.Services.AddAntiforgery(options => options.HeaderName = "RequestVerifica
 
 // [CLEAN CODE] TẦNG DATA ACCESS: Đăng ký DbContext với chuỗi kết nối SQL Server
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.ConfigureWarnings(w => w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
+});
 
 // [HIỆU NĂNG]: Đăng ký Memory Cache giúp tăng tốc độ truy xuất dữ liệu không thay đổi thường xuyên
 builder.Services.AddMemoryCache();
