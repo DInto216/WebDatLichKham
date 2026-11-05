@@ -1,4 +1,4 @@
-﻿@{
+@{
     Layout = "~/Views/Shared/_PublicLayout.cshtml";
     ViewBag.Title = "Đặt Lịch Khám";
     ViewBag.ActiveNav = "Booking";
@@ -195,7 +195,7 @@
               <div class="col-md-6">
                 <div class="form-medical">
                   <label class="form-label">Chuyên khoa</label>
-                  <select class="form-select" id="filterSpecialty">
+                  <select class="form-select" id="filterSpecialty" onchange="BookingWizard.filterDoctors()">
                     <option value="">Tất cả chuyên khoa</option>
                   </select>
                 </div>
@@ -431,71 +431,131 @@
       };
 
       const getDoctorPrice = (docId) => {
-        const idInt = parseInt(docId.replace(/\D/g, '') || 1);
+        const idInt = parseInt((docId || '1').replace(/\D/g, '') || 1);
         return 300000 + ((idInt % 5) * 50000);
       };
 
-      const loadSpecialties = async () => {
-        specialties = await API.getSpecialties();
+      const populateSpecialtyDropdown = () => {
         const select = document.getElementById('filterSpecialty');
-        specialties.forEach(sp => {
-          const opt = document.createElement('option');
-          opt.value = sp.name;
-          opt.textContent = `${sp.icon} ${sp.name}`;
-          select.appendChild(opt);
-        });
-        select.addEventListener('change', filterDoctors);
+        if (!select) return;
+        const currentVal = select.value;
+        select.innerHTML = '<option value="">Tất cả chuyên khoa</option>';
+
+        if (specialties && specialties.length > 0) {
+          specialties.forEach(sp => {
+            const name = sp.name || sp.Name || '';
+            const icon = sp.icon || sp.Icon || '';
+            if (!name) return;
+            const opt = document.createElement('option');
+            opt.value = name;
+            const iconDisplay = (icon && !icon.startsWith('bi-') && icon.length <= 4) ? `${icon} ` : '';
+            opt.textContent = `${iconDisplay}${name}`;
+            select.appendChild(opt);
+          });
+        } else if (doctors && doctors.length > 0) {
+          const uniqueSpecs = [...new Set(doctors.map(d => d.specialtyName || d.SpecialtyName).filter(Boolean))];
+          uniqueSpecs.forEach(name => {
+            const opt = document.createElement('option');
+            opt.value = name;
+            opt.textContent = `🩺 ${name}`;
+            select.appendChild(opt);
+          });
+        }
+
+        if (currentVal) select.value = currentVal;
+      };
+
+      const loadSpecialties = async () => {
+        try {
+          const res = await API.getSpecialties();
+          specialties = Array.isArray(res) ? res : [];
+        } catch (e) {
+          console.warn('[Booking] API.getSpecialties không phản hồi, dùng danh sách dự phòng', e);
+          specialties = [];
+        }
+        populateSpecialtyDropdown();
       };
 
       const loadDoctors = async () => {
-        doctors = await API.getDoctors();
+        try {
+          const res = await API.getDoctors();
+          doctors = Array.isArray(res) ? res : [];
+        } catch (e) {
+          console.error('[Booking] API.getDoctors không phản hồi', e);
+          doctors = [];
+        }
         filterDoctors();
+        // Nếu danh sách chuyên khoa rỗng, tạo từ doctors
+        const select = document.getElementById('filterSpecialty');
+        if (select && select.options.length <= 1) {
+          populateSpecialtyDropdown();
+        }
       };
 
       const filterDoctors = () => {
         const list = document.getElementById('doctorList');
-        const spFilter = document.getElementById('filterSpecialty').value;
-        const search = document.getElementById('searchDoctor').value.toLowerCase();
+        if (!list) return;
+        const spFilter = document.getElementById('filterSpecialty') ? document.getElementById('filterSpecialty').value : '';
+        const searchInput = document.getElementById('searchDoctor');
+        const search = searchInput ? searchInput.value.toLowerCase().trim() : '';
         
         let filtered = doctors;
-        if (spFilter) filtered = filtered.filter(d => d.specialtyName === spFilter);
-        if (search) filtered = filtered.filter(d => d.name.toLowerCase().includes(search));
+        if (spFilter) filtered = filtered.filter(d => (d.specialtyName || d.SpecialtyName) === spFilter);
+        if (search) filtered = filtered.filter(d => (d.name || d.Name || '').toLowerCase().includes(search));
 
         if (filtered.length === 0) {
             list.innerHTML = '<div class="col-12 text-center py-4 text-muted">Không tìm thấy bác sĩ phù hợp</div>';
             return;
         }
 
-        list.innerHTML = filtered.map(doc => `
+        list.innerHTML = filtered.map(doc => {
+          const docId = doc.id || doc.Id;
+          const docName = doc.name || doc.Name;
+          const docSpecialty = doc.specialtyName || doc.SpecialtyName || '';
+          const docAvatar = doc.avatar || doc.Avatar;
+          const docAcademic = doc.academicTitle || doc.AcademicTitle;
+          const docDegree = doc.degree || doc.Degree;
+          const docTitle = `${docAcademic ? docAcademic + ' ' : ''}${docDegree ? docDegree + ' ' : ''}${docName}`;
+
+          return `
           <div class="col-md-6 col-lg-4">
-            <div class="doctor-select-card ${selectedDoctor === doc.id ? 'selected' : ''}" onclick="BookingWizard.selectDoctor('${doc.id}')">
+            <div class="doctor-select-card ${selectedDoctor === docId ? 'selected' : ''}" onclick="BookingWizard.selectDoctor('${docId}')">
               <div class="d-flex gap-3 align-items-center">
                 <div class="flex-shrink-0 overflow-hidden shadow-sm" style="width:64px;height:64px;background:var(--bg-secondary);border: 2px solid white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;">
-                  ${doc.avatar ? `<img src="${doc.avatar}" style="width:100%;height:100%;object-fit:cover;">` : `👨‍⚕️`}
+                  ${docAvatar ? `<img src="${docAvatar}" style="width:100%;height:100%;object-fit:cover;">` : `👨‍⚕️`}
                 </div>
                 <div>
-                  <div style="font-size:var(--text-xs);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-tertiary);margin-bottom:4px;">${doc.specialtyName}</div>
-                  <h6 class="mb-1" style="font-size:15px;color:var(--text-primary);">${doc.academicTitle ? doc.academicTitle + ' ' : ''}${doc.degree ? doc.degree + ' ' : ''}${doc.name}</h6>
-                  <div style="font-weight:700;color:var(--primary-600);font-size:15px;margin-top:2px;">${App.formatCurrency(getDoctorPrice(doc.id))}</div>
+                  <div style="font-size:var(--text-xs);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-tertiary);margin-bottom:4px;">${docSpecialty}</div>
+                  <h6 class="mb-1" style="font-size:15px;color:var(--text-primary);">${docTitle}</h6>
+                  <div style="font-weight:700;color:var(--primary-600);font-size:15px;margin-top:2px;">${App.formatCurrency(getDoctorPrice(docId))}</div>
                 </div>
               </div>
             </div>
           </div>
-        `).join('');
+        `;
+        }).join('');
       };
 
       const selectDoctor = async (id) => {
         selectedDoctor = id;
         filterDoctors();
-        const doc = doctors.find(d => d.id === id);
+        const doc = doctors.find(d => (d.id || d.Id) === id);
+        if (!doc) return;
+
+        const docName = doc.name || doc.Name;
+        const docSpecialty = doc.specialtyName || doc.SpecialtyName || '';
+        const docAvatar = doc.avatar || doc.Avatar;
+        const docAcademic = doc.academicTitle || doc.AcademicTitle;
+        const docDegree = doc.degree || doc.Degree;
+        const docTitle = `${docAcademic ? docAcademic + ' ' : ''}${docDegree ? docDegree + ' ' : ''}${docName}`;
         
         document.getElementById('selectedDoctorInfo').innerHTML = `
           <div class="overflow-hidden shadow-sm" style="width:48px;height:48px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;">
-            ${doc.avatar ? `<img src="${doc.avatar}" style="width:100%;height:100%;object-fit:cover;">` : `👨‍⚕️`}
+            ${docAvatar ? `<img src="${docAvatar}" style="width:100%;height:100%;object-fit:cover;">` : `👨‍⚕️`}
           </div>
           <div>
-            <div class="fw-bold">${doc.academicTitle ? doc.academicTitle + ' ' : ''}${doc.degree ? doc.degree + ' ' : ''}${doc.name}</div>
-            <div class="text-tertiary" style="font-size:12px;">${doc.specialtyName}</div>
+            <div class="fw-bold">${docTitle}</div>
+            <div class="text-tertiary" style="font-size:12px;">${docSpecialty}</div>
           </div>
         `;
         
@@ -838,14 +898,19 @@
 
       const init = async () => {
         const dateInput = document.getElementById('bookingDate');
-        const today = new Date();
-        const nextMonth = new Date();
-        nextMonth.setDate(today.getDate() + 30);
-        
-        dateInput.min = today.toISOString().split('T')[0];
-        dateInput.max = nextMonth.toISOString().split('T')[0];
+        if (dateInput) {
+          const today = new Date();
+          const nextMonth = new Date();
+          nextMonth.setDate(today.getDate() + 30);
+          dateInput.min = today.toISOString().split('T')[0];
+          dateInput.max = nextMonth.toISOString().split('T')[0];
+        }
 
-        await Promise.all([loadSpecialties(), loadDoctors(), loadPaymentSettings()]);
+        try {
+          await Promise.all([loadSpecialties(), loadDoctors(), loadPaymentSettings()]);
+        } catch (err) {
+          console.error('[Booking] Init error:', err);
+        }
 
         // Tự động chọn bác sĩ hoặc chuyên khoa nếu được điều hướng từ AI Chatbot / Trang chi tiết
         const urlParams = new URLSearchParams(window.location.search);
@@ -854,17 +919,17 @@
 
         if (spParam) {
           const select = document.getElementById('filterSpecialty');
-          const matchSp = specialties.find(s => s.id === spParam || s.name.toLowerCase() === spParam.toLowerCase());
+          const matchSp = specialties.find(s => (s.id || s.Id) === spParam || (s.name || s.Name || '').toLowerCase() === spParam.toLowerCase());
           if (matchSp && select) {
-            select.value = matchSp.name;
+            select.value = matchSp.name || matchSp.Name;
             filterDoctors();
           }
         }
 
         if (docParam) {
-          const targetDoc = doctors.find(d => d.id === docParam);
+          const targetDoc = doctors.find(d => (d.id || d.Id) === docParam);
           if (targetDoc) {
-            selectDoctor(targetDoc.id);
+            selectDoctor(targetDoc.id || targetDoc.Id);
           }
         }
       };
@@ -874,7 +939,11 @@
       };
     })();
 
-    document.addEventListener('DOMContentLoaded', BookingWizard.init);
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', BookingWizard.init);
+    } else {
+      BookingWizard.init();
+    }
   </script>
 }
 

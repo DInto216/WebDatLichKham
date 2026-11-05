@@ -1,4 +1,4 @@
-﻿/* ============================================================
+/* ============================================================
    MEDIBOT AI CHATBOT - CLIENT LOGIC (Google Gemini Powered)
    ============================================================ */
 
@@ -13,15 +13,15 @@ const AiAssistant = (() => {
   let dom = {};
 
   const QUICK_QUESTIONS = [
-    { icon: '🤕', label: 'Đau nửa đầu, hoa mắt chóng mặt', query: 'Tôi bị đau nửa đầu kèm hoa mắt chóng mặt 2 ngày nay, nên khám chuyên khoa nào?' },
-    { icon: '🫁', label: 'Ho khan, rát họng, sốt nhẹ', query: 'Tôi bị ho rát họng và sốt nhẹ 38 độ, tư vấn giúp tôi chuyên khoa và bác sĩ phù hợp' },
-    { icon: '👶', label: 'Bé sốt cao và biếng ăn', query: 'Bé nhà tôi 3 tuổi bị sốt và biếng ăn quấy khóc, tôi cần đặt lịch khám bác sĩ nào?' },
-    { icon: '💔', label: 'Đau tức ngực, hồi hộp', query: 'Tôi hay bị đau tức ngực và hồi hộp khi gắng sức, tôi nên khám gì?' },
-    { icon: '🩺', label: 'Tư vấn gói khám tổng quát', query: 'Tôi muốn kiểm tra sức khỏe tổng quát định kỳ, phòng khám có những bác sĩ chuyên môn nào?' }
+    { icon: '??', label: 'Ðau n?a d?u, hoa m?t chóng m?t', query: 'Tôi b? dau n?a d?u kèm hoa m?t chóng m?t 2 ngày nay, nên khám chuyên khoa nào?' },
+    { icon: '??', label: 'Ho khan, rát h?ng, s?t nh?', query: 'Tôi b? ho rát h?ng và s?t nh? 38 d?, tu v?n giúp tôi chuyên khoa và bác si phù h?p' },
+    { icon: '??', label: 'Bé s?t cao và bi?ng an', query: 'Bé nhà tôi 3 tu?i b? s?t và bi?ng an qu?y khóc, tôi c?n d?t l?ch khám bác si nào?' },
+    { icon: '??', label: 'Ðau t?c ng?c, h?i h?p', query: 'Tôi hay b? dau t?c ng?c và h?i h?p khi g?ng s?c, tôi nên khám gì?' },
+    { icon: '??', label: 'Tu v?n gói khám t?ng quát', query: 'Tôi mu?n ki?m tra s?c kh?e t?ng quát d?nh k?, phòng khám có nh?ng bác si chuyên môn nào?' }
   ];
 
   const init = () => {
-    // Chỉ tạo nếu chưa tồn tại trên trang
+    // Ch? t?o n?u chua t?n t?i trên trang
     if (document.getElementById('aiAssistantRoot')) return;
 
     createDomStructure();
@@ -35,9 +35,9 @@ const AiAssistant = (() => {
       <!-- Floating Action Button -->
       <div class="ai-fab-container" id="aiFabContainer">
         <div class="ai-fab-tooltip" id="aiFabTooltip">
-          <span>🩺 <strong>MediBot AI</strong>: Cần tư vấn triệu chứng?</span>
+          <span>?? <strong>MediBot AI</strong>: C?n tu v?n tri?u ch?ng?</span>
         </div>
-        <button class="ai-fab-btn" id="aiFabBtn" aria-label="Mở Trợ lý AI Bác sĩ">
+        <button class="ai-fab-btn" id="aiFabBtn" aria-label="M? Tr? lý AI Bác si">
           <div class="ai-fab-pulse"></div>
           <div class="ai-fab-icon"><i class="bi bi-robot"></i></div>
           <div class="ai-fab-badge"><i class="bi bi-stars"></i> AI</div>
@@ -54,15 +54,15 @@ const AiAssistant = (() => {
               <span class="ai-online-dot"></span>
             </div>
             <div class="ai-header-text">
-              <h6>MediBot AI <span class="ai-gemini-pill" id="aiModelBadge">AI Y Tế</span></h6>
-              <p>Trợ lý Y tế & Gợi ý Đặt Lịch</p>
+              <h6>MediBot AI <span class="ai-gemini-pill" id="aiModelBadge">AI Y T?</span></h6>
+              <p>Tr? lý Y t? & G?i ý Ð?t L?ch</p>
             </div>
           </div>
           <div class="ai-header-actions">
-            <button class="ai-btn-icon" id="aiBtnReset" title="Bắt đầu hội thoại mới">
+            <button class="ai-btn-icon" id="aiBtnReset" title="B?t d?u h?i tho?i m?i">
               <i class="bi bi-arrow-clockwise"></i>
             </button>
-            <button class="ai-btn-icon" id="aiBtnClose" title="Đóng cửa sổ">
+            <button class="ai-btn-icon" id="aiBtnClose" title="Ðóng c?a s?">
               <i class="bi bi-x-lg"></i>
             </button>
           </div>
@@ -74,13 +74,13 @@ const AiAssistant = (() => {
           <div class="ai-welcome-card" id="aiWelcomeCard">
             <div class="ai-welcome-title">
               <i class="bi bi-stars text-primary"></i>
-              <span>Chào bạn, tôi là Bác sĩ Trợ lý MediBot!</span>
+              <span>Chào b?n, tôi là Bác si Tr? lý MediBot!</span>
             </div>
             <div class="ai-welcome-desc">
-              Tôi là trợ lý ảo y tế thông minh, sẵn sàng phân tích các triệu chứng ban đầu và gợi ý chuyên khoa cũng như bác sĩ phù hợp nhất trong hệ thống để bạn đặt lịch khám.
+              Tôi là tr? lý ?o y t? thông minh, s?n sàng phân tích các tri?u ch?ng ban d?u và g?i ý chuyên khoa cung nhu bác si phù h?p nh?t trong h? th?ng d? b?n d?t l?ch khám.
             </div>
             <div style="font-size:11.5px;font-weight:600;color:#64748b;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.04em;">
-              Chọn câu hỏi nhanh:
+              Ch?n câu h?i nhanh:
             </div>
             <div class="ai-suggestion-pills" id="aiQuickPills">
               ${QUICK_QUESTIONS.map(q => `
@@ -95,13 +95,13 @@ const AiAssistant = (() => {
         <!-- Chat Footer -->
         <div class="ai-chat-footer">
           <div class="ai-input-row">
-            <input type="text" class="ai-chat-input" id="aiChatInput" placeholder="Mô tả triệu chứng hoặc vấn đề sức khỏe..." autocomplete="off">
-            <button class="ai-send-btn" id="aiBtnSend" title="Gửi tin nhắn">
+            <input type="text" class="ai-chat-input" id="aiChatInput" placeholder="Mô t? tri?u ch?ng ho?c v?n d? s?c kh?e..." autocomplete="off">
+            <button class="ai-send-btn" id="aiBtnSend" title="G?i tin nh?n">
               <i class="bi bi-send-fill"></i>
             </button>
           </div>
           <p class="ai-disclaimer">
-            <i class="bi bi-shield-check"></i> Thông tin tham khảo y khoa, không thay thế chẩn đoán bác sĩ trực tiếp.
+            <i class="bi bi-shield-check"></i> Thông tin tham kh?o y khoa, không thay th? ch?n doán bác si tr?c ti?p.
           </p>
         </div>
       </div>
@@ -160,7 +160,6 @@ const AiAssistant = (() => {
     dom.window.classList.add('open');
     dom.window.setAttribute('aria-hidden', 'false');
     if (dom.fabContainer) dom.fabContainer.classList.add('chat-open');
-    if (dom.tooltip) dom.tooltip.style.display = 'none';
     setTimeout(() => {
       dom.input.focus();
     }, 200);
@@ -175,7 +174,7 @@ const AiAssistant = (() => {
 
   const resetChat = () => {
     history = [];
-    // Giữ lại welcome card, xóa các message khác
+    // Gi? l?i welcome card, xóa các message khác
     const welcome = document.getElementById('aiWelcomeCard');
     dom.body.innerHTML = '';
     if (welcome) dom.body.appendChild(welcome);
@@ -200,7 +199,7 @@ const AiAssistant = (() => {
     try {
       const payload = {
         message: text,
-        history: history.slice(0, -1) // lịch sử trước tin nhắn này
+        history: history.slice(0, -1) // l?ch s? tru?c tin nh?n này
       };
 
       const response = await API.consultAi(payload);
@@ -212,13 +211,13 @@ const AiAssistant = (() => {
         history.push({ role: 'model', content: response.reply });
         appendBotMessage(response);
       } else {
-        appendBotError(response?.errorMessage || 'Rất tiếc, đã có lỗi xảy ra khi kết nối tới trợ lý AI. Bạn vui lòng thử lại nhé.');
+        appendBotError(response?.errorMessage || 'R?t ti?c, dã có l?i x?y ra khi k?t n?i t?i tr? lý AI. B?n vui lòng th? l?i nhé.');
       }
     } catch (error) {
       console.error('AI Consult Error:', error);
       hideTypingIndicator();
       setWaitingState(false);
-      appendBotError('Không thể kết nối đến máy chủ trợ lý AI. Vui lòng kiểm tra kết nối mạng và thử lại sau.');
+      appendBotError('Không th? k?t n?i d?n máy ch? tr? lý AI. Vui lòng ki?m tra k?t n?i m?ng và th? l?i sau.');
     }
   };
 
@@ -254,7 +253,7 @@ const AiAssistant = (() => {
         <div class="ai-alert-card emergency">
           <i class="bi bi-exclamation-triangle-fill ai-alert-icon"></i>
           <div>
-            <strong>Dấu hiệu cấp cứu:</strong> Tình trạng này có thể cần can thiệp y tế khẩn cấp. Vui lòng liên hệ <a href="tel:115" style="color:#b91c1c;font-weight:700;">Đường dây nóng 115</a> hoặc đến ngay bệnh viện gần nhất!
+            <strong>D?u hi?u c?p c?u:</strong> Tình tr?ng này có th? c?n can thi?p y t? kh?n c?p. Vui lòng liên h? <a href="tel:115" style="color:#b91c1c;font-weight:700;">Ðu?ng dây nóng 115</a> ho?c d?n ngay b?nh vi?n g?n nh?t!
           </div>
         </div>
       `;
@@ -263,7 +262,7 @@ const AiAssistant = (() => {
         <div class="ai-alert-card warning">
           <i class="bi bi-exclamation-circle-fill ai-alert-icon"></i>
           <div>
-            <strong>Cần theo dõi sát:</strong> Bạn nên sắp xếp đi khám trong vòng 24 giờ tới để tránh tiến triển xấu.
+            <strong>C?n theo dõi sát:</strong> B?n nên s?p x?p di khám trong vòng 24 gi? t?i d? tránh ti?n tri?n x?u.
           </div>
         </div>
       `;
@@ -275,11 +274,11 @@ const AiAssistant = (() => {
       doctorsHtml = `
         <div class="ai-doctor-recommendations">
           <div style="font-size:11.5px;font-weight:700;color:#0f766e;text-transform:uppercase;letter-spacing:0.04em;">
-            <i class="bi bi-person-check-fill me-1"></i> Bác sĩ đề xuất tại phòng khám:
+            <i class="bi bi-person-check-fill me-1"></i> Bác si d? xu?t t?i phòng khám:
           </div>
           ${res.suggestedDoctors.map(doc => {
             const title = [doc.academicTitle, doc.degree, doc.name].filter(Boolean).join(' ');
-            const avatar = doc.avatar ? `<img src="${doc.avatar}" class="ai-doc-avatar" alt="${doc.name}">` : `<div class="ai-doc-avatar d-flex align-items-center justify-content-center" style="font-size:18px;">👨‍⚕️</div>`;
+            const avatar = doc.avatar ? `<img src="${doc.avatar}" class="ai-doc-avatar" alt="${doc.name}">` : `<div class="ai-doc-avatar d-flex align-items-center justify-content-center" style="font-size:18px;">?????</div>`;
             return `
               <div class="ai-doc-card">
                 <div class="ai-doc-info">
@@ -290,7 +289,7 @@ const AiAssistant = (() => {
                   </div>
                 </div>
                 <a href="/Home/Booking?doctor=${doc.id}" class="ai-doc-book-btn">
-                  Đặt lịch <i class="bi bi-chevron-right"></i>
+                  Ð?t l?ch <i class="bi bi-chevron-right"></i>
                 </a>
               </div>
             `;
@@ -306,7 +305,7 @@ const AiAssistant = (() => {
         <div class="ai-followups-container">
           ${res.followUpQuestions.map(q => `
             <div class="ai-followup-chip" onclick="AiAssistant.askQuestion('${escapeQuotes(q)}')">
-              💬 ${escapeHtml(q)}
+              ?? ${escapeHtml(q)}
             </div>
           `).join('')}
         </div>
@@ -387,7 +386,7 @@ const AiAssistant = (() => {
     // Bold **text**
     html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
 
-    // Bullet points: - item hoặc * item
+    // Bullet points: - item ho?c * item
     const lines = html.split('\n');
     let inList = false;
     let result = [];
