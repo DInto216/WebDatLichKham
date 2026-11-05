@@ -1,7 +1,5 @@
-# 🏥 MediBooking – Website Đặt Lịch Hẹn Khám Bệnh Trực Tuyến Tích Hợp AI
+﻿# 🏥 MediBooking – Website Đặt Lịch Hẹn Khám Bệnh Trực Tuyến Tích Hợp AI
 
-> **Đề tài Thực tập Tốt nghiệp:** Xây dựng website đăng ký lịch hẹn khám bệnh trực tuyến tích hợp AI  
-> **Hình thức:** Cá nhân &nbsp;|&nbsp; **Loại:** Thực tập Tốt nghiệp  
 > **Công nghệ:** ASP.NET Core 9.0 · Entity Framework Core · SQL Server · Gemini AI · Chart.js
 
 ---
@@ -233,14 +231,14 @@ Appointments ──┘
 
 ## 📄 License
 
-Dự án được xây dựng phục vụ mục đích **học thuật** – Đề tài **Thực tập Tốt nghiệp**.
+Dự án được xây dựng phục vụ mục đích **học thuật** và nghiên cứu.
 
 ---
 
 <div align="center">
 
 **Made with ❤️ by DInto216**  
-*Đề tài Thực tập Tốt nghiệp – Xây dựng website đăng ký lịch hẹn khám bệnh trực tuyến tích hợp AI*
+*MediBooking – Website Đăng Ký Lịch Hẹn Khám Bệnh Trực Tuyến Tích Hợp AI*
 
 </div>
 
