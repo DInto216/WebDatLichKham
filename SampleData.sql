@@ -833,3 +833,4 @@ INSERT INTO [Appointments] ([Id], [BookingId], [PatientName], [Phone], [Email], 
 GO
 SET IDENTITY_INSERT [MedicalHistories] OFF;
 GO
+
