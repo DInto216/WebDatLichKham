@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using WebDatLichKham.Data;
 using WebDatLichKham.Models;
@@ -23,12 +23,60 @@ namespace WebDatLichKham.Services
         private readonly ApplicationDbContext _context;
         private readonly IEmailService _emailService;
         private readonly IMemoryCache _cache;
+        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IConfiguration _configuration;
 
-        public AppointmentService(ApplicationDbContext context, IEmailService emailService, IMemoryCache cache)
+        public AppointmentService(
+            ApplicationDbContext context,
+            IEmailService emailService,
+            IMemoryCache cache,
+            IHttpClientFactory httpClientFactory,
+            IConfiguration configuration)
         {
             _context = context;
             _emailService = emailService;
             _cache = cache;
+            _httpClientFactory = httpClientFactory;
+            _configuration = configuration;
+        }
+
+        private async Task<bool> VerifyTurnstileTokenAsync(string token)
+        {
+            if (string.IsNullOrWhiteSpace(token)) return false;
+
+            var secretKey = _configuration["TurnstileSettings:SecretKey"] ?? "1x0000000000000000000000000000000AA";
+
+            // Nếu là dummy/testing key mặc định của Cloudflare, tự động pass
+            if (secretKey == "1x0000000000000000000000000000000AA")
+            {
+                return true;
+            }
+
+            try
+            {
+                var client = _httpClientFactory.CreateClient();
+                client.Timeout = TimeSpan.FromSeconds(10);
+
+                var values = new Dictionary<string, string>
+                {
+                    { "secret", secretKey },
+                    { "response", token }
+                };
+
+                var formContent = new FormUrlEncodedContent(values);
+                var response = await client.PostAsync("https://challenges.cloudflare.com/turnstile/v0/siteverify", formContent);
+
+                if (!response.IsSuccessStatusCode) return false;
+
+                var jsonStr = await response.Content.ReadAsStringAsync();
+                using var doc = System.Text.Json.JsonDocument.Parse(jsonStr);
+                return doc.RootElement.TryGetProperty("success", out var successProp) && successProp.GetBoolean();
+            }
+            catch
+            {
+                // Nếu rớt mạng khi verify Cloudflare, cho phép test key vượt qua để không chặn người dùng
+                return secretKey == "1x0000000000000000000000000000000AA";
+            }
         }
 
         // ============================================
@@ -138,18 +186,28 @@ namespace WebDatLichKham.Services
                     throw new ArgumentException("Khung giờ này của bác sĩ đã có người đặt. Vui lòng chọn khung giờ khác.");
             }
 
-            // === LỚP 7: XÁC MINH MATH CAPTCHA ===
-            if (string.IsNullOrWhiteSpace(data.CaptchaToken) || string.IsNullOrWhiteSpace(data.CaptchaAnswer))
+            // === LỚP 7: XÁC MINH BẢO MẬT (CLOUDFLARE TURNSTILE HOẶC MATH CAPTCHA) ===
+            if (!string.IsNullOrWhiteSpace(data.TurnstileToken))
             {
-                throw new ArgumentException("Vui lòng hoàn thành câu hỏi xác minh bảo mật trước khi đặt lịch.");
+                bool turnstileValid = await VerifyTurnstileTokenAsync(data.TurnstileToken);
+                if (!turnstileValid)
+                {
+                    throw new ArgumentException("Xác minh bảo mật Cloudflare Turnstile không thành công. Vui lòng thử lại.");
+                }
             }
-            var cacheKey = "captcha_" + data.CaptchaToken;
-            if (!_cache.TryGetValue(cacheKey, out string? correctAnswer) || correctAnswer != data.CaptchaAnswer.Trim())
+            else if (!string.IsNullOrWhiteSpace(data.CaptchaToken) && !string.IsNullOrWhiteSpace(data.CaptchaAnswer))
             {
-                throw new ArgumentException("Câu trả lời xác minh không đúng. Vui lòng thử lại.");
+                var cacheKey = "captcha_" + data.CaptchaToken;
+                if (!_cache.TryGetValue(cacheKey, out string? correctAnswer) || correctAnswer != data.CaptchaAnswer.Trim())
+                {
+                    throw new ArgumentException("Câu trả lời xác minh không đúng. Vui lòng thử lại.");
+                }
+                _cache.Remove(cacheKey);
             }
-            // Xóa token ngay sau khi dùng (one-time use)
-            _cache.Remove(cacheKey);
+            else
+            {
+                throw new ArgumentException("Vui lòng hoàn thành xác minh bảo mật trước khi đặt lịch.");
+            }
 
             // === ĐẶT RATE LIMIT SAU KHI PASS HẾT KIỂM TRA ===
             _cache.Set(rateLimitKey, true, TimeSpan.FromSeconds(30));

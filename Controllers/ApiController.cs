@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
@@ -179,6 +179,15 @@ namespace WebDatLichKham.Controllers
         // ============================================
         // ANTI-SPAM: Lay cau hoi Math Captcha
         // ============================================
+                // ============================================
+        // ANTI-SPAM: Cloudflare Turnstile Configuration
+        // ============================================
+        [HttpGet("antispam/turnstile-config")]
+        public IActionResult GetTurnstileConfig([FromServices] IConfiguration config)
+        {
+            var siteKey = config["TurnstileSettings:SiteKey"] ?? "1x00000000000000000000AA";
+            return Ok(new { siteKey });
+        }
         [HttpGet("antispam/captcha")]
         public async Task<IActionResult> GetAntiSpamCaptcha()
         {

@@ -51,7 +51,7 @@ Hệ thống tích hợp **6 lớp bảo vệ** tự động:
 | 3 | ⏱️ Rate Limiting | Chặn gửi liên tục trong 30 giây |
 | 4 | 📊 Giới hạn hoạt động | Tối đa 3 lịch hẹn đang chờ/mỗi SĐT |
 | 5 | 📆 Ràng buộc ngày | Không đặt ngày quá khứ hoặc >60 ngày |
-| 6 | 🔢 Math Captcha | Xác minh bằng phép tính đơn giản |
+| 6 | 🛡️ Cloudflare Turnstile | Xác minh tự động 1 chạm (không cần giải toán) |
 
 ---
 
@@ -101,7 +101,7 @@ WebDatLichKham/
 2. Bước 1: Chọn chuyên khoa
 3. Bước 2: Chọn bác sĩ & xem thông tin
 4. Bước 3: Điền thông tin bệnh nhân (họ tên, SĐT, email, lý do)
-5. Bước 4: Chọn ngày giờ + xác minh Captcha → Xác nhận
+5. Bước 4: Chọn ngày giờ + xác minh Cloudflare Turnstile → Xác nhận
 6. Nhận mã đặt lịch + email xác nhận ✅
 ```
 

@@ -59,10 +59,13 @@ namespace WebDatLichKham.Models
         public string BotTrap { get; set; } = string.Empty;       // Honeypot: bot sẽ điền, người thật để trống
 
         [NotMapped]
-        public string CaptchaToken { get; set; } = string.Empty;  // Token định danh câu hỏi captcha
+        public string TurnstileToken { get; set; } = string.Empty; // Token xác thực Cloudflare Turnstile
 
         [NotMapped]
-        public string CaptchaAnswer { get; set; } = string.Empty; // Đáp án người dùng nhập
+        public string CaptchaToken { get; set; } = string.Empty;  // Token định danh câu hỏi captcha (fallback)
+
+        [NotMapped]
+        public string CaptchaAnswer { get; set; } = string.Empty; // Đáp án người dùng nhập (fallback)
     }
 
     public class PatientCancelAppointmentRequest
