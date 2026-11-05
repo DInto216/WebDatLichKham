@@ -21,6 +21,7 @@
                 <th style="width:80px;">Ảnh đại diện</th>
                 <th>Tên</th>
                 <th>Vai trò</th>
+                <th>Chuyên khoa</th>
                 <th>Ngày tạo</th>
                 <th style="width:80px;">Thao tác</th>
               </tr>
@@ -80,7 +81,7 @@
 
     async function loadAccounts() {
       const tbody = document.getElementById('accountsTable');
-      App.showTableLoading(tbody, 6, 4);
+      App.showTableLoading(tbody, 7, 5);
       const accounts = await API.getAccounts();
 
       const roleBadges = {
@@ -98,6 +99,7 @@
           </td>
           <td>${acc.name}</td>
           <td>${roleBadges[acc.role] || acc.role}</td>
+          <td>${acc.specialtyName ? `<span style="font-size:var(--text-sm);color:var(--text-secondary);">${acc.specialtyName}</span>` : '<span style="color:var(--text-muted);font-size:var(--text-xs);">—</span>'}</td>
           <td>${App.formatDate(acc.createdAt)}</td>
           <td>
             ${acc.role !== 'admin' ? `<button class="btn-icon sm" onclick="deleteAccount('${acc.id}','${acc.username}')" aria-label="Xóa" style="color:var(--danger)"><i class="bi bi-trash"></i></button>` : '<span style="color:var(--text-muted);font-size:var(--text-xs);">—</span>'}

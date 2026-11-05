@@ -29,6 +29,21 @@ namespace WebDatLichKham.Services
         public async Task<IEnumerable<object>> GetAllAsync()
         {
             var accounts = await _context.Accounts.AsNoTracking().ToListAsync();
+
+            // JOIN voi Doctors de lay SpecialtyName
+            var doctorIds = accounts
+                .Where(a => !string.IsNullOrEmpty(a.DoctorId))
+                .Select(a => a.DoctorId!)
+                .Distinct()
+                .ToList();
+
+            var doctors = await _context.Doctors.AsNoTracking()
+                .Where(d => doctorIds.Contains(d.Id))
+                .Select(d => new { d.Id, d.SpecialtyName })
+                .ToListAsync();
+
+            var doctorMap = doctors.ToDictionary(d => d.Id, d => d.SpecialtyName);
+
             return accounts.Select(a => new
             {
                 a.Id,
@@ -38,7 +53,8 @@ namespace WebDatLichKham.Services
                 a.Role,
                 a.DoctorId,
                 a.CreatedAt,
-                avatar = a.Avatar ?? ""
+                avatar = a.Avatar ?? "",
+                specialtyName = (a.DoctorId != null && doctorMap.TryGetValue(a.DoctorId, out var sp)) ? sp : ""
             });
         }
 
