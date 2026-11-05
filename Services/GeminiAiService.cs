@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -21,7 +21,7 @@ namespace WebDatLichKham.Services
         private readonly ApplicationDbContext _dbContext;
         private readonly ILogger<GeminiAiService> _logger;
 
-        private const string DefaultModel = "gemini-1.5-flash";
+        private const string DefaultModel = "gemini-2.5-flash";
 
         public GeminiAiService(
             IHttpClientFactory httpClientFactory,
@@ -101,7 +101,7 @@ namespace WebDatLichKham.Services
             var endpoint = $"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={apiKey}";
 
             var client = _httpClientFactory.CreateClient("GeminiClient");
-            client.Timeout = TimeSpan.FromSeconds(20);
+            client.Timeout = TimeSpan.FromSeconds(30);
 
             var systemInstruction = BuildSystemPrompt(specialties, doctors);
             var contents = new List<object>();
@@ -164,9 +164,38 @@ namespace WebDatLichKham.Services
         private string BuildSystemPrompt(List<Specialty> specialties, List<Doctor> doctors)
         {
             var sb = new StringBuilder();
-            sb.AppendLine("Bạn là MediBot - Bác sĩ Trợ lý Ảo Y tế thông minh của phòng khám MediBooking.");
-            sb.AppendLine("Nhiệm vụ: phân tích triệu chứng sơ bộ, đưa ra lời khuyên ân cần và gợi ý đúng chuyên khoa + bác sĩ trong hệ thống.");
-            sb.AppendLine("Trả về duy nhất JSON: {\"reply\":\"...\", \"urgencyLevel\":\"normal|warning|emergency\", \"suggestedSpecialtyId\":\"...\", \"suggestedDoctorIds\":[\"...\"], \"followUpQuestions\":[\"...\"]}");
+            sb.AppendLine("Bạn là MediBot - Bác sĩ Trợ lý Y tế Trực tuyến của Phòng khám Đa khoa MediBooking.");
+            sb.AppendLine("MỤC TIÊU CỐT LÕI: Lắng nghe và phản hồi TRỰC DIỆN, ĐÚNG TRỌNG TÂM vào câu hỏi hoặc triệu chứng cụ thể mà người bệnh vừa nêu. Tuyệt đối không trả lời chung chung, không sáo rỗng hoặc lặp lại một khuôn mẫu cứng nhắc.");
+            sb.AppendLine();
+            sb.AppendLine("NGUYÊN TẮC TƯ VẤN:");
+            sb.AppendLine("1. Phân tích triệu chứng: Chỉ ra cụ thể các nguyên nhân y khoa phổ biến có thể dẫn đến triệu chứng của người bệnh.");
+            sb.AppendLine("2. Hướng dẫn chăm sóc tại nhà: Đưa ra 2-3 lời khuyên rõ ràng, thiết thực (nên làm gì để giảm nhẹ, cần kiêng gì, lưu ý gì).");
+            sb.AppendLine("3. Đánh giá mức độ khẩn cấp (urgencyLevel):");
+            sb.AppendLine("   - 'emergency': Triệu chứng nguy hiểm (đau thắt ngực, khó thở dữ dội, co giật, liệt, mất ý thức, nôn ra máu...). Yêu cầu gọi 115 hoặc đến cấp cứu ngay.");
+            sb.AppendLine("   - 'warning': Triệu chứng kéo dài nhiều ngày hoặc có nguy cơ biến chứng cần đi khám sớm.");
+            sb.AppendLine("   - 'normal': Triệu chứng nhẹ, thông thường hoặc câu hỏi thông tin.");
+            sb.AppendLine("4. Gợi ý chính xác Chuyên khoa và Bác sĩ: Chọn đúng ID chuyên khoa và 1-2 ID bác sĩ từ danh sách thực tế của phòng khám dưới đây để hệ thống hiển thị nút đặt lịch trực tiếp cho bệnh nhân.");
+            sb.AppendLine();
+            sb.AppendLine("=== DANH MỤC CHUYÊN KHOA PHÒNG KHÁM MEDIBOOKING ===");
+            foreach (var sp in specialties)
+            {
+                sb.AppendLine($"- ID: \"{sp.Id}\" | Tên: {sp.Name} | Mô tả: {sp.Description}");
+            }
+            sb.AppendLine();
+            sb.AppendLine("=== DANH SÁCH BÁC SĨ ĐANG CÔNG TÁC ===");
+            foreach (var doc in doctors)
+            {
+                sb.AppendLine($"- ID: \"{doc.Id}\" | Bác sĩ: {doc.AcademicTitle} {doc.Degree} {doc.Name} | Chuyên khoa ID: \"{doc.SpecialtyId}\" ({doc.SpecialtyName})");
+            }
+            sb.AppendLine();
+            sb.AppendLine("YÊU CẦU ĐẦU RA: Trả về DUY NHẤT một đối tượng JSON hợp lệ (không kèm bất kỳ văn bản nào khác ngoài JSON):");
+            sb.AppendLine("{");
+            sb.AppendLine("  \"reply\": \"(Nội dung tư vấn chi tiết, ân cần, định dạng markdown đẹp mắt bằng các gạch đầu dòng và in đậm ý chính)\",");
+            sb.AppendLine("  \"urgencyLevel\": \"normal\" hoặc \"warning\" hoặc \"emergency\",");
+            sb.AppendLine("  \"suggestedSpecialtyId\": \"(ID chuyên khoa phù hợp nhất từ danh sách trên)\",");
+            sb.AppendLine("  \"suggestedDoctorIds\": [\"(ID của bác sĩ phù hợp nhất từ danh sách trên)\"],");
+            sb.AppendLine("  \"followUpQuestions\": [\"(3 câu hỏi gợi ý tiếp theo bám sát đúng tình trạng cụ thể của người bệnh)\"]");
+            sb.AppendLine("}");
             return sb.ToString();
         }
 
@@ -223,9 +252,39 @@ namespace WebDatLichKham.Services
 
                 return result;
             }
-            catch
+            catch (Exception ex)
             {
-                return GenerateClinicalResponse(rawJson, specialties, doctors);
+                _logger.LogWarning(ex, "Không thể deserialize JSON từ Gemini, sử dụng phản hồi trực tiếp của AI.");
+                var fallbackReply = cleanedJson;
+                var matchedSp = specialties.FirstOrDefault(s => fallbackReply.IndexOf(s.Name, StringComparison.OrdinalIgnoreCase) >= 0);
+                var res = new AiConsultResponse
+                {
+                    Reply = fallbackReply,
+                    UrgencyLevel = "normal",
+                    IsSuccess = true,
+                    Mode = "gemini",
+                    FollowUpQuestions = new List<string>
+                    {
+                        "Tôi cần chuẩn bị gì trước khi đi khám?",
+                        "Chi phí khám chuyên khoa là bao nhiêu?",
+                        "Đặt lịch khám với bác sĩ chuyên khoa"
+                    }
+                };
+
+                if (matchedSp != null)
+                {
+                    res.SuggestedSpecialty = new SpecialtySummaryDto
+                    {
+                        Id = matchedSp.Id,
+                        Name = matchedSp.Name,
+                        Icon = matchedSp.Icon,
+                        Description = matchedSp.Description
+                    };
+                    var doc = doctors.FirstOrDefault(d => d.SpecialtyId == matchedSp.Id);
+                    if (doc != null) res.SuggestedDoctors.Add(MapToDoctorSummary(doc));
+                }
+
+                return res;
             }
         }
 
