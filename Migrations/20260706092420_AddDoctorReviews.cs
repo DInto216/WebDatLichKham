@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -267,12 +267,12 @@ namespace WebDatLichKham.Migrations
                 columns: new[] { "Id", "Comment", "Date", "DoctorId", "DoctorName", "PatientName", "Rating", "Specialty" },
                 values: new object[,]
                 {
-                    { "rev_01", "Bác sĩ An tư vấn rất nhiệt tình, chu đáo. Quy trình khám diễn ra nhanh chóng, tôi rất hài lòng.", "2026-06-15", "doc_01", "BS. Nguyễn Văn An", "Nguyễn Tấn Đ.", 5, "Nội tổng quát" },
-                    { "rev_02", "Phòng khám sạch sẽ, bác sĩ Bích giải thích kỹ càng về bệnh án và thuốc. Tuyệt vời!", "2026-06-20", "doc_02", "BS. Trần Thị Bích", "Lê Minh H.", 5, "Nhi khoa" },
-                    { "rev_03", "Chuyên môn cao, dịch vụ tốt. Tuy nhiên lúc chờ lấy thuốc hơi lâu một chút.", "2026-06-28", "doc_03", "BS. Lê Minh Tuấn", "Trần Quyết T.", 4, "Tim mạch" },
-                    { "rev_04", "Bác sĩ Nhung rất nhẹ nhàng, mát tay. Các nốt mẩn đỏ của tôi đã hết hẳn sau 1 tuần dùng thuốc.", "2026-07-01", "doc_04", "BS. Phạm Hồng Nhung", "Phạm Thị M.", 5, "Da liễu" },
-                    { "rev_05", "Rất chuyên nghiệp, bác sĩ Hùng thao tác cực kỳ cẩn thận.", "2026-07-02", "doc_05", "BS. Võ Thanh Hùng", "Vũ Đức K.", 5, "Tai Mũi Họng" },
-                    { "rev_06", "Hệ thống đặt lịch rất tiện, không phải chờ đợi. Bác sĩ siêu có tâm.", "2026-07-03", "doc_01", "BS. Nguyễn Văn An", "Đinh Tuấn N.", 5, "Nội tổng quát" }
+                    { "rev_01", "B�c si An tu v?n r?t nhi?t t�nh, chu d�o. Quy tr�nh kh�m di?n ra nhanh ch�ng, t�i r?t h�i l�ng.", "2026-06-15", "doc_01", "BS. Nguy?n Van An", "Nguy?n T?n �.", 5, "N?i t?ng qu�t" },
+                    { "rev_02", "Ph�ng kh�m s?ch s?, b�c si B�ch gi?i th�ch k? c�ng v? b?nh �n v� thu?c. Tuy?t v?i!", "2026-06-20", "doc_02", "BS. Tr?n Th? B�ch", "L� Minh H.", 5, "Nhi khoa" },
+                    { "rev_03", "Chuy�n m�n cao, d?ch v? t?t. Tuy nhi�n l�c ch? l?y thu?c hoi l�u m?t ch�t.", "2026-06-28", "doc_03", "BS. L� Minh Tu?n", "Tr?n Quy?t T.", 4, "Tim m?ch" },
+                    { "rev_04", "B�c si Nhung r?t nh? nh�ng, m�t tay. C�c n?t m?n d? c?a t�i d� h?t h?n sau 1 tu?n d�ng thu?c.", "2026-07-01", "doc_04", "BS. Ph?m H?ng Nhung", "Ph?m Th? M.", 5, "Da li?u" },
+                    { "rev_05", "R?t chuy�n nghi?p, b�c si H�ng thao t�c c?c k? c?n th?n.", "2026-07-02", "doc_05", "BS. V� Thanh H�ng", "Vu �?c K.", 5, "Tai Mui H?ng" },
+                    { "rev_06", "H? th?ng d?t l?ch r?t ti?n, kh�ng ph?i ch? d?i. B�c si si�u c� t�m.", "2026-07-03", "doc_01", "BS. Nguy?n Van An", "�inh Tu?n N.", 5, "N?i t?ng qu�t" }
                 });
         }
 

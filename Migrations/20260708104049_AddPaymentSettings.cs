@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -35,9 +35,9 @@ namespace WebDatLichKham.Migrations
                 columns: new[] { "Id", "AdditionalConfigJson", "DisplayName", "Icon", "IsActive", "MethodCode", "UpdatedAt" },
                 values: new object[,]
                 {
-                    { 1, null, "Thanh toán tại quầy", "bi-cash", true, "cash", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 2, "{\"bankName\":\"Vietcombank\",\"accountNumber\":\"0123456789\",\"accountName\":\"MEDIBOOKING VN\"}", "Chuyển khoản Ngân hàng", "bi-bank2", true, "bank_transfer", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 3, null, "Ví MoMo", "bi-qr-code", true, "momo", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 1, null, "Thanh to�n t?i qu?y", "bi-cash", true, "cash", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 2, "{\"bankName\":\"Vietcombank\",\"accountNumber\":\"0123456789\",\"accountName\":\"MEDIBOOKING VN\"}", "Chuy?n kho?n Ng�n h�ng", "bi-bank2", true, "bank_transfer", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 3, null, "V� MoMo", "bi-qr-code", true, "momo", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
                     { 4, null, "ZaloPay", "bi-qr-code", true, "zalopay", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
                 });
         }

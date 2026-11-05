@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -135,10 +135,10 @@ namespace WebDatLichKham.Migrations
                 columns: new[] { "Id", "Avatar", "CreatedAt", "DoctorId", "Name", "Password", "Role", "Username" },
                 values: new object[,]
                 {
-                    { "acc_admin", null, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, "Quản trị viên", "admin123", "admin", "admin" },
-                    { "acc_doc01", null, new DateTime(2025, 1, 15, 0, 0, 0, 0, DateTimeKind.Unspecified), "doc_01", "BS. Nguyễn Văn An", "doctor123", "doctor", "doctor01" },
-                    { "acc_doc02", null, new DateTime(2025, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "doc_02", "BS. Trần Thị Bích", "doctor123", "doctor", "doctor02" },
-                    { "acc_doc03", null, new DateTime(2025, 2, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), "doc_03", "BS. Lê Minh Tuấn", "doctor123", "doctor", "doctor03" }
+                    { "acc_admin", null, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, "Qu?n tr? vi�n", "admin123", "admin", "admin" },
+                    { "acc_doc01", null, new DateTime(2025, 1, 15, 0, 0, 0, 0, DateTimeKind.Unspecified), "doc_01", "BS. Nguy?n Van An", "doctor123", "doctor", "doctor01" },
+                    { "acc_doc02", null, new DateTime(2025, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "doc_02", "BS. Tr?n Th? B�ch", "doctor123", "doctor", "doctor02" },
+                    { "acc_doc03", null, new DateTime(2025, 2, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), "doc_03", "BS. L� Minh Tu?n", "doctor123", "doctor", "doctor03" }
                 });
 
             _ = migrationBuilder.InsertData(
@@ -146,12 +146,12 @@ namespace WebDatLichKham.Migrations
                 columns: new[] { "Id", "BirthYear", "BookingId", "CreatedAt", "Date", "DoctorId", "DoctorName", "Email", "Gender", "PatientName", "Phone", "Reason", "Specialty", "Status", "Time" },
                 values: new object[,]
                 {
-                    { "appt_01", 1990, "BK-A1B2C3D4", new DateTime(2026, 6, 25, 10, 0, 0, 0, DateTimeKind.Unspecified), "2026-06-26", "doc_01", "BS. Nguyễn Văn An", "hoa@email.com", "Nữ", "Nguyễn Thị Hoa", "0912345678", "Đau đầu, chóng mặt kéo dài", "Nội tổng quát", "pending", "08:00" },
-                    { "appt_02", 1985, "BK-E5F6G7H8", new DateTime(2026, 6, 24, 14, 30, 0, 0, DateTimeKind.Unspecified), "2026-06-26", "doc_01", "BS. Nguyễn Văn An", "minh@email.com", "Nam", "Trần Văn Minh", "0987654321", "Khám sức khỏe tổng quát", "Nội tổng quát", "approved", "09:00" },
-                    { "appt_03", 1995, "BK-I9J0K1L2", new DateTime(2026, 6, 24, 9, 0, 0, 0, DateTimeKind.Unspecified), "2026-06-26", "doc_02", "BS. Trần Thị Bích", "lan@email.com", "Nữ", "Lê Thị Lan", "0909123456", "Bé sốt cao, ho nhiều", "Nhi khoa", "approved", "08:30" },
-                    { "appt_04", 1978, "BK-M3N4O5P6", new DateTime(2026, 6, 23, 16, 0, 0, 0, DateTimeKind.Unspecified), "2026-06-25", "doc_03", "BS. Lê Minh Tuấn", "bao@email.com", "Nam", "Phạm Quốc Bảo", "0978111222", "Đau ngực, khó thở", "Tim mạch", "completed", "14:00" },
-                    { "appt_05", 2000, "BK-Q7R8S9T0", new DateTime(2026, 6, 25, 11, 0, 0, 0, DateTimeKind.Unspecified), "2026-06-27", "doc_04", "BS. Phạm Hồng Nhung", "yen@email.com", "Nữ", "Hoàng Thị Yến", "0961222333", "Nổi mẩn đỏ, ngứa da", "Da liễu", "pending", "09:00" },
-                    { "appt_06", 1970, "BK-U1V2W3X4", new DateTime(2026, 6, 22, 8, 0, 0, 0, DateTimeKind.Unspecified), "2026-06-25", "doc_05", "BS. Võ Thanh Hùng", "tung@email.com", "Nam", "Đỗ Văn Tùng", "0945333444", "Viêm họng mãn tính", "Tai Mũi Họng", "cancelled", "08:30" }
+                    { "appt_01", 1990, "BK-A1B2C3D4", new DateTime(2026, 6, 25, 10, 0, 0, 0, DateTimeKind.Unspecified), "2026-06-26", "doc_01", "BS. Nguy?n Van An", "hoa@email.com", "N?", "Nguy?n Th? Hoa", "0912345678", "�au d?u, ch�ng m?t k�o d�i", "N?i t?ng qu�t", "pending", "08:00" },
+                    { "appt_02", 1985, "BK-E5F6G7H8", new DateTime(2026, 6, 24, 14, 30, 0, 0, DateTimeKind.Unspecified), "2026-06-26", "doc_01", "BS. Nguy?n Van An", "minh@email.com", "Nam", "Tr?n Van Minh", "0987654321", "Kh�m s?c kh?e t?ng qu�t", "N?i t?ng qu�t", "approved", "09:00" },
+                    { "appt_03", 1995, "BK-I9J0K1L2", new DateTime(2026, 6, 24, 9, 0, 0, 0, DateTimeKind.Unspecified), "2026-06-26", "doc_02", "BS. Tr?n Th? B�ch", "lan@email.com", "N?", "L� Th? Lan", "0909123456", "B� s?t cao, ho nhi?u", "Nhi khoa", "approved", "08:30" },
+                    { "appt_04", 1978, "BK-M3N4O5P6", new DateTime(2026, 6, 23, 16, 0, 0, 0, DateTimeKind.Unspecified), "2026-06-25", "doc_03", "BS. L� Minh Tu?n", "bao@email.com", "Nam", "Ph?m Qu?c B?o", "0978111222", "�au ng?c, kh� th?", "Tim m?ch", "completed", "14:00" },
+                    { "appt_05", 2000, "BK-Q7R8S9T0", new DateTime(2026, 6, 25, 11, 0, 0, 0, DateTimeKind.Unspecified), "2026-06-27", "doc_04", "BS. Ph?m H?ng Nhung", "yen@email.com", "N?", "Ho�ng Th? Y?n", "0961222333", "N?i m?n d?, ng?a da", "Da li?u", "pending", "09:00" },
+                    { "appt_06", 1970, "BK-U1V2W3X4", new DateTime(2026, 6, 22, 8, 0, 0, 0, DateTimeKind.Unspecified), "2026-06-25", "doc_05", "BS. V� Thanh H�ng", "tung@email.com", "Nam", "�? Van T�ng", "0945333444", "Vi�m h?ng m�n t�nh", "Tai Mui H?ng", "cancelled", "08:30" }
                 });
 
             _ = migrationBuilder.InsertData(
@@ -159,12 +159,12 @@ namespace WebDatLichKham.Migrations
                 columns: new[] { "Id", "Avatar", "Bio", "Degree", "Name", "Price", "Rating", "Reviews", "ScheduleJson", "SpecialtyId", "SpecialtyName" },
                 values: new object[,]
                 {
-                    { "doc_01", "", "Hơn 15 năm kinh nghiệm trong lĩnh vực Nội khoa tổng quát", "PGS.TS", "BS. Nguyễn Văn An", 350000m, 4.7999999999999998, 124, "{\"monday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\",\"10:00\",\"14:00\",\"14:30\",\"15:00\",\"15:30\"],\"tuesday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\",\"10:00\",\"14:00\",\"14:30\",\"15:00\"],\"wednesday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\",\"14:00\",\"14:30\",\"15:00\",\"15:30\"],\"thursday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\",\"10:00\"],\"friday\":[\"08:00\",\"08:30\",\"09:00\",\"14:00\",\"14:30\",\"15:00\",\"15:30\",\"16:00\"],\"saturday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\"],\"sunday\":[]}", "sp_01", "Nội tổng quát" },
-                    { "doc_02", "", "20 năm kinh nghiệm chuyên khoa Nhi, từng tu nghiệp tại Nhật Bản", "TS.BS", "BS. Trần Thị Bích", 400000m, 4.9000000000000004, 210, "{\"monday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\",\"10:00\",\"10:30\"],\"tuesday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\",\"14:00\",\"14:30\",\"15:00\"],\"wednesday\":[],\"thursday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\",\"10:00\",\"14:00\",\"14:30\"],\"friday\":[\"08:00\",\"08:30\",\"09:00\",\"14:00\",\"14:30\",\"15:00\"],\"saturday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\",\"10:00\"],\"sunday\":[]}", "sp_02", "Nhi khoa" },
-                    { "doc_03", "", "Chuyên gia tim mạch can thiệp, tốt nghiệp ĐH Y Hà Nội", "ThS.BS", "BS. Lê Minh Tuấn", 500000m, 4.7000000000000002, 98, "{\"monday\":[\"08:00\",\"08:30\",\"09:00\",\"14:00\",\"14:30\",\"15:00\"],\"tuesday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\"],\"wednesday\":[\"08:00\",\"08:30\",\"09:00\",\"14:00\",\"14:30\",\"15:00\",\"15:30\"],\"thursday\":[],\"friday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\",\"14:00\",\"14:30\"],\"saturday\":[],\"sunday\":[]}", "sp_03", "Tim mạch" },
-                    { "doc_04", "", "Chuyên gia Da liễu thẩm mỹ, nhiều năm kinh nghiệm", "BS.CKI", "BS. Phạm Hồng Nhung", 300000m, 4.5999999999999996, 156, "{\"monday\":[\"09:00\",\"09:30\",\"10:00\",\"10:30\",\"14:00\",\"14:30\"],\"tuesday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\",\"10:00\"],\"wednesday\":[\"09:00\",\"09:30\",\"10:00\",\"14:00\",\"14:30\",\"15:00\"],\"thursday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\",\"14:00\",\"14:30\"],\"friday\":[],\"saturday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\"],\"sunday\":[]}", "sp_04", "Da liễu" },
-                    { "doc_05", "", "Phó Giáo sư chuyên ngành Tai Mũi Họng", "PGS.TS", "BS. Võ Thanh Hùng", 350000m, 4.7999999999999998, 89, "{\"monday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\",\"10:00\"],\"tuesday\":[\"14:00\",\"14:30\",\"15:00\",\"15:30\",\"16:00\"],\"wednesday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\"],\"thursday\":[\"08:00\",\"08:30\",\"09:00\",\"14:00\",\"14:30\",\"15:00\"],\"friday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\",\"10:00\"],\"saturday\":[],\"sunday\":[]}", "sp_05", "Tai Mũi Họng" },
-                    { "doc_06", "", "Tiến sĩ chuyên ngành Sản phụ khoa, BV Từ Dũ", "TS.BS", "BS. Đặng Thị Mai", 450000m, 4.9000000000000004, 175, "{\"monday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\",\"14:00\",\"14:30\"],\"tuesday\":[\"08:00\",\"08:30\",\"09:00\"],\"wednesday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\",\"10:00\",\"14:00\",\"14:30\",\"15:00\"],\"thursday\":[\"08:00\",\"08:30\",\"09:00\"],\"friday\":[\"14:00\",\"14:30\",\"15:00\",\"15:30\"],\"saturday\":[\"08:00\",\"08:30\",\"09:00\"],\"sunday\":[]}", "sp_10", "Sản phụ khoa" }
+                    { "doc_01", "", "Hon 15 nam kinh nghi?m trong linh v?c N?i khoa t?ng qu�t", "PGS.TS", "BS. Nguy?n Van An", 350000m, 4.7999999999999998, 124, "{\"monday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\",\"10:00\",\"14:00\",\"14:30\",\"15:00\",\"15:30\"],\"tuesday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\",\"10:00\",\"14:00\",\"14:30\",\"15:00\"],\"wednesday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\",\"14:00\",\"14:30\",\"15:00\",\"15:30\"],\"thursday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\",\"10:00\"],\"friday\":[\"08:00\",\"08:30\",\"09:00\",\"14:00\",\"14:30\",\"15:00\",\"15:30\",\"16:00\"],\"saturday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\"],\"sunday\":[]}", "sp_01", "N?i t?ng qu�t" },
+                    { "doc_02", "", "20 nam kinh nghi?m chuy�n khoa Nhi, t?ng tu nghi?p t?i Nh?t B?n", "TS.BS", "BS. Tr?n Th? B�ch", 400000m, 4.9000000000000004, 210, "{\"monday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\",\"10:00\",\"10:30\"],\"tuesday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\",\"14:00\",\"14:30\",\"15:00\"],\"wednesday\":[],\"thursday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\",\"10:00\",\"14:00\",\"14:30\"],\"friday\":[\"08:00\",\"08:30\",\"09:00\",\"14:00\",\"14:30\",\"15:00\"],\"saturday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\",\"10:00\"],\"sunday\":[]}", "sp_02", "Nhi khoa" },
+                    { "doc_03", "", "Chuy�n gia tim m?ch can thi?p, t?t nghi?p �H Y H� N?i", "ThS.BS", "BS. L� Minh Tu?n", 500000m, 4.7000000000000002, 98, "{\"monday\":[\"08:00\",\"08:30\",\"09:00\",\"14:00\",\"14:30\",\"15:00\"],\"tuesday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\"],\"wednesday\":[\"08:00\",\"08:30\",\"09:00\",\"14:00\",\"14:30\",\"15:00\",\"15:30\"],\"thursday\":[],\"friday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\",\"14:00\",\"14:30\"],\"saturday\":[],\"sunday\":[]}", "sp_03", "Tim m?ch" },
+                    { "doc_04", "", "Chuy�n gia Da li?u th?m m?, nhi?u nam kinh nghi?m", "BS.CKI", "BS. Ph?m H?ng Nhung", 300000m, 4.5999999999999996, 156, "{\"monday\":[\"09:00\",\"09:30\",\"10:00\",\"10:30\",\"14:00\",\"14:30\"],\"tuesday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\",\"10:00\"],\"wednesday\":[\"09:00\",\"09:30\",\"10:00\",\"14:00\",\"14:30\",\"15:00\"],\"thursday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\",\"14:00\",\"14:30\"],\"friday\":[],\"saturday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\"],\"sunday\":[]}", "sp_04", "Da li?u" },
+                    { "doc_05", "", "Ph� Gi�o su chuy�n ng�nh Tai Mui H?ng", "PGS.TS", "BS. V� Thanh H�ng", 350000m, 4.7999999999999998, 89, "{\"monday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\",\"10:00\"],\"tuesday\":[\"14:00\",\"14:30\",\"15:00\",\"15:30\",\"16:00\"],\"wednesday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\"],\"thursday\":[\"08:00\",\"08:30\",\"09:00\",\"14:00\",\"14:30\",\"15:00\"],\"friday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\",\"10:00\"],\"saturday\":[],\"sunday\":[]}", "sp_05", "Tai Mui H?ng" },
+                    { "doc_06", "", "Ti?n si chuy�n ng�nh S?n ph? khoa, BV T? Du", "TS.BS", "BS. �?ng Th? Mai", 450000m, 4.9000000000000004, 175, "{\"monday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\",\"14:00\",\"14:30\"],\"tuesday\":[\"08:00\",\"08:30\",\"09:00\"],\"wednesday\":[\"08:00\",\"08:30\",\"09:00\",\"09:30\",\"10:00\",\"14:00\",\"14:30\",\"15:00\"],\"thursday\":[\"08:00\",\"08:30\",\"09:00\"],\"friday\":[\"14:00\",\"14:30\",\"15:00\",\"15:30\"],\"saturday\":[\"08:00\",\"08:30\",\"09:00\"],\"sunday\":[]}", "sp_10", "S?n ph? khoa" }
                 });
 
             _ = migrationBuilder.InsertData(
@@ -172,16 +172,16 @@ namespace WebDatLichKham.Migrations
                 columns: new[] { "MaLichSu", "BookingId", "Diagnosis", "DoctorName", "MaBenhAn", "Notes", "PatientName", "Prescription", "PrescriptionItemsJson", "SoDienThoai", "Specialty", "Symptoms", "VisitDate" },
                 values: new object[,]
                 {
-                    { 901, "BK-A1B2C3D4", "Đau nửa đầu migraine", "BS. Nguyễn Văn An", 501, "Tái khám sau 2 tuần. Tránh căng thẳng, ngủ đủ giấc.", "Nguyễn Thị Hoa", "Paracetamol 500mg x2, Ibuprofen 400mg x1", "[{\"name\":\"Paracetamol 500mg\",\"qty\":20,\"unit\":\"Viên\",\"dosage\":\"Ngày 2 lần, mỗi lần 1 viên, sau ăn\"},{\"name\":\"Ibuprofen 400mg\",\"qty\":10,\"unit\":\"Viên\",\"dosage\":\"Ngày 1 lần khi đau, sau ăn no\"}]", "0912345678", "Nội tổng quát", "Đau đầu dữ dội vùng trán và thái dương, buồn nôn, nhạy cảm ánh sáng", "2026-03-10" },
-                    { 902, null, "Tái khám - Đau nửa đầu", "BS. Nguyễn Văn An", 502, "Tình trạng cải thiện tốt", "Nguyễn Thị Hoa", "Paracetamol 500mg x1", "[{\"name\":\"Paracetamol 500mg\",\"qty\":10,\"unit\":\"Viên\",\"dosage\":\"Khi đau, tối đa 2 viên/ngày\"}]", "0912345678", "Nội tổng quát", "Tái khám, đau đầu giảm", "2026-03-24" },
-                    { 903, null, "Viêm da tiếp xúc", "BS. Phạm Hồng Nhung", 503, "Tránh tiếp xúc hóa chất", "Nguyễn Thị Hoa", "Kem bôi Hydrocortisone 1%", "[{\"name\":\"Kem bôi Hydrocortisone 1%\",\"qty\":1,\"unit\":\"Tuýp\",\"dosage\":\"Bôi vùng tổn thương 2 lần/ngày\"}]", "0912345678", "Da liễu", "Da tay bị đỏ, ngứa, bị nổi mẩn", "2026-05-15" },
-                    { 904, null, "Viêm dạ dày", "BS. Nguyễn Văn An", 504, "Kiêng đồ cay nóng, rượu bia", "Trần Văn Minh", "Omeprazole 20mg x2, Sucralfate x3", "[{\"name\":\"Omeprazole 20mg\",\"qty\":14,\"unit\":\"Viên\",\"dosage\":\"Ngày 2 lần trước ăn 30 phút\"},{\"name\":\"Sucralfate 1g\",\"qty\":21,\"unit\":\"Gói\",\"dosage\":\"Ngày 3 lần trước ăn\"}]", "0987654321", "Nội tổng quát", "Đau bụng vùng thượng vị, ợ chua", "2026-01-20" },
-                    { 905, null, "Tăng huyết áp độ 1", "BS. Lê Minh Tuấn", 505, "Theo dõi huyết áp hàng ngày", "Trần Văn Minh", "Amlodipine 5mg x1", "[{\"name\":\"Amlodipine 5mg\",\"qty\":30,\"unit\":\"Viên\",\"dosage\":\"Ngày 1 viên, sáng sau ăn\"}]", "0987654321", "Tim mạch", "Chóng mặt, đau đầu khi thay đổi tư thế", "2026-04-05" },
-                    { 906, null, "Viêm phế quản cấp (bé)", "BS. Trần Thị Bích", 506, "Uống nhiều nước, nghỉ ngơi", "Lê Thị Lan", "Amoxicillin 250mg x3, Thuốc ho Bảo Thanh", "[{\"name\":\"Amoxicillin 250mg\",\"qty\":21,\"unit\":\"Viên\",\"dosage\":\"Ngày 3 lần, mỗi lần 1 viên\"},{\"name\":\"Thuốc ho Bảo Thanh\",\"qty\":1,\"unit\":\"Chai\",\"dosage\":\"Ngày 3 lần, 10ml mỗi lần\"}]", "0909123456", "Nhi khoa", "Bé sốt cao, ho nhiều, khó thở", "2026-02-14" },
-                    { 907, "BK-M3N4O5P6", "Rối loạn nhịp tim", "BS. Lê Minh Tuấn", 507, "Hạn chế vận động mạnh. Tái khám sau 3 tuần.", "Phạm Quốc Bảo", "Bisoprolol 2.5mg x1, Aspirin 81mg x1", "[{\"name\":\"Bisoprolol 2.5mg\",\"qty\":30,\"unit\":\"Viên\",\"dosage\":\"Ngày 1 viên, sáng\"},{\"name\":\"Aspirin 81mg\",\"qty\":30,\"unit\":\"Viên\",\"dosage\":\"Ngày 1 viên, sau ăn trưa\"}]", "0978111222", "Tim mạch", "Đau ngực, khó thở khi gắng sức, hồi hộp", "2026-05-20" },
-                    { 908, null, "Tái khám - Rối loạn nhịp tim", "BS. Lê Minh Tuấn", 508, "Nhịp tim ổn định, tiếp tục thuốc", "Phạm Quốc Bảo", "Bisoprolol 2.5mg x1", "[{\"name\":\"Bisoprolol 2.5mg\",\"qty\":30,\"unit\":\"Viên\",\"dosage\":\"Ngày 1 viên, sáng\"}]", "0978111222", "Tim mạch", "Tái khám, còn hồi hộp nhẹ", "2026-06-10" },
-                    { 909, null, "Mề đay dị ứng", "BS. Phạm Hồng Nhung", 509, "Tránh hải sản, phấn hoa", "Hoàng Thị Yến", "Loratadine 10mg x1, Kem dưỡng ẩm", "[{\"name\":\"Loratadine 10mg\",\"qty\":10,\"unit\":\"Viên\",\"dosage\":\"Ngày 1 viên, tối\"},{\"name\":\"Kem dưỡng ẩm Cetaphil\",\"qty\":1,\"unit\":\"Tuýp\",\"dosage\":\"Bôi 2 lần/ngày sau tắm\"}]", "0961222333", "Da liễu", "Nổi mẩn đỏ, ngứa khắp người", "2026-04-18" },
-                    { 910, null, "Viêm xoang mãn tính", "BS. Võ Thanh Hùng", 510, "Rửa mũi bằng nước muối sinh lý hàng ngày", "Đỗ Văn Tùng", "Amoxicillin 250mg x3, Xịt mũi Nasonex", "[{\"name\":\"Amoxicillin 250mg\",\"qty\":21,\"unit\":\"Viên\",\"dosage\":\"Ngày 3 lần, mỗi lần 1 viên\"},{\"name\":\"Xịt mũi Nasonex\",\"qty\":1,\"unit\":\"Chai\",\"dosage\":\"Xịt 2 nhát mỗi bên mũi, ngày 1 lần\"}]", "0945333444", "Tai Mũi Họng", "Nghẹt mũi, đau đầu vùng trán, chảy dịch mũi", "2026-02-28" }
+                    { 901, "BK-A1B2C3D4", "�au n?a d?u migraine", "BS. Nguy?n Van An", 501, "T�i kh�m sau 2 tu?n. Tr�nh cang th?ng, ng? d? gi?c.", "Nguy?n Th? Hoa", "Paracetamol 500mg x2, Ibuprofen 400mg x1", "[{\"name\":\"Paracetamol 500mg\",\"qty\":20,\"unit\":\"Vi�n\",\"dosage\":\"Ng�y 2 l?n, m?i l?n 1 vi�n, sau an\"},{\"name\":\"Ibuprofen 400mg\",\"qty\":10,\"unit\":\"Vi�n\",\"dosage\":\"Ng�y 1 l?n khi dau, sau an no\"}]", "0912345678", "N?i t?ng qu�t", "�au d?u d? d?i v�ng tr�n v� th�i duong, bu?n n�n, nh?y c?m �nh s�ng", "2026-03-10" },
+                    { 902, null, "T�i kh�m - �au n?a d?u", "BS. Nguy?n Van An", 502, "T�nh tr?ng c?i thi?n t?t", "Nguy?n Th? Hoa", "Paracetamol 500mg x1", "[{\"name\":\"Paracetamol 500mg\",\"qty\":10,\"unit\":\"Vi�n\",\"dosage\":\"Khi dau, t?i da 2 vi�n/ng�y\"}]", "0912345678", "N?i t?ng qu�t", "T�i kh�m, dau d?u gi?m", "2026-03-24" },
+                    { 903, null, "Vi�m da ti?p x�c", "BS. Ph?m H?ng Nhung", 503, "Tr�nh ti?p x�c h�a ch?t", "Nguy?n Th? Hoa", "Kem b�i Hydrocortisone 1%", "[{\"name\":\"Kem b�i Hydrocortisone 1%\",\"qty\":1,\"unit\":\"Tu�p\",\"dosage\":\"B�i v�ng t?n thuong 2 l?n/ng�y\"}]", "0912345678", "Da li?u", "Da tay b? d?, ng?a, b? n?i m?n", "2026-05-15" },
+                    { 904, null, "Vi�m d? d�y", "BS. Nguy?n Van An", 504, "Ki�ng d? cay n�ng, ru?u bia", "Tr?n Van Minh", "Omeprazole 20mg x2, Sucralfate x3", "[{\"name\":\"Omeprazole 20mg\",\"qty\":14,\"unit\":\"Vi�n\",\"dosage\":\"Ng�y 2 l?n tru?c an 30 ph�t\"},{\"name\":\"Sucralfate 1g\",\"qty\":21,\"unit\":\"G�i\",\"dosage\":\"Ng�y 3 l?n tru?c an\"}]", "0987654321", "N?i t?ng qu�t", "�au b?ng v�ng thu?ng v?, ? chua", "2026-01-20" },
+                    { 905, null, "Tang huy?t �p d? 1", "BS. L� Minh Tu?n", 505, "Theo d�i huy?t �p h�ng ng�y", "Tr?n Van Minh", "Amlodipine 5mg x1", "[{\"name\":\"Amlodipine 5mg\",\"qty\":30,\"unit\":\"Vi�n\",\"dosage\":\"Ng�y 1 vi�n, s�ng sau an\"}]", "0987654321", "Tim m?ch", "Ch�ng m?t, dau d?u khi thay d?i tu th?", "2026-04-05" },
+                    { 906, null, "Vi�m ph? qu?n c?p (b�)", "BS. Tr?n Th? B�ch", 506, "U?ng nhi?u nu?c, ngh? ngoi", "L� Th? Lan", "Amoxicillin 250mg x3, Thu?c ho B?o Thanh", "[{\"name\":\"Amoxicillin 250mg\",\"qty\":21,\"unit\":\"Vi�n\",\"dosage\":\"Ng�y 3 l?n, m?i l?n 1 vi�n\"},{\"name\":\"Thu?c ho B?o Thanh\",\"qty\":1,\"unit\":\"Chai\",\"dosage\":\"Ng�y 3 l?n, 10ml m?i l?n\"}]", "0909123456", "Nhi khoa", "B� s?t cao, ho nhi?u, kh� th?", "2026-02-14" },
+                    { 907, "BK-M3N4O5P6", "R?i lo?n nh?p tim", "BS. L� Minh Tu?n", 507, "H?n ch? v?n d?ng m?nh. T�i kh�m sau 3 tu?n.", "Ph?m Qu?c B?o", "Bisoprolol 2.5mg x1, Aspirin 81mg x1", "[{\"name\":\"Bisoprolol 2.5mg\",\"qty\":30,\"unit\":\"Vi�n\",\"dosage\":\"Ng�y 1 vi�n, s�ng\"},{\"name\":\"Aspirin 81mg\",\"qty\":30,\"unit\":\"Vi�n\",\"dosage\":\"Ng�y 1 vi�n, sau an trua\"}]", "0978111222", "Tim m?ch", "�au ng?c, kh� th? khi g?ng s?c, h?i h?p", "2026-05-20" },
+                    { 908, null, "T�i kh�m - R?i lo?n nh?p tim", "BS. L� Minh Tu?n", 508, "Nh?p tim ?n d?nh, ti?p t?c thu?c", "Ph?m Qu?c B?o", "Bisoprolol 2.5mg x1", "[{\"name\":\"Bisoprolol 2.5mg\",\"qty\":30,\"unit\":\"Vi�n\",\"dosage\":\"Ng�y 1 vi�n, s�ng\"}]", "0978111222", "Tim m?ch", "T�i kh�m, c�n h?i h?p nh?", "2026-06-10" },
+                    { 909, null, "M? day d? ?ng", "BS. Ph?m H?ng Nhung", 509, "Tr�nh h?i s?n, ph?n hoa", "Ho�ng Th? Y?n", "Loratadine 10mg x1, Kem du?ng ?m", "[{\"name\":\"Loratadine 10mg\",\"qty\":10,\"unit\":\"Vi�n\",\"dosage\":\"Ng�y 1 vi�n, t?i\"},{\"name\":\"Kem du?ng ?m Cetaphil\",\"qty\":1,\"unit\":\"Tu�p\",\"dosage\":\"B�i 2 l?n/ng�y sau t?m\"}]", "0961222333", "Da li?u", "N?i m?n d?, ng?a kh?p ngu?i", "2026-04-18" },
+                    { 910, null, "Vi�m xoang m�n t�nh", "BS. V� Thanh H�ng", 510, "R?a mui b?ng nu?c mu?i sinh l� h�ng ng�y", "�? Van T�ng", "Amoxicillin 250mg x3, X?t mui Nasonex", "[{\"name\":\"Amoxicillin 250mg\",\"qty\":21,\"unit\":\"Vi�n\",\"dosage\":\"Ng�y 3 l?n, m?i l?n 1 vi�n\"},{\"name\":\"X?t mui Nasonex\",\"qty\":1,\"unit\":\"Chai\",\"dosage\":\"X?t 2 nh�t m?i b�n mui, ng�y 1 l?n\"}]", "0945333444", "Tai Mui H?ng", "Ngh?t mui, dau d?u v�ng tr�n, ch?y d?ch mui", "2026-02-28" }
                 });
 
             _ = migrationBuilder.InsertData(
@@ -189,11 +189,11 @@ namespace WebDatLichKham.Migrations
                 columns: new[] { "Id", "ExpiryDate", "Ingredients", "Name", "Unit" },
                 values: new object[,]
                 {
-                    { "med_01", "2027-12-31", "Paracetamol", "Paracetamol 500mg", "Viên" },
-                    { "med_02", "2026-05-15", "Amoxicillin", "Amoxicillin 250mg", "Viên" },
-                    { "med_03", "2028-01-20", "Ibuprofen", "Ibuprofen 400mg", "Viên" },
-                    { "med_04", "2025-10-10", "Vitamin C", "Vitamin C 1000mg", "Viên sủi" },
-                    { "med_05", "2026-02-28", "Thảo dược", "Thuốc ho Bảo Thanh", "Chai" }
+                    { "med_01", "2027-12-31", "Paracetamol", "Paracetamol 500mg", "Vi�n" },
+                    { "med_02", "2026-05-15", "Amoxicillin", "Amoxicillin 250mg", "Vi�n" },
+                    { "med_03", "2028-01-20", "Ibuprofen", "Ibuprofen 400mg", "Vi�n" },
+                    { "med_04", "2025-10-10", "Vitamin C", "Vitamin C 1000mg", "Vi�n s?i" },
+                    { "med_05", "2026-02-28", "Th?o du?c", "Thu?c ho B?o Thanh", "Chai" }
                 });
 
             _ = migrationBuilder.InsertData(
@@ -201,16 +201,16 @@ namespace WebDatLichKham.Migrations
                 columns: new[] { "Id", "Description", "DoctorCount", "Icon", "Name" },
                 values: new object[,]
                 {
-                    { "sp_01", "Khám và điều trị các bệnh nội khoa", 8, "🫀", "Nội tổng quát" },
-                    { "sp_02", "Chăm sóc sức khỏe trẻ em", 5, "👶", "Nhi khoa" },
-                    { "sp_03", "Chẩn đoán và điều trị bệnh tim", 4, "❤️", "Tim mạch" },
-                    { "sp_04", "Điều trị các bệnh về da", 3, "🧴", "Da liễu" },
-                    { "sp_05", "Khám và điều trị TMH", 4, "👂", "Tai Mũi Họng" },
-                    { "sp_06", "Khám và điều trị bệnh về mắt", 3, "👁️", "Mắt" },
-                    { "sp_07", "Chăm sóc sức khỏe răng miệng", 6, "🦷", "Răng Hàm Mặt" },
-                    { "sp_08", "Điều trị xương khớp", 3, "🦴", "Chấn thương chỉnh hình" },
-                    { "sp_09", "Chẩn đoán bệnh thần kinh", 2, "🧠", "Thần kinh" },
-                    { "sp_10", "Chăm sóc sức khỏe phụ nữ", 5, "🤰", "Sản phụ khoa" }
+                    { "sp_01", "Kh�m v� di?u tr? c�c b?nh n?i khoa", 8, "??", "N?i t?ng qu�t" },
+                    { "sp_02", "Cham s�c s?c kh?e tr? em", 5, "??", "Nhi khoa" },
+                    { "sp_03", "Ch?n do�n v� di?u tr? b?nh tim", 4, "??", "Tim m?ch" },
+                    { "sp_04", "�i?u tr? c�c b?nh v? da", 3, "??", "Da li?u" },
+                    { "sp_05", "Kh�m v� di?u tr? TMH", 4, "??", "Tai Mui H?ng" },
+                    { "sp_06", "Kh�m v� di?u tr? b?nh v? m?t", 3, "???", "M?t" },
+                    { "sp_07", "Cham s�c s?c kh?e rang mi?ng", 6, "??", "Rang H�m M?t" },
+                    { "sp_08", "�i?u tr? xuong kh?p", 3, "??", "Ch?n thuong ch?nh h�nh" },
+                    { "sp_09", "Ch?n do�n b?nh th?n kinh", 2, "??", "Th?n kinh" },
+                    { "sp_10", "Cham s�c s?c kh?e ph? n?", 5, "??", "S?n ph? khoa" }
                 });
         }
 
