@@ -156,12 +156,6 @@ Appointments ──┘
 
 ---
 
-## 📄 License
-
-Dự án được xây dựng phục vụ mục đích **học thuật** và nghiên cứu.
-
----
-
 <div align="center">
 
 **Made with ❤️ by DInto216**  
