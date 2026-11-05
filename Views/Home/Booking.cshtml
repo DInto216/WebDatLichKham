@@ -218,7 +218,37 @@
                 </div>
               </div>
             </div>
-            <div id="doctorList" class="row g-3"></div>
+            <div id="doctorList" class="row g-3">
+              @if (ViewBag.Doctors != null)
+              {
+                foreach (var doc in (IEnumerable<WebDatLichKham.Models.Doctor>)ViewBag.Doctors)
+                {
+                  var docTitle = (string.IsNullOrEmpty(doc.AcademicTitle) ? "" : doc.AcademicTitle + " ") +
+                                 (string.IsNullOrEmpty(doc.Degree) ? "" : doc.Degree + " ") + doc.Name;
+                  <div class="col-md-6 col-lg-4 doctor-item" data-specialty="@doc.SpecialtyName" data-name="@doc.Name.ToLower()">
+                    <div class="doctor-select-card" id="docCard_@doc.Id" onclick="BookingWizard.selectDoctor('@doc.Id')">
+                      <div class="d-flex gap-3 align-items-center">
+                        <div class="flex-shrink-0 overflow-hidden shadow-sm" style="width:64px;height:64px;background:var(--bg-secondary);border: 2px solid white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;">
+                          @if (!string.IsNullOrEmpty(doc.Avatar))
+                          {
+                            <img src="@doc.Avatar" style="width:100%;height:100%;object-fit:cover;">
+                          }
+                          else
+                          {
+                            <span>👨‍⚕️</span>
+                          }
+                        </div>
+                        <div>
+                          <div style="font-size:var(--text-xs);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-tertiary);margin-bottom:4px;">@doc.SpecialtyName</div>
+                          <h6 class="mb-1" style="font-size:15px;color:var(--text-primary);">@docTitle</h6>
+                          <div style="font-weight:700;color:var(--primary-600);font-size:15px;margin-top:2px;">@doc.Price.ToString("N0") VNĐ</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                }
+              }
+            </div>
           </div>
         </div>
 
@@ -391,8 +421,8 @@
       let selectedDate = null;
       let selectedTime = null;
       let selectedPaymentMethod = 'cash';
-      let doctors = [];
-      let specialties = [];
+      let doctors = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.Doctors ?? new List<WebDatLichKham.Models.Doctor>(), new System.Text.Json.JsonSerializerOptions { Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping, PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase }));
+      let specialties = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.Specialties ?? new List<WebDatLichKham.Models.Specialty>(), new System.Text.Json.JsonSerializerOptions { Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping, PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase }));
       let currentDoctorAppointments = [];
 
       let paymentSettings = [];
@@ -487,30 +517,34 @@
 
       const loadDoctors = async () => {
         try {
-          const res = await API.getDoctors();
-          doctors = Array.isArray(res) ? res : [];
+          if (!doctors || doctors.length === 0) {
+            const res = await API.getDoctors();
+            doctors = Array.isArray(res) ? res : [];
+          }
         } catch (e) {
           console.error('[Booking] API.getDoctors không phản hồi', e);
-          doctors = [];
         }
         filterDoctors();
-        // Nếu danh sách chuyên khoa rỗng, tạo từ doctors
-        const select = document.getElementById('filterSpecialty');
-        if (select && select.options.length <= 1) {
-          populateSpecialtyDropdown();
-        }
       };
 
       const filterDoctors = () => {
         const list = document.getElementById('doctorList');
         if (!list) return;
-        const spFilter = document.getElementById('filterSpecialty') ? document.getElementById('filterSpecialty').value : '';
+        const spSelect = document.getElementById('filterSpecialty');
+        const spFilter = spSelect ? spSelect.value.trim().toLowerCase() : '';
         const searchInput = document.getElementById('searchDoctor');
         const search = searchInput ? searchInput.value.toLowerCase().trim() : '';
         
         let filtered = doctors;
-        if (spFilter) filtered = filtered.filter(d => (d.specialtyName || d.SpecialtyName) === spFilter);
-        if (search) filtered = filtered.filter(d => (d.name || d.Name || '').toLowerCase().includes(search));
+        if (spFilter) {
+          filtered = filtered.filter(d => {
+            const docSp = (d.specialtyName || d.SpecialtyName || '').trim().toLowerCase();
+            return docSp === spFilter;
+          });
+        }
+        if (search) {
+          filtered = filtered.filter(d => (d.name || d.Name || '').toLowerCase().includes(search));
+        }
 
         if (filtered.length === 0) {
             list.innerHTML = '<div class="col-12 text-center py-4 text-muted">Không tìm thấy bác sĩ phù hợp</div>';

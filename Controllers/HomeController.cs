@@ -46,6 +46,7 @@ namespace WebDatLichKham.Controllers
         public async Task<IActionResult> Booking()
         {
             ViewBag.Specialties = await _context.Specialties.AsNoTracking().ToListAsync();
+            ViewBag.Doctors = await _context.Doctors.AsNoTracking().ToListAsync();
             return View();
         }
 
