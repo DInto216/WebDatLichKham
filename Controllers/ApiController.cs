@@ -176,6 +176,16 @@ namespace WebDatLichKham.Controllers
             return Ok(appts);
         }
 
+        // ============================================
+        // ANTI-SPAM: Lay cau hoi Math Captcha
+        // ============================================
+        [HttpGet("antispam/captcha")]
+        public async Task<IActionResult> GetAntiSpamCaptcha()
+        {
+            var result = await _appointmentService.GenerateAntiSpamCaptchaAsync();
+            return Ok(result);
+        }
+
         [HttpPost("appointments")]
         public async Task<IActionResult> AddAppointment([FromBody] Appointment data)
         {

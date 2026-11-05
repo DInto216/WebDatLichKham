@@ -1,4 +1,4 @@
-/* ============================================
+﻿/* ============================================
    MEDICAL BOOKING - API MODULE (Real Database Backend)
    Communicates with ASP.NET Core MVC controllers
    ============================================ */
@@ -330,6 +330,10 @@ const API = (() => {
     return await request('/api/ai/config');
   };
 
+  const getAntiSpamCaptcha = async () => {
+    return await request('/api/antispam/captcha');
+  };
+
   // ---- Public API ----
   return {
     consultAi,
@@ -373,6 +377,7 @@ const API = (() => {
     updatePayment,
     maskName,
     maskPhone,
+    getAntiSpamCaptcha,
     generateBookingId
   };
 })();

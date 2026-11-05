@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using WebDatLichKham.Data;
 using WebDatLichKham.Models;
 
@@ -14,19 +15,46 @@ namespace WebDatLichKham.Services
         Task<IEnumerable<object>> GetPaymentsAsync();
         Task<(bool Success, string Message, Appointment? Data)> CancelByPatientAsync(string bookingId, string phone, string? reason);
         Task<(bool Success, string Message, Appointment? Data)> RescheduleByPatientAsync(string bookingId, string phone, string newDate, string newTime);
+        Task<object> GenerateAntiSpamCaptchaAsync();
     }
 
     public class AppointmentService : IAppointmentService
     {
         private readonly ApplicationDbContext _context;
         private readonly IEmailService _emailService;
+        private readonly IMemoryCache _cache;
 
-        public AppointmentService(ApplicationDbContext context, IEmailService emailService)
+        public AppointmentService(ApplicationDbContext context, IEmailService emailService, IMemoryCache cache)
         {
             _context = context;
             _emailService = emailService;
+            _cache = cache;
         }
 
+        // ============================================
+        // ANTI-SPAM: Tạo câu hỏi xác minh Math Captcha
+        // ============================================
+        public Task<object> GenerateAntiSpamCaptchaAsync()
+        {
+            var rng = new Random();
+            int a = rng.Next(1, 20);
+            int b = rng.Next(1, 20);
+            int answer = a + b;
+
+            // Token ngẫu nhiên 1 lần dùng, hết hạn sau 10 phút
+            var token = Guid.NewGuid().ToString("N");
+            _cache.Set("captcha_" + token, answer.ToString(), TimeSpan.FromMinutes(10));
+
+            return Task.FromResult<object>(new
+            {
+                token,
+                question = $"{a} + {b} = ?"
+            });
+        }
+
+        // ============================================
+        // GET ALL APPOINTMENTS
+        // ============================================
         public async Task<IEnumerable<Appointment>> GetAllAsync(string? doctorId = null, string? date = null)
         {
             // TỐI ƯU HÓA: Sử dụng AsNoTracking cho các truy vấn chỉ đọc để vô hiệu hóa Tracking Snapshot, tiết kiệm RAM.
@@ -45,17 +73,90 @@ namespace WebDatLichKham.Services
             return await query.OrderByDescending(a => a.Date).ThenByDescending(a => a.Time).ToListAsync();
         }
 
+        // ============================================
+        // ADD APPOINTMENT (có đầy đủ Anti-Spam)
+        // ============================================
         public async Task<Appointment> AddAsync(Appointment data)
         {
+            // === LỚP 1: HONEYPOT TRAP ===
+            // Field ẩn trong form - bot thường tự điền, người thật để trống
+            if (!string.IsNullOrWhiteSpace(data.BotTrap))
+            {
+                throw new ArgumentException("Yêu cầu đặt lịch bị từ chối do phát hiện hành vi tự động.");
+            }
+
+            // === LỚP 2: KIỂM TRA SỐ ĐIỆN THOẠI VIỆT NAM ===
             if (!string.IsNullOrEmpty(data.Phone))
             {
                 data.Phone = data.Phone.Replace(" ", "").Replace("-", "");
             }
-            if (string.IsNullOrEmpty(data.Phone) || !System.Text.RegularExpressions.Regex.IsMatch(data.Phone, @"^\d{10,11}$"))
+            if (string.IsNullOrEmpty(data.Phone) ||
+                !System.Text.RegularExpressions.Regex.IsMatch(data.Phone, @"^(03|05|07|08|09)\d{8}$|^02\d{9}$"))
             {
-                throw new ArgumentException("Số điện thoại không hợp lệ. Số điện thoại phải gồm 10-11 chữ số.");
+                throw new ArgumentException("Số điện thoại không hợp lệ. Vui lòng nhập số điện thoại Việt Nam hợp lệ (10-11 chữ số, đầu số 02x, 03x, 05x, 07x, 08x, 09x).");
+            }
+            // Chặn số lặp bất thường (ví dụ: 0999999999)
+            var digitRepeat = System.Text.RegularExpressions.Regex.IsMatch(data.Phone, @"(\d)\1{7,}");
+            if (digitRepeat)
+            {
+                throw new ArgumentException("Số điện thoại không hợp lệ. Vui lòng nhập số điện thoại thực.");
             }
 
+            // === LỚP 3: RATE LIMITING (Chống gửi liên tục) ===
+            var rateLimitKey = "ratelimit_" + data.Phone;
+            if (_cache.TryGetValue(rateLimitKey, out _))
+            {
+                throw new ArgumentException("Bạn vừa đặt lịch gần đây. Vui lòng đợi 30 giây trước khi thử lại.");
+            }
+
+            // === LỚP 4: GIỚI HẠN LỊCH HẸN ĐANG HOẠT ĐỘNG ===
+            var activeCount = await _context.Appointments.AsNoTracking()
+                .CountAsync(a => a.Phone == data.Phone && a.Status != "cancelled" && a.Status != "completed");
+            if (activeCount >= 3)
+            {
+                throw new ArgumentException("Số điện thoại này đã có 3 lịch hẹn đang chờ xác nhận. Vui lòng hủy bớt lịch hẹn cũ trước khi đặt mới.");
+            }
+
+            // === LỚP 5: KIỂM TRA NGÀY HỢP LỆ ===
+            if (DateTime.TryParse(data.Date, out var appointmentDate))
+            {
+                if (appointmentDate.Date < DateTime.Today)
+                    throw new ArgumentException("Ngày khám không hợp lệ. Không thể đặt lịch trong quá khứ.");
+                if (appointmentDate.Date > DateTime.Today.AddDays(60))
+                    throw new ArgumentException("Ngày khám không hợp lệ. Chỉ được phép đặt lịch trong vòng 60 ngày tới.");
+            }
+
+            // === LỚP 6: CHỐNG TRÙNG LỊCH BÁC SĨ ===
+            if (!string.IsNullOrEmpty(data.DoctorId))
+            {
+                bool slotTaken = await _context.Appointments.AnyAsync(a =>
+                    a.DoctorId == data.DoctorId &&
+                    a.Date == data.Date &&
+                    a.Time == data.Time &&
+                    a.Status != "cancelled");
+                if (slotTaken)
+                    throw new ArgumentException("Khung giờ này của bác sĩ đã có người đặt. Vui lòng chọn khung giờ khác.");
+            }
+
+            // === LỚP 7: XÁC MINH MATH CAPTCHA ===
+            if (string.IsNullOrWhiteSpace(data.CaptchaToken) || string.IsNullOrWhiteSpace(data.CaptchaAnswer))
+            {
+                throw new ArgumentException("Vui lòng hoàn thành câu hỏi xác minh bảo mật trước khi đặt lịch.");
+            }
+            var cacheKey = "captcha_" + data.CaptchaToken;
+            if (!_cache.TryGetValue(cacheKey, out string? correctAnswer) || correctAnswer != data.CaptchaAnswer.Trim())
+            {
+                throw new ArgumentException("Câu trả lời xác minh không đúng. Vui lòng thử lại.");
+            }
+            // Xóa token ngay sau khi dùng (one-time use)
+            _cache.Remove(cacheKey);
+
+            // === ĐẶT RATE LIMIT SAU KHI PASS HẾT KIỂM TRA ===
+            _cache.Set(rateLimitKey, true, TimeSpan.FromSeconds(30));
+
+            // ============================================
+            // LƯU DỮ LIỆU
+            // ============================================
             if (string.IsNullOrEmpty(data.BookingId))
             {
                 var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -112,6 +213,9 @@ namespace WebDatLichKham.Services
             return data;
         }
 
+        // ============================================
+        // UPDATE STATUS
+        // ============================================
         public async Task<Appointment> UpdateStatusAsync(string id, string status)
         {
             var appt = await _context.Appointments.FindAsync(id);
@@ -122,6 +226,9 @@ namespace WebDatLichKham.Services
             return appt;
         }
 
+        // ============================================
+        // UPDATE PAYMENT
+        // ============================================
         public async Task<Appointment> UpdatePaymentAsync(string id, string paymentStatus)
         {
             var appt = await _context.Appointments.FindAsync(id);
@@ -136,6 +243,9 @@ namespace WebDatLichKham.Services
             return appt;
         }
 
+        // ============================================
+        // LOOKUP
+        // ============================================
         public async Task<IEnumerable<Appointment>> LookupAsync(string phone)
         {
             if (string.IsNullOrEmpty(phone)) return new List<Appointment>();
@@ -148,6 +258,9 @@ namespace WebDatLichKham.Services
                 .ToListAsync();
         }
 
+        // ============================================
+        // GET PAYMENTS
+        // ============================================
         public async Task<IEnumerable<object>> GetPaymentsAsync()
         {
             var list = await _context.Appointments.AsNoTracking()
@@ -158,17 +271,20 @@ namespace WebDatLichKham.Services
             return list.Select(a => new
             {
                 id = a.Id,
-                transactionId = a.Id, // Use appointment ID as transaction ID
+                transactionId = a.Id,
                 appointmentId = a.BookingId,
                 patientName = a.PatientName,
                 amount = a.PaymentAmount,
                 paymentMethod = a.PaymentMethod,
                 transactionDate = a.PaidAt?.ToString("yyyy-MM-ddTHH:mm:ss") ?? (a.Date + "T" + a.Time + ":00"),
-                status = a.PaymentStatus, // frontend expects 'status' to be the payment status
+                status = a.PaymentStatus,
                 createdAt = a.CreatedAt
             });
         }
 
+        // ============================================
+        // CANCEL BY PATIENT
+        // ============================================
         public async Task<(bool Success, string Message, Appointment? Data)> CancelByPatientAsync(string bookingId, string phone, string? reason)
         {
             if (string.IsNullOrWhiteSpace(bookingId) || string.IsNullOrWhiteSpace(phone))
@@ -207,6 +323,9 @@ namespace WebDatLichKham.Services
             return (true, "Hủy lịch hẹn thành công.", appt);
         }
 
+        // ============================================
+        // RESCHEDULE BY PATIENT
+        // ============================================
         public async Task<(bool Success, string Message, Appointment? Data)> RescheduleByPatientAsync(string bookingId, string phone, string newDate, string newTime)
         {
             if (string.IsNullOrWhiteSpace(bookingId) || string.IsNullOrWhiteSpace(phone) ||
@@ -264,4 +383,3 @@ namespace WebDatLichKham.Services
         }
     }
 }
-

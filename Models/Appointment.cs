@@ -53,6 +53,16 @@ namespace WebDatLichKham.Models
         public decimal PaymentAmount { get; set; } = 0;
 
         public DateTime? PaidAt { get; set; }
+
+        // ---- Anti-Spam Fields (NotMapped - không lưu vào DB) ----
+        [NotMapped]
+        public string BotTrap { get; set; } = string.Empty;       // Honeypot: bot sẽ điền, người thật để trống
+
+        [NotMapped]
+        public string CaptchaToken { get; set; } = string.Empty;  // Token định danh câu hỏi captcha
+
+        [NotMapped]
+        public string CaptchaAnswer { get; set; } = string.Empty; // Đáp án người dùng nhập
     }
 
     public class PatientCancelAppointmentRequest
@@ -70,4 +80,3 @@ namespace WebDatLichKham.Models
         public string NewTime { get; set; } = string.Empty;
     }
 }
-
