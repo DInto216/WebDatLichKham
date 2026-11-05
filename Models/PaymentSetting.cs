@@ -27,3 +27,4 @@ namespace WebDatLichKham.Models
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     }
 }
+

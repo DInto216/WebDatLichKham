@@ -70,3 +70,4 @@ namespace WebDatLichKham.Models
         public string NewTime { get; set; } = string.Empty;
     }
 }
+

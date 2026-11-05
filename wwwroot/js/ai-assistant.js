@@ -427,3 +427,4 @@ const AiAssistant = (() => {
 })();
 
 document.addEventListener('DOMContentLoaded', AiAssistant.init);
+

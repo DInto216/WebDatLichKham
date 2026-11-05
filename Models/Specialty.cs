@@ -20,3 +20,4 @@ namespace WebDatLichKham.Models
         public virtual ICollection<Doctor> Doctors { get; set; } = new List<Doctor>();
     }
 }
+

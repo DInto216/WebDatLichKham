@@ -7,3 +7,4 @@ namespace WebDatLichKham.Services
         Task SendExamResultAsync(string toEmail, string patientName, string bookingId, string doctorName, string diagnosis, string prescription);
     }
 }
+

@@ -46,3 +46,4 @@ namespace WebDatLichKham.Models
         public string ScheduleJson { get; set; } = string.Empty;
     }
 }
+

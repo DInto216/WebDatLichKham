@@ -22,3 +22,4 @@ namespace WebDatLichKham.Models
         public string Specialty { get; set; } = string.Empty;
     }
 }
+

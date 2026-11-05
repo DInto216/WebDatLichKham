@@ -25,3 +25,4 @@ namespace WebDatLichKham.Models
         public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
 }
+

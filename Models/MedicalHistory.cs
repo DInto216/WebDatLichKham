@@ -33,3 +33,4 @@ namespace WebDatLichKham.Models
         public string PrescriptionItemsJson { get; set; } = string.Empty;
     }
 }
+

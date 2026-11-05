@@ -8,3 +8,4 @@ namespace WebDatLichKham.Services
         AiConfigDto GetConfigInfo();
     }
 }
+

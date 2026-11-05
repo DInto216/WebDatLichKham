@@ -17,3 +17,4 @@ namespace WebDatLichKham.Models
         public string ExpiryDate { get; set; } = string.Empty;
     }
 }
+
