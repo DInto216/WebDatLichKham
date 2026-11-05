@@ -233,25 +233,7 @@
                 </div>
               </div>
             </div>
-                            <!-- ===== ANTI-SPAM CAPTCHA WIDGET ===== -->
-                <div id="captchaBox" class="mt-4 p-3" style="background: linear-gradient(135deg,#f0f9ff,#e0f2fe); border:1.5px solid #38bdf8; border-radius:12px;">
-                  <div class="d-flex align-items-center gap-2 mb-2">
-                    <i class="bi bi-shield-check text-primary fs-5"></i>
-                    <span class="fw-semibold" style="color:#0369a1;font-size:.95rem;">Xác minh bảo mật</span>
-                  </div>
-                  <p class="mb-2" style="font-size:.88rem;color:#475569;">Vui lòng giải phép tính dưới đây để xác nhận bạn không phải robot:</p>
-                  <div class="d-flex align-items-center gap-2 flex-wrap">
-                    <span id="captchaQuestion" class="fw-bold px-3 py-1" style="background:#fff;border:1.5px dashed #38bdf8;border-radius:8px;font-size:1.1rem;color:#0c4a6e;min-width:90px;text-align:center;">Đang tải...</span>
-                    <span style="color:#64748b">=</span>
-                    <input type="number" id="captchaInput" class="form-control" style="width:90px;border:1.5px solid #38bdf8;border-radius:8px;" placeholder="?" min="0" max="99">
-                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="BookingWizard.loadCaptcha()" title="Làm mới câu hỏi">
-                      <i class="bi bi-arrow-clockwise"></i>
-                    </button>
-                  </div>
-                  <input type="hidden" id="captchaToken">
-                </div>
-                <!-- ===== END CAPTCHA WIDGET ===== -->
-                <div class="d-flex justify-content-between mt-4 pt-4" style="border-top:1px solid var(--bg-tertiary)">
+            <div class="d-flex justify-content-between mt-4 pt-4" style="border-top:1px solid var(--bg-tertiary)">
               <button type="button" class="btn-secondary-medical" onclick="BookingWizard.goToStep(1)"><i class="bi bi-arrow-left"></i> Quay lại</button>
               <button type="button" class="btn-primary-medical" id="btnToStep3" disabled onclick="BookingWizard.goToStep(3)">Tiếp tục <i class="bi bi-arrow-right"></i></button>
             </div>
@@ -746,6 +728,7 @@
           btn.disabled = false;
           btn.innerHTML = '<i class="bi bi-check-circle"></i> Xác Nhận Đặt Lịch';
           App.toast.error('Lỗi', err.message);
+          loadCaptcha();
         }
       };
 
