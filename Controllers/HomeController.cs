@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebDatLichKham.Data;
@@ -43,8 +43,9 @@ namespace WebDatLichKham.Controllers
         /// Luồng: Đặt lịch khám bệnh. Trả về giao diện Wizard (Booking.cshtml)
         /// Form nhập liệu sẽ gọi API bằng JS thay vì PostBack truyền thống.
         /// </summary>
-        public IActionResult Booking()
+        public async Task<IActionResult> Booking()
         {
+            ViewBag.Specialties = await _context.Specialties.AsNoTracking().ToListAsync();
             return View();
         }
 

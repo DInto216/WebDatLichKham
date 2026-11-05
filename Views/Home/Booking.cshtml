@@ -1,4 +1,4 @@
-@{
+﻿@{
     Layout = "~/Views/Shared/_PublicLayout.cshtml";
     ViewBag.Title = "Đặt Lịch Khám";
     ViewBag.ActiveNav = "Booking";
@@ -197,6 +197,14 @@
                   <label class="form-label">Chuyên khoa</label>
                   <select class="form-select" id="filterSpecialty" onchange="BookingWizard.filterDoctors()">
                     <option value="">Tất cả chuyên khoa</option>
+                    @if (ViewBag.Specialties != null)
+                    {
+                      foreach (var sp in (IEnumerable<WebDatLichKham.Models.Specialty>)ViewBag.Specialties)
+                      {
+                        var iconStr = (!string.IsNullOrEmpty(sp.Icon) && !sp.Icon.StartsWith("bi-") && sp.Icon.Length <= 4) ? sp.Icon + " " : "";
+                        <option value="@sp.Name">@iconStr@sp.Name</option>
+                      }
+                    }
                   </select>
                 </div>
               </div>
@@ -438,6 +446,7 @@
       const populateSpecialtyDropdown = () => {
         const select = document.getElementById('filterSpecialty');
         if (!select) return;
+        if (select.options.length > 1 && (!specialties || specialties.length === 0)) return;
         const currentVal = select.value;
         select.innerHTML = '<option value="">Tất cả chuyên khoa</option>';
 
