@@ -1,4 +1,4 @@
-﻿@{
+@{
     Layout = "~/Views/Shared/_PublicLayout.cshtml";
     ViewBag.Title = "Đặt Lịch Khám";
     ViewBag.ActiveNav = "Booking";
@@ -463,27 +463,33 @@
         });
 
         if (step === 3) updateSummary();
-        if (step === 4) updatePaymentSummary();
+        if (step === 4) { updatePaymentSummary(); initTurnstile(); }
 
         window.scrollTo({ top: 200, behavior: 'smooth' });
       };
 
       const getDoctorPrice = (docId) => {
+        // Tim gia thuc tu mang doctors (camelCase tu Html.Raw JSON)
+        const doc = doctors ? doctors.find(d => (d.id || d.Id) === docId) : null;
+        if (doc && (doc.price || doc.Price)) return doc.price || doc.Price;
+        // Fallback nếu chưa load xong
         const idInt = parseInt((docId || '1').replace(/\D/g, '') || 1);
         return 300000 + ((idInt % 5) * 50000);
       };
 
       const populateSpecialtyDropdown = () => {
+        // Nếu dropdown đã có options từ SSR (Razor), không ghi đè
         const select = document.getElementById('filterSpecialty');
         if (!select) return;
-        if (select.options.length > 1 && (!specialties || specialties.length === 0)) return;
+        if (select.options.length > 1) return; // SSR đã render xong, skip
+        // Fallback: build từ JS nếu SSR thất bại
         const currentVal = select.value;
         select.innerHTML = '<option value="">Tất cả chuyên khoa</option>';
-
-        if (specialties && specialties.length > 0) {
-          specialties.forEach(sp => {
-            const name = sp.name || sp.Name || '';
-            const icon = sp.icon || sp.Icon || '';
+        const spList = specialties && specialties.length > 0 ? specialties : [];
+        if (spList.length > 0) {
+          spList.forEach(sp => {
+            const name = sp.Name || sp.name || '';
+            const icon = sp.Icon || sp.icon || '';
             if (!name) return;
             const opt = document.createElement('option');
             opt.value = name;
@@ -492,7 +498,7 @@
             select.appendChild(opt);
           });
         } else if (doctors && doctors.length > 0) {
-          const uniqueSpecs = [...new Set(doctors.map(d => d.specialtyName || d.SpecialtyName).filter(Boolean))];
+          const uniqueSpecs = [...new Set(doctors.map(d => d.SpecialtyName || d.specialtyName).filter(Boolean))];
           uniqueSpecs.forEach(name => {
             const opt = document.createElement('option');
             opt.value = name;
@@ -500,18 +506,19 @@
             select.appendChild(opt);
           });
         }
-
         if (currentVal) select.value = currentVal;
       };
 
       const loadSpecialties = async () => {
         try {
           const res = await API.getSpecialties();
+          // API có thể trả PascalCase (Id, Name) hoặc camelCase tuỳ cấu hình server
           specialties = Array.isArray(res) ? res : [];
         } catch (e) {
-          console.warn('[Booking] API.getSpecialties không phản hồi, dùng danh sách dự phòng', e);
+          console.warn('[Booking] API.getSpecialties không phản hồi, dùng SSR data', e);
           specialties = [];
         }
+        // Chỉ populate nếu SSR chưa render (hàm tự check options.length > 1)
         populateSpecialtyDropdown();
       };
 
@@ -534,13 +541,56 @@
         const spFilter = spSelect ? spSelect.value.trim().toLowerCase() : '';
         const searchInput = document.getElementById('searchDoctor');
         const search = searchInput ? searchInput.value.toLowerCase().trim() : '';
-        
+
+        // Ưu tiên lọc trực tiếp các phần tử DOM (.doctor-item) đã render
+        const items = list.querySelectorAll('.doctor-item');
+        let visibleCount = 0;
+
+        if (items && items.length > 0) {
+          items.forEach(el => {
+            const docSp = (el.getAttribute('data-specialty') || '').trim().toLowerCase();
+            const docName = (el.getAttribute('data-name') || '').trim().toLowerCase();
+
+            const matchSp = !spFilter || docSp === spFilter;
+            const matchSearch = !search || docName.includes(search);
+
+            if (matchSp && matchSearch) {
+              el.style.display = '';
+              visibleCount++;
+            } else {
+              el.style.display = 'none';
+            }
+          });
+
+          // Cập nhật selected card
+          items.forEach(el => {
+            const card = el.querySelector('.doctor-select-card');
+            if (card) {
+              const docId = card.id ? card.id.replace('docCard_', '') : '';
+              card.classList.toggle('selected', selectedDoctor === docId);
+            }
+          });
+
+          let emptyNotice = document.getElementById('doctorEmptyNotice');
+          if (visibleCount === 0) {
+            if (!emptyNotice) {
+              emptyNotice = document.createElement('div');
+              emptyNotice.id = 'doctorEmptyNotice';
+              emptyNotice.className = 'col-12 text-center py-4 text-muted';
+              emptyNotice.textContent = 'Không tìm thấy bác sĩ phù hợp';
+              list.appendChild(emptyNotice);
+            }
+            emptyNotice.style.display = 'block';
+          } else if (emptyNotice) {
+            emptyNotice.style.display = 'none';
+          }
+          return;
+        }
+
+        // Dự phòng nếu danh sách DOM chưa có
         let filtered = doctors;
         if (spFilter) {
-          filtered = filtered.filter(d => {
-            const docSp = (d.specialtyName || d.SpecialtyName || '').trim().toLowerCase();
-            return docSp === spFilter;
-          });
+          filtered = filtered.filter(d => (d.specialtyName || d.SpecialtyName || '').trim().toLowerCase() === spFilter);
         }
         if (search) {
           filtered = filtered.filter(d => (d.name || d.Name || '').toLowerCase().includes(search));
@@ -561,8 +611,8 @@
           const docTitle = `${docAcademic ? docAcademic + ' ' : ''}${docDegree ? docDegree + ' ' : ''}${docName}`;
 
           return `
-          <div class="col-md-6 col-lg-4">
-            <div class="doctor-select-card ${selectedDoctor === docId ? 'selected' : ''}" onclick="BookingWizard.selectDoctor('${docId}')">
+          <div class="col-md-6 col-lg-4 doctor-item" data-specialty="${docSpecialty}" data-name="${docName.toLowerCase()}">
+            <div class="doctor-select-card ${selectedDoctor === docId ? 'selected' : ''}" id="docCard_${docId}" onclick="BookingWizard.selectDoctor('${docId}')">
               <div class="d-flex gap-3 align-items-center">
                 <div class="flex-shrink-0 overflow-hidden shadow-sm" style="width:64px;height:64px;background:var(--bg-secondary);border: 2px solid white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;">
                   ${docAvatar ? `<img src="${docAvatar}" style="width:100%;height:100%;object-fit:cover;">` : `👨‍⚕️`}
@@ -652,18 +702,20 @@
       };
 
       const updateSummary = () => {
-        const doc = doctors.find(d => d.id === selectedDoctor);
+        const doc = doctors.find(d => (d.id || d.Id) === selectedDoctor);
+        if (!doc) return;
         document.getElementById('bookingSummary').innerHTML = `
-          <div class="d-flex justify-content-between mb-3"><span class="text-tertiary">Chuyên khoa:</span><span class="fw-bold">${doc.specialtyName}</span></div>
-          <div class="d-flex justify-content-between mb-3"><span class="text-tertiary">Bác sĩ:</span><span class="fw-bold">${doc.academicTitle ? doc.academicTitle + ' ' : ''}${doc.degree ? doc.degree + ' ' : ''}${doc.name}</span></div>
+          <div class="d-flex justify-content-between mb-3"><span class="text-tertiary">Chuyên khoa:</span><span class="fw-bold">${doc.specialtyName || doc.SpecialtyName || ''}</span></div>
+          <div class="d-flex justify-content-between mb-3"><span class="text-tertiary">Bác sĩ:</span><span class="fw-bold">${doc.academicTitle ? doc.academicTitle + ' ' : ''}${doc.degree ? doc.degree + ' ' : ''}${doc.name || doc.Name || ''}</span></div>
           <div class="d-flex justify-content-between mb-3"><span class="text-tertiary">Ngày khám:</span><span class="fw-bold">${App.formatDate(selectedDate)}</span></div>
           <div class="d-flex justify-content-between"><span class="text-tertiary">Khung giờ:</span><span class="fw-bold text-primary">${selectedTime}</span></div>
         `;
       };
 
       const updatePaymentSummary = () => {
-        const doc = doctors.find(d => d.id === selectedDoctor);
-        const price = getDoctorPrice(doc.id);
+        const doc = doctors.find(d => (d.id || d.Id) === selectedDoctor);
+        if (!doc) return;
+        const price = getDoctorPrice(doc.id || doc.Id);
         document.getElementById('paymentSummary').innerHTML = `
           <div class="d-flex justify-content-between mb-3"><span class="text-tertiary">Phí khám:</span><span class="fw-bold">${App.formatCurrency(price)}</span></div>
           <div class="d-flex justify-content-between mb-3"><span class="text-tertiary">Khuyến mãi:</span><span class="fw-bold text-success">- 0 đ</span></div>
@@ -702,9 +754,10 @@
             </div>
           `;
         } else if (method === 'bank_transfer') {
-          const doc = doctors.find(d => d.id === selectedDoctor);
-          const priceStr = App.formatCurrency(getDoctorPrice(doc.id));
-          const priceRaw = getDoctorPrice(doc.id);
+          const doc = doctors.find(d => (d.id || d.Id) === selectedDoctor);
+          if (!doc) return;
+          const priceStr = App.formatCurrency(getDoctorPrice(doc.id || doc.Id));
+          const priceRaw = getDoctorPrice(doc.id || doc.Id);
           const bankName = additionalConfig.bankName || 'Vietcombank';
           const accNumber = additionalConfig.accountNumber || '0123456789';
           const accName = additionalConfig.accountName || 'MEDIBOOKING VN';
@@ -730,8 +783,9 @@
               <div class="mt-3 text-muted" style="font-size:0.8rem;"><i class="bi bi-info-circle me-1"></i>Hệ thống sẽ tự động xác nhận sau 1-2 phút khi nhận được tiền.</div>
             </div>`;
         } else if (method === 'momo') {
-          const doc = doctors.find(d => d.id === selectedDoctor);
-          const price = App.formatCurrency(getDoctorPrice(doc.id));
+          const doc = doctors.find(d => (d.id || d.Id) === selectedDoctor);
+          if (!doc) return;
+          const price = App.formatCurrency(getDoctorPrice(doc.id || doc.Id));
           details.innerHTML = `
             <div class="payment-qr-box" style="background:white;border:1px solid #fce7f3;border-radius:12px;padding:24px;text-align:center;box-shadow:0 10px 25px rgba(219,39,119,0.08);">
               <div style="background:linear-gradient(135deg, #be185d, #db2777);color:white;padding:12px;border-radius:8px;margin-bottom:20px;font-weight:600;">
@@ -746,8 +800,9 @@
               </div>
             </div>`;
         } else if (method === 'zalopay') {
-          const doc = doctors.find(d => d.id === selectedDoctor);
-          const price = App.formatCurrency(getDoctorPrice(doc.id));
+          const doc = doctors.find(d => (d.id || d.Id) === selectedDoctor);
+          if (!doc) return;
+          const price = App.formatCurrency(getDoctorPrice(doc.id || doc.Id));
           details.innerHTML = `
             <div class="payment-qr-box" style="background:white;border:1px solid #e0f2fe;border-radius:12px;padding:24px;text-align:center;box-shadow:0 10px 25px rgba(2,132,199,0.08);">
               <div style="background:linear-gradient(135deg, #0369a1, #0284c7);color:white;padding:12px;border-radius:8px;margin-bottom:20px;font-weight:600;">
@@ -833,7 +888,13 @@
         btn.disabled = true;
         btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Đang xử lý...';
 
-        const doc = doctors.find(d => d.id === selectedDoctor);
+        const doc = doctors.find(d => (d.id || d.Id) === selectedDoctor);
+        if (!doc) {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="bi bi-check-circle"></i> Xác Nhận Đặt Lịch';
+          App.toast.error('Lỗi', 'Không tìm thấy thông tin bác sĩ. Vui lòng quay lại bước 1.');
+          return;
+        }
         const reqData = {
           patientName: document.getElementById('patientName').value,
           phone: document.getElementById('patientPhone').value,
@@ -843,12 +904,12 @@
           address: document.getElementById('patientAddress').value,
           reason: document.getElementById('patientReason').value,
           doctorId: selectedDoctor,
-          doctorName: `${doc.academicTitle ? doc.academicTitle + ' ' : ''}${doc.degree ? doc.degree + ' ' : ''}${doc.name}`.trim(),
-          specialty: doc.specialtyName,
+          doctorName: `${doc.academicTitle || doc.AcademicTitle ? (doc.academicTitle || doc.AcademicTitle) + ' ' : ''}${doc.degree || doc.Degree ? (doc.degree || doc.Degree) + ' ' : ''}${doc.name || doc.Name || ''}`.trim(),
+          specialty: doc.specialtyName || doc.SpecialtyName || '',
           date: selectedDate,
           time: selectedTime,
           paymentMethod: selectedPaymentMethod,
-          paymentAmount: getDoctorPrice(doc.id),
+          paymentAmount: getDoctorPrice(doc.id || doc.Id),
           botTrap: document.getElementById('botTrap')?.value || '',
           turnstileToken: document.getElementById('turnstileToken')?.value || ''
         };
@@ -962,11 +1023,21 @@
 
         if (spParam) {
           const select = document.getElementById('filterSpecialty');
-          const matchSp = specialties.find(s => (s.id || s.Id) === spParam || (s.name || s.Name || '').toLowerCase() === spParam.toLowerCase());
+          const matchSp = specialties.find(s => (s.id || s.Id) === spParam || (s.Name || s.name || '').toLowerCase() === spParam.toLowerCase());
           if (matchSp && select) {
-            select.value = matchSp.name || matchSp.Name;
+            select.value = matchSp.Name || matchSp.name;
             filterDoctors();
           }
+        }
+
+        // Gắn sự kiện lắng nghe trực tiếp để đảm bảo hoạt động 100%
+        const spSelectEl = document.getElementById('filterSpecialty');
+        if (spSelectEl) {
+          spSelectEl.addEventListener('change', filterDoctors);
+        }
+        const searchInputEl = document.getElementById('searchDoctor');
+        if (searchInputEl) {
+          searchInputEl.addEventListener('input', filterDoctors);
         }
 
         if (docParam) {
@@ -978,9 +1049,12 @@
       };
 
       return {
-        init, goToStep, selectDoctor, filterDoctors, onDateChange, selectTime, validateStep3, loadCaptcha, selectPayment, copyText, submitBooking
+        init, goToStep, selectDoctor, filterDoctors, onDateChange, selectTime, validateStep3, loadCaptcha: initTurnstile, selectPayment, copyText, submitBooking
       };
     })();
+
+    // Đưa BookingWizard ra toàn cục window để gọi được từ inline HTML
+    window.BookingWizard = BookingWizard;
 
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', BookingWizard.init);
