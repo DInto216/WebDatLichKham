@@ -168,7 +168,20 @@ namespace WebDatLichKham.Controllers
                 var claimDoctorId = User.FindFirst("DoctorId")?.Value;
                 if (string.IsNullOrEmpty(claimDoctorId))
                 {
-                    return Forbid();
+                    var uid = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                    if (!string.IsNullOrEmpty(uid))
+                    {
+                        var acc = await _accountService.GetAccountByIdAsync(uid);
+                        if (acc != null && !string.IsNullOrEmpty(acc.DoctorId))
+                        {
+                            claimDoctorId = acc.DoctorId;
+                        }
+                    }
+                }
+
+                if (string.IsNullOrEmpty(claimDoctorId))
+                {
+                    return Ok(new List<Appointment>());
                 }
                 doctorId = claimDoctorId;
             }

@@ -3,153 +3,288 @@
     ViewBag.Title = "Danh Sách Ca Khám";
     ViewBag.ActiveMenu = "Examinations";
     ViewBag.PageTitle = "Danh Sách Ca Khám";
-    ViewBag.PageSubtitle = "Các lịch hẹn đã được Admin duyệt";
+    ViewBag.PageSubtitle = "Các lịch hẹn đã được Admin duyệt phân công cho bạn";
 }
 
 @section TopbarActions {
-    <div class="form-medical" style="min-width:160px;">
-          <input type="date" class="form-control" id="filterDate" style="font-size:var(--text-sm);">
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+        <div class="btn-group" role="group" aria-label="Bộ lọc ca khám">
+            <button type="button" class="btn btn-sm btn-outline-primary active" id="btnFilterAll" onclick="setFilterMode('all')">
+                <i class="bi bi-list-check me-1"></i>Tất cả
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-primary" id="btnFilterToday" onclick="setFilterMode('today')">
+                <i class="bi bi-calendar-event me-1"></i>Hôm nay
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-primary" id="btnFilterUpcoming" onclick="setFilterMode('upcoming')">
+                <i class="bi bi-clock-history me-1"></i>Sắp tới
+            </button>
         </div>
-        <button class="btn-icon" onclick="loadExaminations()" aria-label="Làm mới"><i class="bi bi-arrow-clockwise"></i></button>
+        <div class="input-group input-group-sm" style="max-width:180px;">
+            <input type="date" class="form-control" id="filterDate" title="Lọc theo ngày cụ thể">
+            <button class="btn btn-outline-secondary" type="button" onclick="clearDateFilter()" title="Xóa lọc ngày">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <button class="btn-icon" onclick="loadExaminations()" aria-label="Làm mới" title="Tải lại dữ liệu">
+            <i class="bi bi-arrow-clockwise"></i>
+        </button>
+    </div>
 }
 
-<!-- Today Summary -->
-      <div class="row g-3 mb-4">
-        <div class="col-sm-4">
-          <div class="stat-card success">
+<!-- Summary Statistics -->
+<div class="row g-3 mb-4">
+    <div class="col-sm-4">
+        <div class="stat-card success">
             <div class="d-flex align-items-center justify-content-between">
-              <div>
-                <div class="stat-value" id="statApproved">-</div>
-                <div class="stat-label">Chờ khám</div>
-              </div>
-              <div class="stat-icon" style="background:var(--success-light);color:var(--success)"><i class="bi bi-calendar-check"></i></div>
+                <div>
+                    <div class="stat-value" id="statApproved">-</div>
+                    <div class="stat-label">Chờ khám (Đã duyệt)</div>
+                </div>
+                <div class="stat-icon" style="background:var(--success-light);color:var(--success)">
+                    <i class="bi bi-calendar-check"></i>
+                </div>
             </div>
-          </div>
         </div>
-        <div class="col-sm-4">
-          <div class="stat-card info">
-            <div class="d-flex align-items-center justify-content-between">
-              <div>
-                <div class="stat-value" id="statCompleted">-</div>
-                <div class="stat-label">Đã khám xong</div>
-              </div>
-              <div class="stat-icon" style="background:var(--info-light);color:var(--info)"><i class="bi bi-clipboard-check"></i></div>
-            </div>
-          </div>
-        </div>
-        <div class="col-sm-4">
-          <div class="stat-card primary">
-            <div class="d-flex align-items-center justify-content-between">
-              <div>
-                <div class="stat-value" id="statTotal">-</div>
-                <div class="stat-label">Tổng ca</div>
-              </div>
-              <div class="stat-icon" style="background:var(--primary-50);color:var(--primary-600)"><i class="bi bi-people"></i></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Examinations List -->
-      <div class="card-medical p-4">
-        <div class="d-flex align-items-center justify-content-between mb-4">
-          <h5 class="mb-0" id="listTitle">Ca khám hôm nay</h5>
-        </div>
-        <div id="examinationsList">
-          <!-- Rendered by JS -->
-        </div>
-      </div>
     </div>
-  </div>
+    <div class="col-sm-4">
+        <div class="stat-card info">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="stat-value" id="statCompleted">-</div>
+                    <div class="stat-label">Đã khám xong</div>
+                </div>
+                <div class="stat-icon" style="background:var(--info-light);color:var(--info)">
+                    <i class="bi bi-clipboard-check"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <div class="stat-card primary">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="stat-value" id="statTotal">-</div>
+                    <div class="stat-label">Tổng ca khám</div>
+                </div>
+                <div class="stat-icon" style="background:var(--primary-50);color:var(--primary-600)">
+                    <i class="bi bi-people"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Examinations List -->
+<div class="card-medical p-4">
+    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+        <div class="d-flex align-items-center gap-2">
+            <h5 class="mb-0" id="listTitle">Tất cả ca khám</h5>
+            <span class="badge bg-primary-subtle text-primary fw-semibold" id="listCountBadge">0 ca</span>
+        </div>
+        <div class="text-muted" style="font-size:var(--text-xs);">
+            <i class="bi bi-info-circle me-1"></i>Chỉ hiển thị các ca khám đã được Quản trị viên duyệt
+        </div>
+    </div>
+
+    <div id="examinationsList">
+        <!-- Rendered by JS -->
+    </div>
+</div>
 
 @section Scripts {
     <script>
-    const user = App.requireAuth(['doctor']);
+    let user = App.requireAuth(['doctor']);
+    let currentFilterMode = 'all'; // 'all' | 'today' | 'upcoming' | 'custom'
+    let rawAppointments = [];
+
+    function setFilterMode(mode) {
+        currentFilterMode = mode;
+        document.getElementById('btnFilterAll').classList.toggle('active', mode === 'all');
+        document.getElementById('btnFilterToday').classList.toggle('active', mode === 'today');
+        document.getElementById('btnFilterUpcoming').classList.toggle('active', mode === 'upcoming');
+        if (mode !== 'custom') {
+            document.getElementById('filterDate').value = '';
+        }
+        renderExaminations();
+    }
+
+    function clearDateFilter() {
+        document.getElementById('filterDate').value = '';
+        setFilterMode('all');
+    }
+
+    async function ensureDoctorProfile() {
+        if (!user) return null;
+        if (!user.doctorId) {
+            try {
+                const refreshed = await API.syncAuth();
+                if (refreshed && refreshed.doctorId) {
+                    user = refreshed;
+                }
+            } catch (e) {}
+        }
+        return user;
+    }
 
     async function loadExaminations() {
-      if (!user || !user.doctorId) return;
-      document.getElementById('sidebarDoctorName').textContent = user.name;
+        await ensureDoctorProfile();
+        if (user && user.name) {
+            const el = document.getElementById('sidebarDoctorName');
+            if (el) el.textContent = user.name;
+        }
 
-      const dateInput = document.getElementById('filterDate');
-      const selectedDate = dateInput.value || new Date().toISOString().split('T')[0];
-      dateInput.value = selectedDate;
+        const container = document.getElementById('examinationsList');
+        App.showLoading(container, 4);
 
-      const isToday = selectedDate === new Date().toISOString().split('T')[0];
-      document.getElementById('listTitle').textContent = isToday
-        ? 'Ca khám hôm nay'
-        : `Ca khám ngày ${App.formatDate(selectedDate)}`;
+        try {
+            // Khong truyen date de lay tat ca ca kham cua Bac si
+            const res = await API.getAppointments({
+                doctorId: (user && user.doctorId) ? user.doctorId : undefined
+            });
+            rawAppointments = Array.isArray(res) ? res : [];
+        } catch (err) {
+            console.error('Lỗi tải danh sách ca khám:', err);
+            rawAppointments = [];
+        }
 
-      const container = document.getElementById('examinationsList');
-      App.showLoading(container, 4);
+        renderExaminations();
+    }
 
-      const allAppointments = await API.getAppointments({
-        doctorId: user.doctorId,
-        date: selectedDate
-      });
+    function renderExaminations() {
+        const container = document.getElementById('examinationsList');
+        const todayStr = new Date().toISOString().split('T')[0];
+        const dateInputVal = document.getElementById('filterDate').value;
 
-      // Only show approved and completed
-      const appointments = allAppointments.filter(a => a.status === 'approved' || a.status === 'completed');
+        // Chi hien thi ca kham da duyet hoac da kham xong
+        const validStatuses = ['approved', 'completed', 'confirmed'];
+        let appointments = rawAppointments.filter(a => validStatuses.includes((a.status || '').toLowerCase()));
 
-      // Stats
-      const approved = appointments.filter(a => a.status === 'approved').length;
-      const completed = appointments.filter(a => a.status === 'completed').length;
-      document.getElementById('statApproved').textContent = approved;
-      document.getElementById('statCompleted').textContent = completed;
-      document.getElementById('statTotal').textContent = appointments.length;
+        // Bo loc theo thoi gian
+        if (dateInputVal) {
+            currentFilterMode = 'custom';
+            document.getElementById('btnFilterAll').classList.remove('active');
+            document.getElementById('btnFilterToday').classList.remove('active');
+            document.getElementById('btnFilterUpcoming').classList.remove('active');
+            appointments = appointments.filter(a => a.date === dateInputVal);
+            document.getElementById('listTitle').textContent = `Ca khám ngày ${App.formatDate(dateInputVal)}`;
+        } else if (currentFilterMode === 'today') {
+            appointments = appointments.filter(a => a.date === todayStr);
+            document.getElementById('listTitle').textContent = 'Ca khám hôm nay';
+        } else if (currentFilterMode === 'upcoming') {
+            appointments = appointments.filter(a => a.date >= todayStr);
+            document.getElementById('listTitle').textContent = 'Ca khám sắp tới (từ hôm nay)';
+        } else {
+            document.getElementById('listTitle').textContent = 'Tất cả ca khám đã duyệt';
+        }
 
-      if (appointments.length === 0) {
-        container.innerHTML = `
-          <div class="empty-state">
-            <div class="empty-icon">📋</div>
-            <h5>Chưa có ca khám</h5>
-            <p>Không có lịch hẹn đã duyệt cho ngày này</p>
-          </div>
-        `;
-        return;
-      }
+        // Thong ke
+        const totalValid = rawAppointments.filter(a => validStatuses.includes((a.status || '').toLowerCase()));
+        const approvedCount = totalValid.filter(a => (a.status || '').toLowerCase() === 'approved' || (a.status || '').toLowerCase() === 'confirmed').length;
+        const completedCount = totalValid.filter(a => (a.status || '').toLowerCase() === 'completed').length;
+        document.getElementById('statApproved').textContent = approvedCount;
+        document.getElementById('statCompleted').textContent = completedCount;
+        document.getElementById('statTotal').textContent = totalValid.length;
+        document.getElementById('listCountBadge').textContent = `${appointments.length} ca`;
 
-      // Sort by time
-      appointments.sort((a, b) => a.time.localeCompare(b.time));
+        if (appointments.length === 0) {
+            container.innerHTML = `
+              <div class="empty-state text-center py-5">
+                <div class="empty-icon" style="font-size:3rem;margin-bottom:12px;">📋</div>
+                <h5 class="fw-bold text-muted">Chưa có ca khám phù hợp</h5>
+                <p class="text-secondary" style="font-size:0.9rem;">Không có lịch hẹn nào đã duyệt trong phạm vi ngày đã chọn.</p>
+                ${currentFilterMode !== 'all' ? `
+                    <button class="btn btn-sm btn-outline-primary mt-2" onclick="setFilterMode('all')">
+                        <i class="bi bi-list-check me-1"></i>Xem tất cả ca khám
+                    </button>
+                ` : ''}
+              </div>
+            `;
+            return;
+        }
 
-      container.innerHTML = appointments.map(apt => `
-        <div class="d-flex align-items-center gap-3 p-3 mb-2 status-transition" style="background:var(--bg-tertiary);border-radius:var(--radius-md);${apt.status === 'completed' ? 'opacity:0.7;' : ''}" id="exam-${apt.id}">
-          <div style="min-width:64px;text-align:center;">
-            <div style="font-size:var(--text-xl);font-weight:800;color:var(--primary-600);">${apt.time}</div>
-          </div>
-          <div style="width:1px;height:40px;background:#E2E8F0;"></div>
-          <div style="flex:1;min-width:0;">
-            <div style="font-weight:600;font-size:var(--text-base);">${apt.patientName}</div>
-            <div style="font-size:var(--text-sm);color:var(--text-tertiary);">
-              <i class="bi bi-telephone me-1"></i>${apt.phone}
-              <span class="mx-2">·</span>
-              ${apt.gender || ''} ${apt.birthYear ? '(' + (new Date().getFullYear() - apt.birthYear) + ' tuổi)' : ''}
+        // Sap xep: Ngay gan nhat / moi nhat len truoc
+        appointments.sort((a, b) => {
+            const dateCmp = (b.date || '').localeCompare(a.date || '');
+            if (dateCmp !== 0) return dateCmp;
+            return (a.time || '').localeCompare(b.time || '');
+        });
+
+        container.innerHTML = appointments.map(apt => {
+            const isCompleted = (apt.status || '').toLowerCase() === 'completed';
+            const isApproved = (apt.status || '').toLowerCase() === 'approved' || (apt.status || '').toLowerCase() === 'confirmed';
+
+            return `
+            <div class="d-flex align-items-center gap-3 p-3 mb-2 status-transition flex-wrap flex-md-nowrap" 
+                 style="background:var(--bg-tertiary);border-radius:var(--radius-md);border-left:4px solid ${isApproved ? 'var(--primary-600)' : '#10b981'};${isCompleted ? 'opacity:0.75;' : ''}" 
+                 id="exam-${apt.id}">
+              
+              <!-- Khung gio & Ngay kham -->
+              <div style="min-width:110px;text-align:center;">
+                <div style="font-size:var(--text-xl);font-weight:800;color:var(--primary-600);line-height:1.2;">${apt.time}</div>
+                <div class="badge mt-1" style="background:#e0f2fe;color:#0284c7;font-size:11px;font-weight:700;">
+                  <i class="bi bi-calendar-event me-1"></i>${App.formatDate(apt.date)}
+                </div>
+              </div>
+
+              <div class="d-none d-md-block" style="width:1px;height:48px;background:#E2E8F0;"></div>
+
+              <!-- Thong tin benh nhan & Chuyen khoa -->
+              <div style="flex:1;min-width:220px;">
+                <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
+                  <span style="font-weight:700;font-size:16px;color:var(--text-primary);">${apt.patientName}</span>
+                  ${apt.specialty ? `
+                    <span class="badge" style="background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;font-size:11px;">
+                      <i class="bi bi-heart-pulse me-1"></i>${apt.specialty}
+                    </span>
+                  ` : ''}
+                  <span class="badge bg-light text-secondary border" style="font-size:11px;font-family:var(--font-mono);">
+                    ${apt.bookingId || apt.id}
+                  </span>
+                </div>
+
+                <div style="font-size:var(--text-sm);color:var(--text-tertiary);">
+                  <i class="bi bi-telephone me-1 text-primary"></i>${apt.phone}
+                  ${apt.gender ? `<span class="mx-2">·</span>${apt.gender}` : ''}
+                  ${apt.birthYear ? `<span class="mx-2">·</span>${new Date().getFullYear() - apt.birthYear} tuổi` : ''}
+                </div>
+
+                <div style="font-size:var(--text-sm);color:var(--text-secondary);margin-top:4px;">
+                  <i class="bi bi-chat-text me-1 text-muted"></i><strong>Lý do:</strong> ${apt.reason || 'Khám theo yêu cầu'}
+                </div>
+              </div>
+
+              <!-- Trang thai & Thao tac -->
+              <div class="text-end ms-auto" style="min-width:140px;">
+                <div class="mb-2" id="exam-status-${apt.id}">${App.renderStatusBadge(apt.status)}</div>
+                ${isApproved ? `
+                  <button class="btn-success-medical" onclick="completeExam('${apt.id}')" style="font-size:12px;padding:6px 14px;">
+                    <i class="bi bi-file-earmark-medical me-1"></i> Khám bệnh 🩺
+                  </button>
+                ` : `
+                  <a href="/Doctor/MedicalHistory" class="btn-ghost" style="font-size:12px;color:var(--primary-600);">
+                    <i class="bi bi-check2-all me-1"></i>Xem bệnh án
+                  </a>
+                `}
+              </div>
             </div>
-            <div style="font-size:var(--text-sm);color:var(--text-secondary);margin-top:4px;">
-              <i class="bi bi-chat-text me-1" style="color:var(--primary-400)"></i>${apt.reason || 'Không có thông tin'}
-            </div>
-          </div>
-          <div class="text-end" style="min-width:140px;">
-            <div class="mb-2" id="exam-status-${apt.id}">${App.renderStatusBadge(apt.status)}</div>
-            ${apt.status === 'approved' ? `
-              <button class="btn-success-medical" onclick="completeExam('${apt.id}')" style="font-size:12px;">
-                <i class="bi bi-check2-circle"></i> Hoàn thành 🩺
-              </button>
-            ` : '<span style="font-size:var(--text-xs);color:var(--text-muted);">Đã hoàn thành</span>'}
-          </div>
-        </div>
-      `).join('');
+            `;
+        }).join('');
     }
 
     function completeExam(id) {
-      window.location.href = `/Doctor/CreateRecord?appointmentId=${id}`;
+        window.location.href = `/Doctor/CreateRecord?appointmentId=${id}`;
     }
 
-    // Date filter
-    document.getElementById('filterDate').addEventListener('change', loadExaminations);
+    // Lang nghe su kien doi ngay
+    document.getElementById('filterDate').addEventListener('change', function() {
+        if (this.value) {
+            setFilterMode('custom');
+        } else {
+            setFilterMode('all');
+        }
+    });
 
-    // Set today as default
-    document.getElementById('filterDate').value = new Date().toISOString().split('T')[0];
+    // Mac dinh nap du lieu ca kham
     loadExaminations();
   </script>
 }
-
