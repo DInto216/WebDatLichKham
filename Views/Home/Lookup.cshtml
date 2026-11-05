@@ -12,6 +12,32 @@
       display: none;
     }
 
+    /* ---- Reschedule Time Slots ---- */
+    .reschedule-slot {
+      border: 1.5px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 8px 4px;
+      text-align: center;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+      background: #f8fafc;
+      transition: all 0.2s ease;
+      color: #334155;
+    }
+    .reschedule-slot:hover {
+      border-color: #0284c7;
+      background: #f0f9ff;
+      color: #0284c7;
+      transform: translateY(-1px);
+    }
+    .reschedule-slot.selected {
+      background: linear-gradient(135deg, #0284c7 0%, #0d9488 100%);
+      color: #ffffff;
+      border-color: #0284c7;
+      box-shadow: 0 4px 10px rgba(2, 132, 199, 0.25);
+    }
+
     @@media print {
       @@page { margin: 0; }
       body { margin: 1cm; }
@@ -160,6 +186,86 @@
     <!-- Element for printing -->
     <div id="printSlip" class="print-slip"></div>
 
+    <!-- Modal Hủy Lịch Khám -->
+    <div class="modal fade" id="modalCancelAppointment" tabindex="-1" aria-labelledby="modalCancelTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius:18px;overflow:hidden;border:none;box-shadow:0 20px 40px rgba(0,0,0,0.15);">
+          <div class="modal-header bg-danger text-white border-0 py-3">
+            <h5 class="modal-title fs-6 fw-bold" id="modalCancelTitle">
+              <i class="bi bi-exclamation-triangle-fill me-2"></i> Xác Nhận Hủy Lịch Khám
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Đóng"></button>
+          </div>
+          <div class="modal-body p-4">
+            <div class="alert alert-warning d-flex align-items-center gap-2 mb-3 py-2" style="font-size:13px;border-radius:10px;">
+              <i class="bi bi-info-circle-fill text-warning flex-shrink-0 fs-5"></i>
+              <div>Sau khi hủy, khung giờ khám này sẽ được trả lại để phục vụ bệnh nhân khác.</div>
+            </div>
+
+            <div id="cancelApptInfo" class="p-3 mb-3" style="background:#f8fafc;border-radius:12px;border:1px solid #e2e8f0;font-size:13.5px;"></div>
+
+            <div class="mb-3">
+              <label for="cancelReasonPreset" class="form-label fw-semibold" style="font-size:13.5px;">Lý do hủy lịch:</label>
+              <select class="form-select form-select-sm mb-2" id="cancelReasonPreset" style="border-radius:8px;padding:8px 12px;">
+                <option value="Bận việc đột xuất không thể đến">Bận việc đột xuất không thể đến</option>
+                <option value="Tình trạng sức khỏe đã thuyên giảm / Khỏi bệnh">Tình trạng sức khỏe đã thuyên giảm / Khỏi bệnh</option>
+                <option value="Muốn dời sang cơ sở y tế khác">Muốn dời sang cơ sở y tế khác</option>
+                <option value="Đã chọn nhầm bác sĩ hoặc chuyên khoa">Đã chọn nhầm bác sĩ hoặc chuyên khoa</option>
+                <option value="other">Lý do khác...</option>
+              </select>
+              <textarea class="form-control form-control-sm" id="cancelReasonDetail" rows="2" placeholder="Ghi chú thêm lý do chi tiết (nếu có)..." style="border-radius:8px;font-size:13px;"></textarea>
+            </div>
+          </div>
+          <div class="modal-footer bg-light border-0 py-2 px-4">
+            <button type="button" class="btn btn-secondary btn-sm px-3" data-bs-dismiss="modal" style="border-radius:8px;">Đóng</button>
+            <button type="button" class="btn btn-danger btn-sm px-4 fw-semibold" id="btnConfirmCancel" onclick="confirmCancelAppointment()" style="border-radius:8px;">
+              <i class="bi bi-check-lg me-1"></i> Xác Nhận Hủy
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Đổi Lịch Khám -->
+    <div class="modal fade" id="modalRescheduleAppointment" tabindex="-1" aria-labelledby="modalRescheduleTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius:18px;overflow:hidden;border:none;box-shadow:0 20px 40px rgba(0,0,0,0.15);">
+          <div class="modal-header text-white border-0 py-3" style="background:linear-gradient(135deg, #0284c7 0%, #0d9488 100%);">
+            <h5 class="modal-title fs-6 fw-bold" id="modalRescheduleTitle">
+              <i class="bi bi-calendar2-range-fill me-2"></i> Đổi Lịch Khám Bệnh
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Đóng"></button>
+          </div>
+          <div class="modal-body p-4">
+            <div id="rescheduleCurrentInfo" class="p-3 mb-3" style="background:#f0f9ff;border-radius:12px;border:1px solid #bae6fd;font-size:13.5px;"></div>
+
+            <div class="mb-3">
+              <label for="rescheduleNewDate" class="form-label fw-semibold" style="font-size:13.5px;">Chọn ngày khám mới:</label>
+              <input type="date" class="form-control" id="rescheduleNewDate" style="border-radius:8px;padding:8px 12px;" onchange="onRescheduleDateChange()">
+            </div>
+
+            <div>
+              <label class="form-label fw-semibold d-flex justify-content-between" style="font-size:13.5px;">
+                <span>Chọn khung giờ mới:</span>
+                <span id="rescheduleSlotStatus" class="text-muted fw-normal" style="font-size:12px;"></span>
+              </label>
+              <div id="rescheduleSlotsContainer" class="row g-2" style="max-height:180px;overflow-y:auto;">
+                <div class="col-12 text-center py-3 text-muted" style="font-size:13px;">
+                  Vui lòng chọn ngày khám ở trên để xem khung giờ còn trống
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer bg-light border-0 py-2 px-4">
+            <button type="button" class="btn btn-secondary btn-sm px-3" data-bs-dismiss="modal" style="border-radius:8px;">Hủy bỏ</button>
+            <button type="button" class="btn btn-primary btn-sm px-4 fw-semibold" id="btnConfirmReschedule" onclick="confirmRescheduleAppointment()" style="border-radius:8px;background:linear-gradient(135deg,#0284c7,#0d9488);border:none;" disabled>
+              <i class="bi bi-calendar-check me-1"></i> Lưu Lịch Khám Mới
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
 @section Scripts {
 <script>
     (() => {
@@ -237,17 +343,32 @@
                   </div>
                 </div>
 
+                ${(result.status === 'pending' || result.status === 'approved') ? `
+                <div class="row g-2 mt-3 pt-3 border-top">
+                  <div class="col-6">
+                    <button type="button" onclick="openRescheduleModal('${result.bookingId}')" class="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center gap-1 py-2 fw-semibold" style="font-size:13px;border-radius:10px;">
+                      <i class="bi bi-calendar2-range"></i> Đổi lịch
+                    </button>
+                  </div>
+                  <div class="col-6">
+                    <button type="button" onclick="openCancelModal('${result.bookingId}')" class="btn btn-outline-danger w-100 d-flex align-items-center justify-content-center gap-1 py-2 fw-semibold" style="font-size:13px;border-radius:10px;">
+                      <i class="bi bi-x-circle"></i> Hủy lịch
+                    </button>
+                  </div>
+                </div>
+                ` : ''}
+
                 ${result.status === 'approved' ? `
-                <div style="margin-top:16px;">
-                  <button onclick="printAppointmentSlip('${result.bookingId}')" class="btn-primary-medical w-100 justify-content-center" style="padding:14px;background:linear-gradient(135deg,#6366f1 0%,#7c3aed 100%);border:none;cursor:pointer;">
+                <div style="margin-top:12px;">
+                  <button onclick="printAppointmentSlip('${result.bookingId}')" class="btn-primary-medical w-100 justify-content-center" style="padding:12px;background:linear-gradient(135deg,#6366f1 0%,#7c3aed 100%);border:none;cursor:pointer;">
                     <i class="bi bi-printer"></i> In phiếu khám
                   </button>
                 </div>
                 ` : ''}
 
                 ${result.status === 'completed' ? `
-                <div style="margin-top:16px;">
-                  <a href="/Home/ExamResult?bookingId=${result.bookingId}" class="btn-primary-medical w-100 justify-content-center" style="padding:14px;background:linear-gradient(135deg,#10b981 0%,#059669 100%);border:none;text-decoration:none;">
+                <div style="margin-top:12px;">
+                  <a href="/Home/ExamResult?bookingId=${result.bookingId}" class="btn-primary-medical w-100 justify-content-center" style="padding:12px;background:linear-gradient(135deg,#10b981 0%,#059669 100%);border:none;text-decoration:none;">
                     <i class="bi bi-file-earmark-medical"></i> Xem đơn thuốc và Bệnh án
                   </a>
                 </div>
@@ -328,6 +449,216 @@
       `;
 
       setTimeout(() => window.print(), 100);
+    }
+
+    // ============================================
+    // APPOINTMENT CANCEL & RESCHEDULE HANDLERS
+    // ============================================
+    let activeCancelBooking = null;
+    let activeRescheduleBooking = null;
+    let selectedRescheduleSlot = null;
+
+    let modalCancelInstance = null;
+    let modalRescheduleInstance = null;
+
+    function getModalInstances() {
+      if (!modalCancelInstance && document.getElementById('modalCancelAppointment')) {
+        modalCancelInstance = new bootstrap.Modal(document.getElementById('modalCancelAppointment'));
+      }
+      if (!modalRescheduleInstance && document.getElementById('modalRescheduleAppointment')) {
+        modalRescheduleInstance = new bootstrap.Modal(document.getElementById('modalRescheduleAppointment'));
+      }
+    }
+
+    function openCancelModal(bookingId) {
+      getModalInstances();
+      if (!window._lookupResults) return;
+      const appt = window._lookupResults.find(x => x.bookingId === bookingId);
+      if (!appt) return;
+
+      activeCancelBooking = appt;
+
+      document.getElementById('cancelApptInfo').innerHTML = `
+        <div class="d-flex justify-content-between mb-1">
+          <span class="text-muted">Mã lịch hẹn:</span>
+          <strong class="text-primary">${appt.bookingId}</strong>
+        </div>
+        <div class="d-flex justify-content-between mb-1">
+          <span class="text-muted">Bệnh nhân:</span>
+          <strong>${appt.patientName}</strong>
+        </div>
+        <div class="d-flex justify-content-between mb-1">
+          <span class="text-muted">Bác sĩ:</span>
+          <strong>${appt.doctorName}</strong>
+        </div>
+        <div class="d-flex justify-content-between">
+          <span class="text-muted">Ngày & Giờ:</span>
+          <strong class="text-danger">${App.formatDate(appt.date)} (${appt.time})</strong>
+        </div>
+      `;
+
+      document.getElementById('cancelReasonPreset').value = 'Bận việc đột xuất không thể đến';
+      document.getElementById('cancelReasonDetail').value = '';
+
+      modalCancelInstance.show();
+    }
+
+    async function confirmCancelAppointment() {
+      if (!activeCancelBooking) return;
+
+      const preset = document.getElementById('cancelReasonPreset').value;
+      const detail = document.getElementById('cancelReasonDetail').value.trim();
+      const reason = preset === 'other' ? (detail || 'Lý do cá nhân') : (detail ? `${preset} - ${detail}` : preset);
+
+      const btn = document.getElementById('btnConfirmCancel');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Đang xử lý...';
+
+      try {
+        const res = await API.cancelAppointment({
+          bookingId: activeCancelBooking.bookingId,
+          phone: activeCancelBooking.phone,
+          reason: reason
+        });
+
+        App.toast.success('Thành công', res.message || 'Lịch hẹn đã được hủy.');
+        modalCancelInstance.hide();
+
+        // Tải lại danh sách lịch hẹn tự động
+        document.getElementById('lookupBtn').click();
+      } catch (err) {
+        App.toast.error('Không thể hủy lịch', err.message || 'Đã có lỗi xảy ra.');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-check-lg me-1"></i> Xác Nhận Hủy';
+      }
+    }
+
+    function openRescheduleModal(bookingId) {
+      getModalInstances();
+      if (!window._lookupResults) return;
+      const appt = window._lookupResults.find(x => x.bookingId === bookingId);
+      if (!appt) return;
+
+      activeRescheduleBooking = appt;
+      selectedRescheduleSlot = null;
+
+      document.getElementById('rescheduleCurrentInfo').innerHTML = `
+        <div class="d-flex justify-content-between mb-1">
+          <span class="text-muted">Mã lịch hẹn:</span>
+          <strong class="text-primary">${appt.bookingId}</strong>
+        </div>
+        <div class="d-flex justify-content-between mb-1">
+          <span class="text-muted">Bác sĩ phụ trách:</span>
+          <strong>${appt.doctorName} (${appt.specialty})</strong>
+        </div>
+        <div class="d-flex justify-content-between">
+          <span class="text-muted">Lịch hiện tại:</span>
+          <strong class="text-secondary">${App.formatDate(appt.date)} (${appt.time})</strong>
+        </div>
+      `;
+
+      const dateInput = document.getElementById('rescheduleNewDate');
+      const today = new Date();
+      const minDate = new Date();
+      minDate.setDate(today.getDate() + 1); // Đổi từ ngày mai
+      const maxDate = new Date();
+      maxDate.setDate(today.getDate() + 30);
+
+      dateInput.min = minDate.toISOString().split('T')[0];
+      dateInput.max = maxDate.toISOString().split('T')[0];
+      dateInput.value = '';
+
+      document.getElementById('rescheduleSlotsContainer').innerHTML = `
+        <div class="col-12 text-center py-3 text-muted" style="font-size:13px;">
+          Vui lòng chọn ngày khám ở trên để xem khung giờ còn trống
+        </div>
+      `;
+      document.getElementById('rescheduleSlotStatus').textContent = '';
+      document.getElementById('btnConfirmReschedule').disabled = true;
+
+      modalRescheduleInstance.show();
+    }
+
+    async function onRescheduleDateChange() {
+      const dateVal = document.getElementById('rescheduleNewDate').value;
+      const container = document.getElementById('rescheduleSlotsContainer');
+      const statusLabel = document.getElementById('rescheduleSlotStatus');
+      const confirmBtn = document.getElementById('btnConfirmReschedule');
+
+      selectedRescheduleSlot = null;
+      confirmBtn.disabled = true;
+
+      if (!dateVal || !activeRescheduleBooking) return;
+
+      container.innerHTML = '<div class="col-12 text-center py-3 text-muted"><span class="spinner-border spinner-border-sm me-1"></span> Đang tải giờ trống...</div>';
+      statusLabel.textContent = 'Đang kiểm tra...';
+
+      try {
+        const slots = await API.getAvailableSlots(activeRescheduleBooking.doctorId, dateVal);
+
+        if (!slots || slots.length === 0) {
+          container.innerHTML = '<div class="col-12 text-center py-3 text-danger" style="font-size:13px;">Bác sĩ không có ca khám trống trong ngày này. Vui lòng chọn ngày khác.</div>';
+          statusLabel.textContent = '0 giờ trống';
+          return;
+        }
+
+        statusLabel.textContent = `${slots.length} khung giờ khả dụng`;
+
+        container.innerHTML = slots.map(slot => `
+          <div class="col-3">
+            <div class="reschedule-slot" onclick="selectRescheduleSlot('${slot}')" id="slot-${slot.replace(':', '')}">
+              ${slot}
+            </div>
+          </div>
+        `).join('');
+      } catch (err) {
+        container.innerHTML = '<div class="col-12 text-center py-3 text-danger" style="font-size:13px;">Lỗi khi tải khung giờ. Vui lòng thử lại.</div>';
+        statusLabel.textContent = '';
+      }
+    }
+
+    function selectRescheduleSlot(time) {
+      selectedRescheduleSlot = time;
+      document.querySelectorAll('.reschedule-slot').forEach(el => el.classList.remove('selected'));
+      const activeEl = document.getElementById(`slot-${time.replace(':', '')}`);
+      if (activeEl) activeEl.classList.add('selected');
+
+      document.getElementById('btnConfirmReschedule').disabled = false;
+    }
+
+    async function confirmRescheduleAppointment() {
+      if (!activeRescheduleBooking || !selectedRescheduleSlot) return;
+
+      const newDate = document.getElementById('rescheduleNewDate').value;
+      if (!newDate) {
+        App.toast.warning('Lưu ý', 'Vui lòng chọn ngày khám mới.');
+        return;
+      }
+
+      const btn = document.getElementById('btnConfirmReschedule');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Đang cập nhật...';
+
+      try {
+        const res = await API.rescheduleAppointment({
+          bookingId: activeRescheduleBooking.bookingId,
+          phone: activeRescheduleBooking.phone,
+          newDate: newDate,
+          newTime: selectedRescheduleSlot
+        });
+
+        App.toast.success('Đổi lịch thành công', res.message || 'Lịch khám mới đã được cập nhật.');
+        modalRescheduleInstance.hide();
+
+        // Tải lại danh sách lịch hẹn tự động
+        document.getElementById('lookupBtn').click();
+      } catch (err) {
+        App.toast.error('Không thể đổi lịch', err.message || 'Đã có lỗi xảy ra.');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-calendar-check me-1"></i> Lưu Lịch Khám Mới';
+      }
     }
   </script>
 }

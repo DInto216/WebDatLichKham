@@ -12,6 +12,8 @@ namespace WebDatLichKham.Services
         Task<Appointment> UpdatePaymentAsync(string id, string paymentStatus);
         Task<IEnumerable<Appointment>> LookupAsync(string phone);
         Task<IEnumerable<object>> GetPaymentsAsync();
+        Task<(bool Success, string Message, Appointment? Data)> CancelByPatientAsync(string bookingId, string phone, string? reason);
+        Task<(bool Success, string Message, Appointment? Data)> RescheduleByPatientAsync(string bookingId, string phone, string newDate, string newTime);
     }
 
     public class AppointmentService : IAppointmentService
@@ -165,6 +167,100 @@ namespace WebDatLichKham.Services
                 status = a.PaymentStatus, // frontend expects 'status' to be the payment status
                 createdAt = a.CreatedAt
             });
+        }
+
+        public async Task<(bool Success, string Message, Appointment? Data)> CancelByPatientAsync(string bookingId, string phone, string? reason)
+        {
+            if (string.IsNullOrWhiteSpace(bookingId) || string.IsNullOrWhiteSpace(phone))
+            {
+                return (false, "Vui lòng cung cấp mã đặt lịch và số điện thoại hợp lệ.", null);
+            }
+
+            var cleanPhone = phone.Trim().Replace(" ", "").Replace("-", "");
+            var appt = await _context.Appointments.FirstOrDefaultAsync(a =>
+                (a.BookingId == bookingId || a.Id == bookingId) && a.Phone == cleanPhone);
+
+            if (appt == null)
+            {
+                return (false, "Không tìm thấy lịch hẹn phù hợp với mã đặt lịch và số điện thoại này.", null);
+            }
+
+            if (appt.Status == "completed")
+            {
+                return (false, "Không thể hủy lịch hẹn đã hoàn thành khám bệnh.", null);
+            }
+
+            if (appt.Status == "cancelled")
+            {
+                return (false, "Lịch hẹn này đã được hủy trước đó.", appt);
+            }
+
+            appt.Status = "cancelled";
+            if (!string.IsNullOrWhiteSpace(reason))
+            {
+                appt.Reason = string.IsNullOrWhiteSpace(appt.Reason)
+                    ? $"[Bệnh nhân hủy]: {reason}"
+                    : $"{appt.Reason} | [Lý do hủy]: {reason}";
+            }
+
+            _ = await _context.SaveChangesAsync();
+            return (true, "Hủy lịch hẹn thành công.", appt);
+        }
+
+        public async Task<(bool Success, string Message, Appointment? Data)> RescheduleByPatientAsync(string bookingId, string phone, string newDate, string newTime)
+        {
+            if (string.IsNullOrWhiteSpace(bookingId) || string.IsNullOrWhiteSpace(phone) ||
+                string.IsNullOrWhiteSpace(newDate) || string.IsNullOrWhiteSpace(newTime))
+            {
+                return (false, "Vui lòng cung cấp đầy đủ thông tin mã lịch hẹn, số điện thoại, ngày khám và giờ khám mới.", null);
+            }
+
+            var cleanPhone = phone.Trim().Replace(" ", "").Replace("-", "");
+            var appt = await _context.Appointments.FirstOrDefaultAsync(a =>
+                (a.BookingId == bookingId || a.Id == bookingId) && a.Phone == cleanPhone);
+
+            if (appt == null)
+            {
+                return (false, "Không tìm thấy lịch hẹn phù hợp với mã đặt lịch và số điện thoại này.", null);
+            }
+
+            if (appt.Status == "completed")
+            {
+                return (false, "Không thể đổi ngày giờ đối với lịch hẹn đã hoàn thành khám bệnh.", null);
+            }
+
+            if (appt.Status == "cancelled")
+            {
+                return (false, "Lịch hẹn này đã bị hủy. Vui lòng tạo lịch hẹn mới thay vì đổi lịch.", null);
+            }
+
+            if (DateTime.TryParse(newDate, out var targetDate))
+            {
+                if (targetDate.Date < DateTime.Today)
+                {
+                    return (false, "Ngày khám mới không được ở trong quá khứ.", null);
+                }
+            }
+
+            // Kiểm tra trùng slot khám của Bác sĩ này
+            bool isSlotTaken = await _context.Appointments.AnyAsync(a =>
+                a.DoctorId == appt.DoctorId &&
+                a.Date == newDate &&
+                a.Time == newTime &&
+                a.Status != "cancelled" &&
+                a.Id != appt.Id);
+
+            if (isSlotTaken)
+            {
+                return (false, "Khung giờ này của bác sĩ đã có bệnh nhân khác đặt. Vui lòng chọn một khung giờ khác.", null);
+            }
+
+            appt.Date = newDate;
+            appt.Time = newTime;
+            appt.Status = "pending"; // Đặt lại trạng thái chờ phòng khám xác nhận khung giờ mới
+
+            _ = await _context.SaveChangesAsync();
+            return (true, "Đổi lịch khám thành công. Lịch hẹn của bạn đã được chuyển sang ngày giờ mới và đang chờ phòng khám duyệt.", appt);
         }
     }
 }

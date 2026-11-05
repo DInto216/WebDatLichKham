@@ -54,4 +54,19 @@ namespace WebDatLichKham.Models
 
         public DateTime? PaidAt { get; set; }
     }
+
+    public class PatientCancelAppointmentRequest
+    {
+        public string BookingId { get; set; } = string.Empty;
+        public string Phone { get; set; } = string.Empty;
+        public string? Reason { get; set; }
+    }
+
+    public class PatientRescheduleAppointmentRequest
+    {
+        public string BookingId { get; set; } = string.Empty;
+        public string Phone { get; set; } = string.Empty;
+        public string NewDate { get; set; } = string.Empty;
+        public string NewTime { get; set; } = string.Empty;
+    }
 }

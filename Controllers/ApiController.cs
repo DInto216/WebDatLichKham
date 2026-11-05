@@ -24,6 +24,7 @@ namespace WebDatLichKham.Controllers
         private readonly IAccountService _accountService;
         private readonly IMedicalHistoryService _medicalHistoryService;
         private readonly IDoctorReviewService _doctorReviewService;
+        private readonly IAiConsultantService _aiConsultantService;
 
         public ApiController(
             ISpecialtyService specialtyService,
@@ -33,7 +34,8 @@ namespace WebDatLichKham.Controllers
             IDashboardService dashboardService,
             IAccountService accountService,
             IMedicalHistoryService medicalHistoryService,
-            IDoctorReviewService doctorReviewService)
+            IDoctorReviewService doctorReviewService,
+            IAiConsultantService aiConsultantService)
         {
             _specialtyService = specialtyService;
             _doctorService = doctorService;
@@ -43,6 +45,7 @@ namespace WebDatLichKham.Controllers
             _accountService = accountService;
             _medicalHistoryService = medicalHistoryService;
             _doctorReviewService = doctorReviewService;
+            _aiConsultantService = aiConsultantService;
         }
 
         // ============================================
@@ -231,6 +234,49 @@ namespace WebDatLichKham.Controllers
             // Xắp xếp mới nhất lên đầu
             var sortedList = list.OrderByDescending(a => a.Date).ThenByDescending(a => a.Time).ToList();
             return Ok(sortedList);
+        }
+
+        /// <summary>
+        /// [BỆNH NHÂN]: Hủy lịch hẹn trực tuyến qua mã đặt lịch và số điện thoại xác thực.
+        /// </summary>
+        [HttpPost("appointments/cancel")]
+        [IgnoreAntiforgeryToken]
+        public async Task<IActionResult> CancelAppointmentByPatient([FromBody] PatientCancelAppointmentRequest request)
+        {
+            if (request == null || string.IsNullOrWhiteSpace(request.BookingId) || string.IsNullOrWhiteSpace(request.Phone))
+            {
+                return BadRequest(new { message = "Thiếu thông tin mã đặt lịch hoặc số điện thoại." });
+            }
+
+            var (success, message, data) = await _appointmentService.CancelByPatientAsync(request.BookingId, request.Phone, request.Reason);
+            if (!success)
+            {
+                return BadRequest(new { message });
+            }
+
+            return Ok(new { message, data });
+        }
+
+        /// <summary>
+        /// [BỆNH NHÂN]: Đổi ngày giờ khám trực tuyến qua mã đặt lịch và số điện thoại xác thực.
+        /// </summary>
+        [HttpPost("appointments/reschedule")]
+        [IgnoreAntiforgeryToken]
+        public async Task<IActionResult> RescheduleAppointmentByPatient([FromBody] PatientRescheduleAppointmentRequest request)
+        {
+            if (request == null || string.IsNullOrWhiteSpace(request.BookingId) || string.IsNullOrWhiteSpace(request.Phone) ||
+                string.IsNullOrWhiteSpace(request.NewDate) || string.IsNullOrWhiteSpace(request.NewTime))
+            {
+                return BadRequest(new { message = "Vui lòng nhập đầy đủ mã đặt lịch, số điện thoại, ngày khám và giờ khám mới." });
+            }
+
+            var (success, message, data) = await _appointmentService.RescheduleByPatientAsync(request.BookingId, request.Phone, request.NewDate, request.NewTime);
+            if (!success)
+            {
+                return BadRequest(new { message });
+            }
+
+            return Ok(new { message, data });
         }
 
         [Authorize(Roles = "admin")]
@@ -605,6 +651,32 @@ namespace WebDatLichKham.Controllers
             {
                 return StatusCode(500, new { message = "Lỗi hệ thống khi tải ảnh: " + ex.Message });
             }
+        }
+
+        // ============================================
+        // AI CONSULTANT (Google Gemini / MediBot)
+        // ============================================
+
+        /// <summary>
+        /// API Tư vấn sức khỏe, sàng lọc triệu chứng và gợi ý chuyên khoa / bác sĩ đặt lịch bằng AI.
+        /// Bỏ qua kiểm tra CSRF để người dùng khách (Guest) có thể trò chuyện trực tiếp từ mọi thiết bị.
+        /// </summary>
+        [HttpPost("ai/consult")]
+        [IgnoreAntiforgeryToken]
+        public async Task<IActionResult> ConsultAi([FromBody] AiConsultRequest request)
+        {
+            var result = await _aiConsultantService.ConsultAsync(request);
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Lấy thông tin cấu hình AI (không để lộ API key).
+        /// </summary>
+        [HttpGet("ai/config")]
+        public IActionResult GetAiConfig()
+        {
+            var info = _aiConsultantService.GetConfigInfo();
+            return Ok(info);
         }
     }
 }

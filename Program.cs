@@ -36,6 +36,8 @@ builder.Services.AddScoped<WebDatLichKham.Services.IAccountService, WebDatLichKh
 builder.Services.AddScoped<WebDatLichKham.Services.IMedicalHistoryService, WebDatLichKham.Services.MedicalHistoryService>();
 builder.Services.AddScoped<WebDatLichKham.Services.IDoctorReviewService, WebDatLichKham.Services.DoctorReviewService>();
 builder.Services.AddScoped<WebDatLichKham.Services.IEmailService, WebDatLichKham.Services.SmtpEmailService>();
+builder.Services.AddHttpClient("GeminiClient");
+builder.Services.AddScoped<WebDatLichKham.Services.IAiConsultantService, WebDatLichKham.Services.GeminiAiService>();
 
 // BẢO MẬT: Cấu hình Cookie Authentication cho quản lý phiên đăng nhập
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

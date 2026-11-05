@@ -139,6 +139,20 @@ const API = (() => {
     return await request(`/api/appointments/lookup?${params.toString()}`);
   };
 
+  const cancelAppointment = async (data) => {
+    return await request('/api/appointments/cancel', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  };
+
+  const rescheduleAppointment = async (data) => {
+    return await request('/api/appointments/reschedule', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  };
+
   // ---- Accounts ----
   const getAccounts = async () => {
     return await request('/api/accounts');
@@ -304,8 +318,22 @@ const API = (() => {
     return result;
   };
 
+  // ---- AI Consultant ----
+  const consultAi = async (data) => {
+    return await request('/api/ai/consult', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  };
+
+  const getAiConfig = async () => {
+    return await request('/api/ai/config');
+  };
+
   // ---- Public API ----
   return {
+    consultAi,
+    getAiConfig,
     getSpecialties,
     addSpecialty,
     updateSpecialty,
@@ -320,6 +348,8 @@ const API = (() => {
     createAppointment,
     updateAppointmentStatus,
     lookupAppointment,
+    cancelAppointment,
+    rescheduleAppointment,
     getAccounts,
     createAccount,
     deleteAccount,

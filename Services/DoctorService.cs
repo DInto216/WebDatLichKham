@@ -147,17 +147,34 @@ namespace WebDatLichKham.Services
             var doctor = await _context.Doctors.AsNoTracking().FirstOrDefaultAsync(d => d.Id == doctorId);
             if (doctor == null) return new List<string>();
 
-            var schedule = JsonSerializer.Deserialize<Dictionary<string, List<string>>>(doctor.ScheduleJson ?? "{}");
+            var defaultSlots = new List<string> { "08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "11:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30" };
+            List<string> workingSlots = new List<string>(defaultSlots);
 
-            if (DateTime.TryParse(date, out DateTime parsedDate))
+            if (!string.IsNullOrWhiteSpace(doctor.ScheduleJson) && doctor.ScheduleJson != "{}")
             {
-                string dayOfWeek = parsedDate.DayOfWeek.ToString().ToLower();
-                if (schedule != null && schedule.ContainsKey(dayOfWeek))
+                try
                 {
-                    return schedule[dayOfWeek];
+                    var schedule = JsonSerializer.Deserialize<Dictionary<string, List<string>>>(doctor.ScheduleJson);
+                    if (DateTime.TryParse(date, out DateTime parsedDate))
+                    {
+                        string dayOfWeek = parsedDate.DayOfWeek.ToString().ToLower();
+                        if (schedule != null && schedule.ContainsKey(dayOfWeek) && schedule[dayOfWeek].Count > 0)
+                        {
+                            workingSlots = schedule[dayOfWeek];
+                        }
+                    }
                 }
+                catch {}
             }
-            return new List<string>();
+
+            // Lấy danh sách giờ đã có bệnh nhân đặt trong ngày này (loại trừ các ca đã hủy)
+            var bookedTimes = await _context.Appointments.AsNoTracking()
+                .Where(a => a.DoctorId == doctorId && a.Date == date && a.Status != "cancelled")
+                .Select(a => a.Time)
+                .ToListAsync();
+
+            // Trả về các khung giờ còn trống
+            return workingSlots.Where(s => !bookedTimes.Contains(s)).ToList();
         }
 
         private void InvalidateCache()

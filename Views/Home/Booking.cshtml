@@ -757,7 +757,7 @@
         }
       };
 
-      const init = () => {
+      const init = async () => {
         const dateInput = document.getElementById('bookingDate');
         const today = new Date();
         const nextMonth = new Date();
@@ -766,9 +766,28 @@
         dateInput.min = today.toISOString().split('T')[0];
         dateInput.max = nextMonth.toISOString().split('T')[0];
 
-        loadSpecialties();
-        loadDoctors();
-        loadPaymentSettings();
+        await Promise.all([loadSpecialties(), loadDoctors(), loadPaymentSettings()]);
+
+        // Tự động chọn bác sĩ hoặc chuyên khoa nếu được điều hướng từ AI Chatbot / Trang chi tiết
+        const urlParams = new URLSearchParams(window.location.search);
+        const docParam = urlParams.get('doctor') || urlParams.get('doctorId');
+        const spParam = urlParams.get('specialty') || urlParams.get('specialtyId');
+
+        if (spParam) {
+          const select = document.getElementById('filterSpecialty');
+          const matchSp = specialties.find(s => s.id === spParam || s.name.toLowerCase() === spParam.toLowerCase());
+          if (matchSp && select) {
+            select.value = matchSp.name;
+            filterDoctors();
+          }
+        }
+
+        if (docParam) {
+          const targetDoc = doctors.find(d => d.id === docParam);
+          if (targetDoc) {
+            selectDoctor(targetDoc.id);
+          }
+        }
       };
 
       return {
