@@ -1,4 +1,4 @@
-/* ============================================================
+﻿/* ============================================================
    MEDIBOT AI CHATBOT - CLIENT LOGIC (Google Gemini Powered)
    ============================================================ */
 
@@ -111,6 +111,7 @@ const AiAssistant = (() => {
 
     // Cache DOM refs
     dom.window = document.getElementById('aiChatWindow');
+    dom.fabContainer = document.getElementById('aiFabContainer');
     dom.fabBtn = document.getElementById('aiFabBtn');
     dom.tooltip = document.getElementById('aiFabTooltip');
     dom.btnClose = document.getElementById('aiBtnClose');
@@ -158,6 +159,7 @@ const AiAssistant = (() => {
     isOpen = true;
     dom.window.classList.add('open');
     dom.window.setAttribute('aria-hidden', 'false');
+    if (dom.fabContainer) dom.fabContainer.classList.add('chat-open');
     if (dom.tooltip) dom.tooltip.style.display = 'none';
     setTimeout(() => {
       dom.input.focus();
@@ -168,6 +170,7 @@ const AiAssistant = (() => {
     isOpen = false;
     dom.window.classList.remove('open');
     dom.window.setAttribute('aria-hidden', 'true');
+    if (dom.fabContainer) dom.fabContainer.classList.remove('chat-open');
   };
 
   const resetChat = () => {
