@@ -553,6 +553,37 @@ namespace WebDatLichKham.Services
                     "Phòng khám có chấp nhận thẻ BHYT không?"
                 });
             }
+// 13.5. Hỏi về Khám sức khỏe tổng quát hoặc Danh sách bác sĩ / chuyên môn
+            else if (MatchAny(q, nq, "tổng quát", "tong quat", "danh sách bác sĩ", "danh sach bac si",
+                              "bác sĩ chuyên môn", "bac si chuyen mon", "có những bác sĩ nào", "co nhung bac si nao",
+                              "bác sĩ nào", "bac si nao", "đội ngũ bác sĩ", "doi ngu bac si", "chuyên môn nào", "chuyen mon nao", "bác sĩ", "bac si"))
+            {
+                matchedSpecialty = specialties.FirstOrDefault(s => s.Name.Contains("Nội")) ?? specialties.FirstOrDefault();
+                reply.AppendLine("Chào bạn! Phòng khám Đa khoa **MediBooking** cung cấp dịch vụ **Khám sức khỏe tổng quát định kỳ** toàn diện cùng đội ngũ bác sĩ đầu ngành giàu kinh nghiệm.");
+                reply.AppendLine();
+                reply.AppendLine("📋 **Danh mục gói khám sức khỏe tổng quát:**");
+                reply.AppendLine("- **Khám lâm sàng:** Đo dấu hiệu sinh tồn, khám Nội tổng quát, tầm soát Tai Mũi Họng, Mắt, Răng Hàm Mặt.");
+                reply.AppendLine("- **Xét nghiệm:** Công thức máu, đường huyết, mỡ máu (Lipid panel), men gan (AST/ALT), chức năng thận (Ure/Creatinin).");
+                reply.AppendLine("- **Chẩn đoán hình ảnh:** Chụp X-quang tim phổi thẳng, Siêu âm ổ bụng tổng quát, đo điện tim (ECG).");
+                reply.AppendLine();
+                reply.AppendLine("👨‍⚕️ **Đội ngũ Bác sĩ chuyên môn đang công tác tại phòng khám:**");
+                foreach (var doc in doctors.Take(6))
+                {
+                    var prefix = (doc.AcademicTitle + " " + doc.Degree).Trim();
+                    var title = string.IsNullOrEmpty(prefix) ? "BS." : prefix;
+                    reply.AppendLine($"- **{title} {doc.Name}** – Chuyên khoa *{doc.SpecialtyName}* ({doc.Experience}).");
+                }
+                reply.AppendLine();
+                reply.AppendLine("💡 **Lưu ý khi đi khám:** Bạn nên nhịn ăn sáng từ 6 - 8 tiếng trước khi lấy máu và uống nước lọc đầy đủ để kết quả xét nghiệm đạt độ chính xác cao nhất.");
+
+                followUps.AddRange(new[]
+                {
+                    "Cần chuẩn bị gì trước khi lấy máu xét nghiệm?",
+                    "Chi phí gói khám tổng quát là bao nhiêu?",
+                    "Đặt lịch khám tổng quát với bác sĩ Nội"
+                });
+            }
+
             // 14. Mặc định: Nội tổng quát
             else
             {
