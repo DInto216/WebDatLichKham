@@ -167,15 +167,6 @@ Truy cập: `https://localhost:7xxx` (xem port trong terminal)
 
 ---
 
-## 👥 Tài khoản mặc định
-
-| Vai trò | Email | Mật khẩu |
-|---------|-------|----------|
-| **Admin** | admin@medibooking.com | Admin@123 |
-| **Bác sĩ** | *(xem trong DbSeeder)* | Doctor@123 |
-
----
-
 ## 📱 Quy trình sử dụng
 
 ### Bệnh nhân đặt lịch khám
